@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<script defer src="./offline-sync.js?v=20261008-2050"></script>
+<script defer src="./offline-paket.js?v=20261009-0030"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0b1a27">
+<title>KOD Güvenlik Sistemleri - Giriş Paneli</title>
+
+<script>
+  const savedTheme = localStorage.getItem('kolart-theme-tone') || 'elite-neon';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+</script>
+
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://securetoken.googleapis.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="qr Devriye">
+
+<link rel="apple-touch-icon" sizes="57x57" href="apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="icon-120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+
+<meta name="msapplication-TileColor" content="#0a1a2e">
+<meta name="msapplication-TileImage" content="ms-icon-144x144.png">
+<meta name="theme-color" content="#0a1a2e">
+
+<style>
+/* --- SABİT DEĞERLER --- */
+:root {
+  color-scheme: dark;
+  --cga-text-main: #ffffff;
+  --cga-gold: #f1c40f; 
+  --cga-border-soft: rgba(255,255,255,0.08);
+}
+
+/* --- TEMA RENKLERİ --- */
+/* 1. Elite Neon (Varsayılan) */
+html[data-theme=elite-neon] {
+  --cga-bg-main: #000000;
+  --cga-bg-secondary: #080808;
+  --cga-neon: #CCFF00;
+  --cga-neon-dark: #b8e600;
+  --cga-card-bg: rgba(255,255,255,0.03);
+  --cga-glow: rgba(204, 255, 0, 0.08);
+  --cga-shadow: rgba(204, 255, 0, 0.4);
+}
+
+/* 2. Cyber Cyan Tema */
+html[data-theme=cyber-cyan] {
+  --cga-bg-main: #050A0C;
+  --cga-bg-secondary: #0A1013;
+  --cga-neon: #00E5FF;
+  --cga-neon-dark: #00b8cc;
+  --cga-card-bg: rgba(0, 229, 255, 0.05);
+  --cga-glow: rgba(0, 229, 255, 0.08);
+  --cga-shadow: rgba(0, 229, 255, 0.4);
+}
+
+/* 3. Hex Purple Tema */
+html[data-theme=hex-purple] {
+  --cga-bg-main: #08050a;
+  --cga-bg-secondary: #0c0a0e;
+  --cga-neon: #bd00ff;
+  --cga-neon-dark: #8a00cc;
+  --cga-card-bg: rgba(189, 0, 255, 0.05);
+  --cga-glow: rgba(189, 0, 255, 0.08);
+  --cga-shadow: rgba(189, 0, 255, 0.4);
+}
+
+/* 4. Deep Orange Tema */
+html[data-theme=deep-orange] {
+  --cga-bg-main: #0a0805;
+  --cga-bg-secondary: #0e0c0a;
+  --cga-neon: #ff5500;
+  --cga-neon-dark: #cc4400;
+  --cga-card-bg: rgba(255, 85, 0, 0.05);
+  --cga-glow: rgba(255, 85, 0, 0.08);
+  --cga-shadow: rgba(255, 85, 0, 0.4);
+}
+
+/* 5. Electric Blue Tema */
+html[data-theme=electric-blue] {
+  --cga-bg-main: #050608;
+  --cga-bg-secondary: #0a0b0d;
+  --cga-neon: #0066ff;
+  --cga-neon-dark: #004ecc;
+  --cga-card-bg: rgba(0, 102, 255, 0.05);
+  --cga-glow: rgba(0, 102, 255, 0.08);
+  --cga-shadow: rgba(0, 102, 255, 0.4);
+}
+
+/* 6. Matrix Green Tema */
+html[data-theme=matrix-green] {
+  --cga-bg-main: #050805;
+  --cga-bg-secondary: #0a0d0a;
+  --cga-neon: #00ff66;
+  --cga-neon-dark: #00cc52;
+  --cga-card-bg: rgba(0, 255, 102, 0.05);
+  --cga-glow: rgba(0, 255, 102, 0.08);
+  --cga-shadow: rgba(0, 255, 102, 0.4);
+}
+
+/* 7. Ruby Red Tema */
+html[data-theme=ruby-red] {
+  --cga-bg-main: #080506;
+  --cga-bg-secondary: #0d0a0b;
+  --cga-neon: #ff0055;
+  --cga-neon-dark: #cc0044;
+  --cga-card-bg: rgba(255, 0, 85, 0.05);
+  --cga-glow: rgba(255, 0, 85, 0.08);
+  --cga-shadow: rgba(255, 0, 85, 0.4);
+}
+
+/* --- GENEL YAPISAL STİLLER --- */
+html, body {
+  margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
+  font-family: 'Montserrat', sans-serif;
+  display: flex; justify-content: center; align-items: center;
+  /* Arkaplan parlaması dinamik değişkene bağlandı */
+  background: radial-gradient(circle at top, var(--cga-glow), transparent 40%),
+              linear-gradient(135deg, var(--cga-bg-main), var(--cga-bg-secondary));
+  color: var(--cga-text-main);
+  -webkit-touch-callout: none;
+  transition: background 0.3s ease;
+}
+
+.container {
+  width: 380px;
+  padding: 40px 30px 70px;
+  border-radius: 26px;
+  background: var(--cga-card-bg);
+  backdrop-filter: blur(22px);
+  box-shadow: 0 0 0 1px var(--cga-border-soft), 0 20px 50px rgba(0,0,0,0.7);
+  text-align: center;
+  transform: translateY(-20px);
+  transition: background 0.3s ease;
+}
+
+h1 { font-size:26px; font-weight:800; color: var(--cga-gold); margin-bottom:8px; cursor:pointer; }
+
+.site-name{
+  display:none; font-size:28px; font-weight:800; letter-spacing:1px; margin:1px 0 18px;
+  color: var(--cga-neon); 
+  text-shadow: 0 0 10px var(--cga-shadow), 0 0 25px var(--cga-glow);
+  transition: color 0.3s ease;
+}
+
+.input-group { display:none; flex-direction:column; text-align:left; margin-bottom:28px; }
+.input-group.active { display:flex; }
+
+input[type="text"], input[type="password"] { width:100%; padding:12px; margin:8px 0; border-radius:12px; border:none; background: rgba(255,255,255,0.1); color:white; font-size:14px;}
+input::placeholder { color: rgba(236,240,241,0.6); }
+
+.remember {display:flex; align-items:center; gap:8px; font-size:14px; margin-top:8px;}
+.remember input[type="checkbox"] { cursor:pointer; accent-color: var(--cga-neon); }
+.remember label { cursor:pointer; color:#fff; }
+
+.loginBtn {
+  width: 150px;
+  padding: 13px;
+  border: none;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  margin-bottom: 0;
+  background: linear-gradient(90deg, var(--cga-neon-dark), var(--cga-neon));
+  box-shadow: 0 6px 20px var(--cga-shadow);
+  transition: 0.25s;
+  color: #000;
+}
+.loginBtn:hover {
+  background: linear-gradient(90deg, var(--cga-neon), var(--cga-neon-dark));
+  transform: translateY(-2px) scale(1.05);
+}
+
+.message {
+  margin-top:15px;
+  margin-bottom:40px;
+  color:#e74c3c;
+  font-weight:600;
+  text-align:center;
+  min-height:20px;
+}
+
+.cga-logo { 
+  width: 220px; 
+  max-width: 70%; 
+  display: block; 
+  margin: 55px auto 0; 
+  filter: drop-shadow(0 0 12px rgba(241, 196, 15, 0.15));
+}
+
+/* --- YENİ NESİL ALT İMZA (FOOTER) --- */
+.corner-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 25px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  color: rgba(241, 196, 15, 0.7);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  text-transform: uppercase;
+  user-select: none;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.corner-bottom span {
+  color: #f1c40f;
+  text-shadow: 0 0 8px rgba(241, 196, 15, 0.3);
+  margin: 0 4px;
+}
+.corner-top {
+  position: fixed;
+  top: 10px;
+  right: 152px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--cga-gold); 
+  opacity: 1; 
+  text-shadow: 0 0 5px rgba(241, 196, 15, 0.4);
+  user-select: none;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.offline-mode-btn {
+  position: fixed;
+  top: max(10px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 14px;
+  border: 1px solid var(--cga-neon);
+  border-radius: 13px;
+  background: var(--cga-bg-secondary);
+  color: var(--cga-neon);
+  font: 700 12px 'Montserrat', sans-serif;
+  text-decoration: none;
+  box-shadow: 0 4px 18px var(--cga-glow);
+  cursor: pointer;
+}
+.offline-mode-btn:hover, .offline-mode-btn:focus-visible {
+  background: var(--cga-neon);
+  color: #000;
+}
+
+.securityText{
+  font-size:16px; font-weight:700; color: var(--cga-gold); margin-bottom:20px; cursor:pointer; text-align:center;
+  padding:8px 0; letter-spacing:0.5px; transition:0.25s;
+}
+.securityText:hover{ transform: scale(1.06); color:#f7d35e; }
+
+#qr-reader {
+  width: 95vw;
+  height: 70vh;
+  max-width: 600px;
+  max-height: 600px;
+  margin: auto;
+  border-radius: 12px;
+  background: #000;
+}
+
+.modal-content { max-width: 95%; }
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal.hidden { display: none; }
+
+.modal-box {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 12px;
+  width: 85%;
+  max-width: 320px;
+  text-align: center;
+  color: #fff;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+#cancelDisconnect { background: #555; color: #fff; }
+#confirmDisconnect { background: #e74c3c; color: #fff; }
+
+.disconnect-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+.disconnect-modal.hidden { display: none; }
+
+* { -webkit-user-select: none; -ms-user-select: none; user-select: none; }
+input, textarea {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  -webkit-touch-callout: default;
+  pointer-events: auto;
+}
+
+.choiceBtn {
+  flex:1;
+  border:none;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
+  background: rgba(255,255,255,0.1);
+  color:#fff;
+  transition:0.25s;
+}
+.choiceBtn:hover { background: var(--cga-glow); transform: scale(1.05); }
+.choiceBtn.active { background: linear-gradient(90deg, var(--cga-neon-dark), var(--cga-neon)); color:#000; }
+
+.modal { position: fixed; inset:0; background: rgba(0,0,0,0.55); display:flex; align-items:center; justify-content:center; z-index:9999; transition:0.3s; }
+.modal.hidden { display:none; }
+.modal-box { background:#1e1e1e; border-radius:12px; color:#fff; }
+
+/* GİRİŞ YAP BUTONU */
+#secLoginBtn {
+    width: 80%;
+    max-width: 280px;
+    padding: 16px 0;
+    margin: 25px auto 0;
+    display: block;
+    
+    font-size: 18px;
+    font-weight: 900; 
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: 'Montserrat', sans-serif;
+    
+    background-color: var(--cga-neon); 
+    color: #000000; 
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    
+    box-shadow: 0 0 15px var(--cga-shadow), 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+#secLoginBtn:hover {
+    transform: translateY(-4px) scale(1.02);
+    background-color: var(--cga-neon-dark); 
+    box-shadow: 0 0 25px var(--cga-shadow), 0 15px 40px rgba(0, 0, 0, 0.6);
+}
+
+#secLoginBtn:active {
+    transform: scale(0.96);
+    box-shadow: 0 0 10px var(--cga-shadow);
+}
+
+#secLoginBtn::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 20%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.4);
+    transform: rotate(30deg);
+    transition: all 0.6s;
+    opacity: 0.1;
+}
+
+#secLoginBtn:hover::after {
+    left: 120%;
+}
+
+#secLoginBtn:disabled {
+    background: #1a1a1a !important;
+    color: #444 !important;
+    box-shadow: none !important;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* --- HAVALI DÖNEN DESTEK PANELİ --- */
+.support-wrapper {
+  position: fixed;
+  bottom: 30px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 15px;
+  pointer-events: none; 
+}
+
+.support-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  opacity: 0;
+  transform: translateY(20px) scale(0) rotate(-180deg);
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  pointer-events: none;
+}
+
+.support-wrapper.active .support-item {
+  opacity: 1;
+  transform: translateY(0) scale(1) rotate(0deg);
+  pointer-events: auto;
+}
+
+.support-label {
+  background: rgba(11, 26, 39, 0.9);
+  color: #f1c40f;
+  padding: 5px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  border: 1px solid rgba(241, 196, 15, 0.3);
+}
+
+.support-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+  color: white;
+}
+
+.btn-whatsapp-icon { background: #25D366; }
+.btn-call-icon { background: #3498db; }
+
+.main-support-btn {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f1c40f, #d4ac0d);
+  color: #0b1a27;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 9px;
+  box-shadow: 0 8px 25px rgba(241, 196, 15, 0.5);
+  transition: 0.4s;
+  pointer-events: auto;
+}
+
+.main-support-btn span.emoji { font-size: 24px; margin-bottom: -2px; }
+
+.support-wrapper.active .main-support-btn {
+  transform: rotate(135deg);
+  background: #e74c3c;
+  color: #fff;
+}
+
+/* Şifre kutusunun konumunu ayarla */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Göz ikonunun stili - Renk temaya bağlandı */
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--cga-neon);
+  font-size: 18px;
+  z-index: 10;
+  user-select: none;
+  transition: color 0.3s ease;
+}
+/* Girişte kullanıcı onayı; bu stiller yalnız index sayfasına aittir. */
+.index-transfer[hidden], .index-transfer [hidden] { display: none !important; }
+.index-transfer {
+  position: fixed; inset: 0; z-index: 2147483647; display: grid; place-items: center;
+  padding: max(18px, env(safe-area-inset-top)) 18px max(18px, env(safe-area-inset-bottom));
+  box-sizing: border-box; background: rgba(2, 8, 12, .88); backdrop-filter: blur(16px);
+  color: #edf5f2; font-family: 'Montserrat', Arial, sans-serif;
+}
+.index-transfer *, .index-transfer *::before, .index-transfer *::after { box-sizing: border-box; }
+body.index-transfer-open #kolartSyncModal { display: none !important; }
+.it-card {
+  width: min(100%, 460px); max-height: calc(100dvh - 40px); overflow: auto; overscroll-behavior: contain;
+  border: 1px solid rgba(216, 231, 207, .18); border-radius: 28px; padding: 28px;
+  background: radial-gradient(ellipse at 100% 0, #40563c55, transparent 55%), linear-gradient(150deg, #172a29, #0e1b20);
+  box-shadow: 0 32px 100px #0009; text-align: left;
+}
+.it-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 24px; }
+.it-brand { font-size: 10px; font-weight: 800; letter-spacing: 1.7px; color: #d6dcb8; }
+.it-private { display: flex; align-items: center; gap: 5px; color: #9facab; font-size: 10px; white-space: nowrap; }
+.it-symbol {
+  display: grid; place-items: center; width: 62px; height: 62px; border-radius: 20px;
+  background: #d6dcb812; border: 1px solid #d6dcb833; color: #e2e9bc; margin-bottom: 20px;
+}
+.it-symbol svg { width: 30px; height: 30px; }
+.it-card h2 { color: #f6faf8; font-size: 25px; line-height: 1.3; letter-spacing: -.8px; margin: 0 0 12px; }
+.it-copy { color: #b8c9c8; font-size: 13px; line-height: 1.75; margin: 0 0 20px; }
+.it-summary { display: flex; align-items: center; gap: 13px; padding: 16px; border-radius: 16px; background: #ffffff05; border: 1px solid #ffffff0a; margin-bottom: 12px; }
+.it-count { font-size: 34px; font-weight: 700; color: #e2e9bc; line-height: 1; font-variant-numeric: tabular-nums; }
+.it-summary-label { color: #d3dfdc; font-size: 12px; font-weight: 700; }
+.it-account { color: #95aba8; font-size: 11px; line-height: 1.6; margin-top: 5px; overflow-wrap: anywhere; }
+.it-dates { max-height: 146px; overflow: auto; scrollbar-width: thin; margin-bottom: 18px; }
+.it-date { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 3px; border-bottom: 1px solid #ffffff0c; font-size: 12px; }
+.it-date span { color: #bdcfcb; }.it-date strong { color: #e7ede3; white-space: nowrap; font-weight: 600; }
+.it-warning { display: flex; align-items: flex-start; gap: 10px; color: #e6dcb5; background: #c9ac5d0c; border: 1px solid #d1b96425; padding: 14px; border-radius: 14px; }
+.it-warning svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; }
+.it-warning p { margin: 0; font-size: 11px; line-height: 1.8; }
+.it-auth { margin-top: 18px; }
+.it-auth label { display: block; color: #d3dfdc; font-size: 12px; font-weight: 700; }
+.it-auth p { color: #a6bfbc; font-size: 11px; line-height: 1.7; margin: 8px 0 10px; }
+.it-auth input { display: block; width: 100%; max-width: none; margin: 0; padding: 14px; border: 1px solid #ffffff25; border-radius: 12px; background: #ffffff08; color: #edf5f2; font: 16px 'Montserrat', Arial, sans-serif; text-align: left; }
+.it-auth input:focus-visible { outline: 2px solid #d6dcb8; outline-offset: 3px; }
+.it-progress { margin-top: 20px; }.it-progress-row { display: flex; justify-content: space-between; gap: 12px; font-size: 11px; color: #adbfbc; margin-bottom: 10px; }
+.it-progress-row strong { color: #edf5f2; font-variant-numeric: tabular-nums; }
+.it-track { overflow: hidden; height: 9px; border-radius: 12px; background: #ffffff0c; }
+.it-bar { height: 100%; width: 0; border-radius: 12px; background: linear-gradient(90deg, #d6dcb8, #83d4ac); transition: width .2s ease; }
+.it-step { color: #a6bfbc; font-size: 11px; line-height: 1.7; margin: 10px 0 0; }
+.it-actions { display: flex; flex-direction: column; gap: 9px; margin-top: 22px; }
+.it-actions button { width: 100%; border: 0; border-radius: 14px; padding: 15px; font: 700 12px 'Montserrat', Arial, sans-serif; cursor: pointer; }
+.it-primary { color: #142522; background: linear-gradient(110deg, #e2e9bc, #a1d9b9); box-shadow: 0 7px 22px #9fcaad10; }
+.it-secondary { color: #b9ceca; background: #ffffff05; border: 1px solid #ffffff12 !important; }
+.it-actions button:focus-visible { outline: 2px solid #d6dcb8; outline-offset: 4px; }
+.it-actions button:disabled { opacity: .55; cursor: wait; }
+.it-foot { display: flex; align-items: center; justify-content: center; gap: 6px; color: #8ea6a1; font-size: 10px; line-height: 1.6; text-align: center; margin: 16px 0 0; }
+.it-card[data-state='success'] .it-symbol { color: #8edeb4; background: #7ed8a714; border-color: #7ed8a740; }
+.it-card[data-state='error'] .it-symbol { color: #edce8b; }
+@media (max-width: 420px) { .it-card { padding: 23px 20px; border-radius: 23px; }.it-card h2 { font-size: 22px; }.it-top { margin-bottom: 20px; } }
+@media (prefers-reduced-motion: reduce) { .it-bar { transition: none; } }
+
+</style>
+</head>
+<body>
+<a id="offlineModeBtn" class="offline-mode-btn" href="./offline-devriye.html" aria-label="Offline Mod: çevrimdışı devriye sayfasını aç">📴 Offline Mod</a>
+<div class="container">
+    <img src="logo.png" class="cga-logo" alt="CGA Logo">
+
+    <div id="qrButtonsWrapper" style="display:flex; gap:8px; justify-content:center; align-items:center; background: rgba(255,255,255,0.05); padding:6px 8px; border-radius:12px; max-width:300px; margin:auto;">
+        <button id="startQR" class="choiceBtn active" style="font-size:14px; padding:6px 10px;">📷 QR Kodu Okut</button>
+        <button id="enterCode" class="choiceBtn" style="font-size:14px; padding:6px 10px;">⌨️ Kod Gir</button>
+    </div>
+
+    <div style="margin-top:10px; text-align:center;">
+        <div id="siteName" class="site-name" style="font-size:24px;"></div>
+        <div id="qrMessage" style="margin-top:4px; color:#f1c40f; font-size:14px;"></div>
+    </div>
+
+    <div id="codeModal" class="modal hidden">
+        <div class="modal-box" style="padding:20px; max-width:300px; text-align:center;">
+            <h3 style="margin-bottom:12px; color:#f1c40f;">Site Kodunu Gir</h3>
+            <input id="codeInput" type="text" maxlength="4" placeholder="0000" style="width:60%; padding:8px; border-radius:8px; border:none; text-align:center; font-size:16px; margin-bottom: 15px;">
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <button id="codeCancel" class="loginBtn" style="padding:6px 12px; font-size:14px; background: #7f8c8d; color: white; box-shadow: none;">İptal</button>
+                <button id="codeConfirm" class="loginBtn" style="padding:6px 12px; font-size:14px;">Onayla</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="qrModal" class="modal hidden">
+        <div class="modal-content">
+            <div id="qr-reader"></div>
+            <button id="closeQRModal" class="loginBtn" style="background:#e74c3c; color:white; box-shadow:none;">Kapat</button>
+        </div>
+    </div>
+
+    <div class="securityText" id="securityBtn">🔐 Güvenlik Girişi</div>
+
+    <div id="securityGroup" class="input-group active">
+        <input type="text" id="secUsername" placeholder="Ad Soyad">
+        <input type="password" id="secPassword" placeholder="Şifre">
+        <div class="remember">
+            <input type="checkbox" id="secRemember">
+            <label for="secRemember">Kullanıcıyı hatırla</label>
+        </div>
+        <button class="loginBtn" id="secLoginBtn">Giriş Yap</button>
+    </div>
+
+    <div class="message" id="message"></div>
+</div>
+
+<div class="corner-bottom">© 2026 CGA Güvenlik Sistemleri</div>
+<div class="corner-top">v1.2.1</div>
+
+<button id="installBtn" class="install-btn" style="position: fixed; top: 12px; left: 12px; display:none; z-index:500;">📲 Uygulamayı Yükle</button>
+
+<div id="authErrorModal" style="display:none; position:fixed; inset:0; z-index:100010; background:rgba(0,0,0,0.85); backdrop-filter:blur(10px); align-items:center; justify-content:center;">
+    <div style="background:rgba(15, 15, 15, 0.95); padding:30px; border-radius:20px; width:90%; max-width:340px; text-align:center; border:1px solid #e74c3c; box-shadow:0 10px 40px rgba(231, 76, 60, 0.3);">
+        <div style="font-size: 40px; margin-bottom: 10px;">⚠️</div>
+        <h3 style="color:#e74c3c; margin-top:0; margin-bottom:12px; font-size:20px; font-weight: 800;">Giriş Başarısız</h3>
+        <p id="authErrorText" style="color:#ecf0f1; font-size:14px; line-height:1.6; margin-bottom:25px;">Hata mesajı buraya gelecek.</p>
+        <button onclick="document.getElementById('authErrorModal').style.display='none'" style="width:100%; padding:14px; font-size:15px; font-weight:700; background:rgba(231, 76, 60, 0.15); color:#e74c3c; border:1px solid #e74c3c; border-radius:12px; cursor:pointer; transition: 0.2s;">
+            Tekrar Dene
+        </button>
+    </div>
+</div>
+
+<div id="disconnectModal" class="modal hidden disconnect-modal">
+    <div class="modal-box">
+        <p>Proje bağlantısından ayrılmak istiyor musunuz?</p>
+        <div class="modal-actions">
+            <button id="cancelDisconnect">İptal</button>
+            <button id="confirmDisconnect">Ayrıl</button>
+        </div>
+    </div>
+</div>
+
+<div id="noProjectModal" class="modal hidden" style="position:fixed; inset:0; background:rgba(11,26,39,0.9); z-index:100005; display:none; align-items:center; justify-content:center;">
+    <div class="modal-box" style="background:rgba(255,255,255,0.06); backdrop-filter:blur(22px); padding:35px 25px; border-radius:24px; width:90%; max-width:380px; text-align:center; border:1px solid rgba(255,255,255,0.1); box-shadow:0 25px 60px rgba(0,0,0,0.6);">
+        <div style="font-size: 45px; margin-bottom: 15px;">⚠️</div>
+        <h3 style="color:#f1c40f; margin-bottom:12px; font-size:22px; font-weight:800; letter-spacing:0.5px;">Proje Bağlantısı Bulunamadı</h3>
+        <p style="color:#ecf0f1; font-size:14px; line-height:1.6; margin-bottom:25px; text-align:center; opacity:0.9;">
+            Sisteme giriş yapmak için size verilen <strong style="color:#fff;">4 haneli proje kodunu</strong> girmelisiniz.<br><br>
+            Eğer kodunuzu bilmiyorsanız, aşağıdaki <strong>Destek Al</strong> butonuna tıklayarak WhatsApp üzerinden hızlıca talep edebilirsiniz.
+        </p>
+        <div style="display:flex; flex-direction:column; gap:12px; width: 100%;">
+            <button id="noProjectEnterCodeBtn" style="width:100%; padding:15px; font-size:15px; background:linear-gradient(135deg, #f1c40f, #f39c12); color:#0b1a27; font-weight:800; border:none; border-radius:14px; cursor:pointer; box-shadow:0 6px 20px rgba(241,196,15,0.25); display:flex; justify-content:center; align-items:center; gap:8px;">
+                ⌨️ ŞİMDİ KODU GİR
+            </button>
+            <div style="display:flex; gap:12px; width:100%;">
+                <a href="whatsapp://send?phone=905537074882&text=Merhaba,%20sistemde%20proje%20bağlantım%20koptu.%204%20haneli%20proje%20kodumu%20öğrenebilir%20miyim?%0A%0A%E2%9A%A0%EF%B8%8F%20L%C3%BCtfen%20a%C5%9Fa%C4%9F%C4%B1daki%20bilgileri%20doldurun:%0A%F0%9F%91%A4%20Ad%20Soyad:%20%0A%F0%9F%8F%A2%20Proje/Site%20Ad%C4%B1:%20" style="flex:1; text-decoration:none; display:flex;">
+                    <button type="button" style="width:100%; padding:14px; font-size:14px; background:linear-gradient(135deg, #2ecc71, #27ae60); color:#fff; border:none; border-radius:14px; cursor:pointer; font-weight:700; display:flex; justify-content:center; align-items:center; gap:6px; box-shadow:0 6px 20px rgba(46,204,113,0.25);">
+                        🛠️ Destek Al
+                    </button>
+                </a>
+                <button id="noProjectCloseBtn" style="flex:1; padding:14px; font-size:14px; background:rgba(255,255,255,0.05); color:#ecf0f1; border:1px solid rgba(255,255,255,0.1); border-radius:14px; cursor:pointer; font-weight:600;">
+                    Kapat
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="loginStatusModal" style="display:none; position:fixed; inset:0; background:rgba(11,26,39,0.9); z-index:100006; align-items:center; justify-content:center;">
+    <div style="background:rgba(255,255,255,0.06); backdrop-filter:blur(22px); padding:40px; border-radius:24px; width:80%; max-width:300px; text-align:center; border:1px solid rgba(255,255,255,0.1);">
+        <h3 id="loginStatusText" style="color:#fff; font-size:16px;">Giriş yapılıyor...</h3>
+    </div>
+</div>
+
+<div id="indexTransferModal" class="index-transfer" hidden role="dialog" aria-modal="true" aria-labelledby="it-title" aria-describedby="it-copy it-warning">
+  <div id="it-card" class="it-card" data-state="review" tabindex="-1">
+    <div class="it-top"><span class="it-brand">KOLART · KAYIT AKTARIMI</span><span class="it-private">● Hesabınıza ait kayıtlar</span></div>
+    <div id="it-symbol" class="it-symbol" aria-hidden="true"></div>
+    <h2 id="it-title">Devriyeleriniz gönderilmeyi bekliyor</h2>
+    <p id="it-copy" class="it-copy"></p>
+    <div class="it-summary"><strong id="it-count" class="it-count">0</strong><div><div id="it-summary-label" class="it-summary-label">bekleyen devriye kaydı</div><div id="it-account" class="it-account"></div></div></div>
+    <div id="it-dates" class="it-dates" aria-label="Devriye tarihleri"></div>
+    <div id="it-warning-box" class="it-warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 3 2.7 19h18.6L12 3Z" stroke-linejoin="round"/><path d="M12 9v4m0 3v.2" stroke-linecap="round"/></svg><p id="it-warning"></p></div>
+    <div id="it-auth-box" class="it-auth" hidden><label for="it-auth-password">Devriye hesabınızın şifresi</label><p id="it-auth-message">Gönderim için kayıtların ait olduğu hesabı doğrulayın.</p><input id="it-auth-password" type="password" autocomplete="current-password" placeholder="Hesap şifreniz" aria-describedby="it-auth-message"></div>
+    <div id="it-progress" class="it-progress" hidden><div class="it-progress-row"><span id="it-progress-label">Şirkete aktarılıyor</span><strong id="it-percent">%0</strong></div><div id="it-track" class="it-track" role="progressbar" aria-label="Devriye gönderimi" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="it-bar" class="it-bar"></div></div><p id="it-step" class="it-step" role="status" aria-live="polite"></p></div>
+    <div class="it-actions"><button id="it-send" type="button" class="it-primary">Yükle ve devam et</button><button id="it-back" type="button" class="it-secondary" hidden>Giriş ekranına dön</button></div>
+    <p id="it-foot" class="it-foot"></p>
+  </div>
+</div>
+
+<div class="support-wrapper" id="supportWrapper">
+    <a href="whatsapp://send?phone=905537074882&text=Merhaba, teknik desteğe ihtiyacım var." class="support-item">
+        <span class="support-label">WhatsApp Mesaj</span>
+        <div class="support-icon btn-whatsapp-icon">
+            <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" width="26" alt="WA">
+        </div>
+    </a>
+    <a href="tel:+905537074882" class="support-item">
+        <span class="support-label">Hemen Ara</span>
+        <div class="support-icon btn-call-icon">📞</div>
+    </a>
+    <button class="main-support-btn" onclick="toggleSupport()">
+        <span class="emoji">🛠️</span>
+        <span>DESTEK</span>
+    </button>
+</div>
+
+<script>
+// Bu küçük bölüm Firebase/CDN yüklenmese de çevrimdışı giriş ekranında çalışır.
+(() => {
+  document.getElementById('secLoginBtn').addEventListener('click', event => {
+    if (navigator.onLine) return;
+    event.preventDefault(); event.stopImmediatePropagation();
+  }, true);
+  // İnternet yokken bağlantı, Firebase hazır olmasa da doğrudan offline sayfayı açar.
+  // İnternet varken ilk tıklama modül yüklenene kadar saklanır; kayıt kontrolü atlanmaz.
+  const offlineButton = document.getElementById('offlineModeBtn');
+  let offlineRequested = false;
+  function openRequestedOffline() {
+    if (!offlineRequested) return;
+    if (!navigator.onLine) {
+      offlineRequested = false;
+      location.href = offlineButton.href;
+    } else if (typeof window.KolartIndexOpenOffline === 'function') {
+      offlineRequested = false;
+      void window.KolartIndexOpenOffline();
+    }
+  }
+  offlineButton.addEventListener('click', event => {
+    if (!navigator.onLine) return;
+    event.preventDefault();
+    if (document.getElementById('secLoginBtn').disabled) return;
+    offlineRequested = true;
+    document.getElementById('message').textContent = 'Telefonunuzdaki devriye kayıtları kontrol ediliyor…';
+    openRequestedOffline();
+  });
+  window.addEventListener('kolart-index-ready', openRequestedOffline);
+  window.addEventListener('offline', openRequestedOffline);
+
+  if ('serviceWorker' in navigator && window.isSecureContext) {
+    // Eski sw.js bu ziyarette eski paket scriptini sunmuşsa yeni servisle bir kez yenile.
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (window.KolartOffline && window.KolartOffline.REVISION !== '20261009-0030') location.reload();
+    });
+    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+      .catch(error => console.warn('Service Worker hatası:', error.message));
+  }
+})();
+</script>
+
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+<script type="module">
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import { getDatabase, ref, get, child, update, onValue, set, runTransaction } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword, updatePassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+// Fotoğraf aktarımına ait SDK, yalnız kullanıcı gönderim istediğinde yüklenir.
+let uploadStoragePromise;
+function loadUploadStorage() {
+    if (!uploadStoragePromise) {
+        uploadStoragePromise = import('https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js')
+            .then(m => ({ getStorage: m.getStorage, sRef: m.ref,
+                uploadBytesResumable: m.uploadBytesResumable, getDownloadURL: m.getDownloadURL }))
+            .catch(error => { uploadStoragePromise = null; throw error; });
+    }
+    return uploadStoragePromise;
+}
+function offlineUploadContext(app, db, auth, siteID) {
+    return { app, db, auth, siteID, ref, get, set, update, onAuthStateChanged };
+}
+
+// Kuyruğun sahibi ve proje kimliği birlikte kontrol edilir. Gönderim yükleme isteğiyle başlar.
+const IndexPatrolUpload = (() => {
+    const dialog = document.getElementById('indexTransferModal');
+    const ui = Object.fromEntries(['card', 'symbol', 'title', 'copy', 'count', 'summary-label', 'account',
+        'dates', 'warning-box', 'warning', 'progress', 'progress-label', 'percent', 'track', 'bar',
+        'step', 'send', 'back', 'foot', 'auth-box', 'auth-password', 'auth-message'].map(id => [id, document.getElementById('it-' + id)]));
+    const arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 16V3m-5 5 5-5 5 5M4 15v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const tick = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m5 12 4.5 4.5L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    let pending, resolver, context, uid, records = [], busy = false, state = 'review';
+    let wakeLock, wakeRequest = false, previousFocus, inertElements = [];
+    const markerKey = () => 'kolart_index_aktarim|' + encodeURIComponent(context.siteID) + '|' + encodeURIComponent(uid);
+    function marker(action) {
+        try {
+            if (action === 'read') return !!localStorage.getItem(markerKey());
+            if (action === 'clear') localStorage.removeItem(markerKey());
+            if (action === 'write') localStorage.setItem(markerKey(), JSON.stringify({ startedAt: Date.now() }));
+        } catch (_) { /* Asıl kayıtlar IndexedDB kuyruğundadır; bu yalnız hatırlatma işaretidir. */ }
+        return false;
+    }
+    function transition(next) { state = next; ui.card.dataset.state = next; }
+    function renderRecords(rows) {
+        records = rows;
+        ui.count.textContent = String(rows.length);
+        ui['summary-label'].textContent = 'bekleyen devriye kaydı';
+        ui.account.textContent = rows[0]?.meta.username || context.auth.currentUser?.displayName || 'Güvenlik hesabınız';
+        const days = new Map();
+        for (const row of rows) {
+            const key = String(row.log.dateKey || row.meta.shiftDate || 'Tarihi belirtilmemiş');
+            days.set(key, (days.get(key) || 0) + 1);
+        }
+        ui.dates.replaceChildren();
+        for (const [day, count] of [...days].sort(([a], [b]) => a.localeCompare(b))) {
+            const line = document.createElement('div'); line.className = 'it-date';
+            const label = document.createElement('span'), amount = document.createElement('strong');
+            const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(day);
+            label.textContent = match ? `${match[3]}.${match[2]}.${match[1]}` : day;
+            amount.textContent = `${count} devriye`;
+            line.append(label, amount); ui.dates.appendChild(line);
+        }
+    }
+    function progress(percent, step) {
+        const value = Math.max(0, Math.min(100, Math.floor(Number(percent) || 0)));
+        ui.bar.style.width = value + '%'; ui.percent.textContent = '%' + value;
+        ui.track.setAttribute('aria-valuenow', String(value));
+        ui.step.textContent = step || 'Şirketten kayıt onayı bekleniyor…';
+    }
+    function needsAuthentication() { return !!context.authorize && context.auth.currentUser?.uid !== uid; }
+    function renderAuthentication() {
+        ui['auth-box'].hidden = !needsAuthentication();
+        ui['auth-password'].disabled = busy;
+        ui['auth-message'].textContent = `${records[0]?.meta.username || 'Devriye hesabı'} hesabının şifresini girin. Yalnız bu hesaba ait kayıtlar gönderilecektir.`;
+    }
+    function focusPrimary() {
+        if (!dialog.hidden) (needsAuthentication() && !busy ? ui['auth-password'] : ui.send.hidden ? ui.card : ui.send).focus({ preventScroll: true });
+    }
+    function open() {
+        previousFocus = document.activeElement;
+        inertElements = [...document.body.children].filter(el => el !== dialog && !['SCRIPT', 'STYLE'].includes(el.tagName))
+            .map(el => [el, el.inert]);
+        for (const [el] of inertElements) el.inert = true;
+        document.body.classList.add('index-transfer-open'); dialog.hidden = false;
+        focusPrimary();
+    }
+    function close(result) {
+        if (busy) return;
+        dialog.hidden = true; window.KolartOfflineSync?.hideModal();
+        document.body.classList.remove('index-transfer-open');
+        for (const [el, original] of inertElements) el.inert = original;
+        inertElements = [];
+        if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
+        const done = resolver; resolver = null; pending = null;
+        ui['auth-password'].value = '';
+        if (done) done(result);
+    }
+    async function keepScreenAwake() {
+        if (!busy || document.visibilityState !== 'visible' || !navigator.wakeLock || wakeRequest || wakeLock) return;
+        wakeRequest = true;
+        try {
+            const lock = await navigator.wakeLock.request('screen');
+            if (!busy || document.visibilityState !== 'visible') await lock.release();
+            else { wakeLock = lock; lock.addEventListener('release', () => { if (wakeLock === lock) wakeLock = null; }); }
+        } catch (_) { /* Ekranı açık tutma desteği olmadığında görünür uyarı geçerlidir. */ }
+        finally { wakeRequest = false; }
+    }
+    function setBusy(value) {
+        busy = value;
+        ui['auth-password'].disabled = value;
+        if (value) { ui.send.hidden = true; ui.back.hidden = true; void keepScreenAwake(); }
+        else if (wakeLock) { const lock = wakeLock; wakeLock = null; void lock.release().catch(() => {}); }
+    }
+    function failure(message) {
+        transition('error'); ui.symbol.innerHTML = arrow;
+        ui.title.textContent = 'Kalan kayıtlarınız telefonda';
+        ui.copy.textContent = message;
+        ui.warning.textContent = 'Onaylanmamış devriyeler telefonunuzda korunur. Tekrar deneyebilir veya sonraki girişinizde kalan kayıtları yükleyebilirsiniz.';
+        ui['warning-box'].hidden = false;
+        ui['progress-label'].textContent = 'Gönderim tamamlanamadı';
+        ui.step.textContent = `${records.length} devriye kaydı gönderilmeyi bekliyor.`;
+        ui.send.textContent = 'Kalan kayıtları tekrar yükle'; ui.send.hidden = false;
+        ui.back.hidden = false; renderAuthentication();
+        ui.foot.textContent = 'Başarıyla iletilen kayıtlar tekrar bekleme listesine alınmaz.';
+    }
+    function friendlyError(error) {
+        const message = String(error?.code || '') + ' ' + String(error?.message || error || '');
+        if (/wrong-password|invalid-credential|invalid-login-credentials/i.test(message)) return 'Şifre doğrulanamadı. Devriye kayıtlarının ait olduğu hesabın şifresini kontrol edin.';
+        if (/ACCOUNT_INACTIVE/i.test(message)) return 'Devriye hesabınız askıya alınmış. Kayıtlarınız telefonda korunuyor; şirketinizle iletişime geçin.';
+        if (/ACCOUNT_MISMATCH/i.test(message)) return 'Hesap ile devriye kayıtları eşleşmiyor. Kayıtların ait olduğu hesabı kullanın.';
+        if (/permission|unauthorized|erişim izni/i.test(message)) return 'Şirkete gönderim yetkisi doğrulanamadı. Aynı devriye hesabıyla tekrar giriş yapın.';
+        if (/AUTH_REQUIRED|oturum|hesap|giriş gerekli/i.test(message)) return 'Devriye hesabınızın oturumu değişti. Aynı hesapla tekrar giriş yaparak kalan kayıtları gönderin.';
+        if (/diğer açık sekme/i.test(message)) return 'Kayıtlarınız diğer açık sekmede yükleniyor. O sekmedeki işlemin tamamlanmasını bekleyin.';
+        if (!navigator.onLine || /İnternet kesildi|network/i.test(message)) return 'İnternet bağlantısı kesildi. Bağlantı geldiğinde kalan kayıtları tekrar yükleyin.';
+        return 'Gönderim tamamlanamadı. İnternet bağlantınızı kontrol ederek kalan kayıtları tekrar yükleyin.';
+    }
+    async function upload() {
+        if (busy) return;
+        if (needsAuthentication() && !ui['auth-password'].value.trim()) {
+            renderAuthentication(); ui['auth-password'].focus(); return;
+        }
+        if (!context.authorize && context.auth.currentUser?.uid !== uid) { failure(friendlyError({ code: 'AUTH_REQUIRED' })); focusPrimary(); return; }
+        if (!navigator.onLine) { failure('İnternet bağlantısı yok. Bağlantı geldiğinde kalan kayıtları yükleyebilirsiniz.'); focusPrimary(); return; }
+        marker('write'); transition('sending'); setBusy(true);
+        ui.title.textContent = 'Devriyeleriniz şirkete iletiliyor';
+        ui.copy.textContent = 'Devriye kayıtlarınız ve varsa fotoğraflarınız gönderiliyor. Şirketin kayıt onayı bekleniyor.';
+        ui.warning.textContent = '“Şirkete iletildi” mesajını görmeden bu ekranı kapatmayın, uygulamadan çıkmayın ve ekranı kilitlemeyin.';
+        ui['warning-box'].hidden = false; ui.progress.hidden = false;
+        ui['progress-label'].textContent = 'Şirkete aktarılıyor';
+        ui.foot.textContent = 'Onaylanmayan kayıtlar telefonunuzda korunur.';
+        progress(0, 'Güvenli gönderim bağlantısı hazırlanıyor…'); ui.card.focus({ preventScroll: true });
+        try {
+            if (context.authorize) {
+                progress(0, 'Devriye hesabınız doğrulanıyor…');
+                await context.authorize(ui['auth-password'].value.trim());
+                ui['auth-password'].value = ''; renderAuthentication();
+            }
+            let timer;
+            const storage = await Promise.race([loadUploadStorage(), new Promise((_, reject) => {
+                timer = setTimeout(() => reject(new Error('Gönderim bağlantısı zaman aşımı')), 20000);
+            })]).finally(() => clearTimeout(timer));
+            if (context.auth.currentUser?.uid !== uid) throw Object.assign(new Error('Oturum değişti'), { code: 'AUTH_REQUIRED' });
+            const completed = await window.KolartOfflineSync.sync({ ...context, ...storage }, { userInitiated: true });
+            const remaining = await window.KolartOfflineSync.queueSummary(context.siteID, uid);
+            if (completed && !remaining.length) {
+                marker('clear'); transition('success'); ui.symbol.innerHTML = tick;
+                ui.title.textContent = 'Şirkete iletildi';
+                ui.copy.textContent = 'Devriye kayıtlarınızın tamamı ve varsa fotoğrafları sisteme kaydedildi. Otomatik olarak devam ediliyor…';
+                ui['summary-label'].textContent = 'devriye kaydı başarıyla iletildi';
+                ui['warning-box'].hidden = true; ui['progress-label'].textContent = 'Aktarım tamamlandı';
+                progress(100, 'Tüm kayıtlar için şirket onayı alındı.');
+                ui.send.hidden = true; ui.back.hidden = true;
+                ui.foot.textContent = 'Bekleyen kayıt kalmadı. Yönlendiriliyorsunuz…';
+            } else {
+                renderRecords(remaining);
+                failure(friendlyError(document.getElementById('ks-text')?.textContent || 'Gönderim tamamlanamadı'));
+            }
+        } catch (error) {
+            try { renderRecords(await window.KolartOfflineSync.queueSummary(context.siteID, uid)); } catch (_) {}
+            failure(friendlyError(error));
+            console.warn('[Index devriye aktarımı]', error.code || error.message);
+        } finally {
+            setBusy(false); window.KolartOfflineSync?.hideModal(); focusPrimary();
+            if (state === 'success') setTimeout(() => {
+                if (context.auth.currentUser?.uid === uid) close(true);
+                else { failure(friendlyError({ code: 'AUTH_REQUIRED' })); focusPrimary(); }
+            }, 320);
+        }
+    }
+    ui.send.onclick = () => { if (state !== 'success') void upload(); };
+    ui.back.onclick = () => { if (!busy && state === 'error') close(false); };
+    ui['auth-password'].addEventListener('keydown', event => {
+        if (event.key === 'Enter') { event.preventDefault(); void upload(); }
+    });
+    window.addEventListener('kolart-sync-progress', event => {
+        if (busy) progress(Math.min(99, Number(event.detail?.percent) || 0), event.detail?.step);
+    });
+    window.addEventListener('beforeunload', event => {
+        if (!busy) return;
+        event.preventDefault(); event.returnValue = 'Devriye aktarımı sürüyor. Bu ekranı açık tutun.';
+    });
+    document.addEventListener('visibilitychange', () => {
+        if (!busy) return;
+        if (document.visibilityState === 'visible') void keepScreenAwake();
+        else ui.warning.textContent = 'Gönderimin tamamlanması için bu ekrana geri dönün. “Şirkete iletildi” mesajını görene kadar uygulamayı açık tutun.';
+    });
+    window.addEventListener('offline', () => {
+        if (busy) ui.warning.textContent = 'İnternet kesildi. Bu ekranı açık tutun. Gönderim tamamlanmazsa kalan kayıtlarınız telefonda korunur.';
+    });
+    dialog.addEventListener('keydown', event => {
+        if (event.key === 'Escape') { event.preventDefault(); return; }
+        if (event.key !== 'Tab') return;
+        const buttons = [ui['auth-password'], ui.send, ui.back].filter(el => !el.hidden && !el.disabled && el.getClientRects().length);
+        if (!buttons.length) { event.preventDefault(); ui.card.focus(); return; }
+        const first = buttons[0], last = buttons.at(-1);
+        if (event.shiftKey && (document.activeElement === first || document.activeElement === ui.card)) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && (document.activeElement === last || document.activeElement === ui.card)) { event.preventDefault(); first.focus(); }
+    });
+    return {
+        async check(c) {
+            if (pending) return pending;
+            context = c; uid = c.expectedUID || c.auth.currentUser?.uid;
+            if (!uid) return false;
+            const rows = await window.KolartOfflineSync.queueSummary(c.siteID, uid);
+            if (!c.authorize && c.auth.currentUser?.uid !== uid) return false;
+            if (!rows.length) { marker('clear'); return true; }
+            pending = new Promise(resolve => { resolver = resolve; });
+            transition('review'); renderRecords(rows); ui.symbol.innerHTML = arrow;
+            ui.title.textContent = marker('read') ? 'Yarım kalan aktarımınız var' : 'Devriyeleriniz gönderilmeyi bekliyor';
+            ui.copy.textContent = marker('read')
+                ? 'Önceki aktarım tamamlanmamış. Aşağıdaki kayıtların şirkete ulaşması bekleniyor. Kalan devriyeleri şimdi yükleyebilirsiniz.'
+                : 'Aşağıdaki tarihlerde telefonunuza kaydedilmiş devriyeler bulunuyor. Şirket ekranında görünmeleri için bu kayıtları yükleyin.';
+            ui.warning.textContent = 'Gönderim bitene kadar bu ekranı açık tutun. Uygulamayı kapatır veya ekranı kilitlerseniz aktarım yarım kalabilir.';
+            ui['warning-box'].hidden = false; ui.progress.hidden = true;
+            ui.send.textContent = 'Yükle ve devam et'; ui.send.hidden = false;
+            ui.back.hidden = true; ui['auth-password'].value = ''; renderAuthentication();
+            ui.foot.textContent = 'Tüm kayıtlar onaylandığında otomatik olarak devam edilir.';
+            progress(0, 'Gönderim onayınız bekleniyor.'); open();
+            return pending;
+        }
+    };
+})();
+
+async function finishOfflineUploads(app, db, auth, siteID) {
+    return IndexPatrolUpload.check(offlineUploadContext(app, db, auth, siteID));
+}
+
+// Girişte henüz doğrulanmış aynı profil, kısa süre içinde tekrar ağdan okunmaz.
+let verifiedProfile;
+function rememberVerifiedProfile(snapshot, db, username, auth) {
+    verifiedProfile = { snapshot, path: ref(db, 'users/' + username).toString(),
+        uid: auth.currentUser?.uid, checkedAt: Date.now() };
+}
+async function preparePatrolBundle(app, db, auth, siteID, username, type, password) {
+    if (type !== 'security') return true;
+    const profile = verifiedProfile;
+    const getForBundle = target => profile && profile.uid === auth.currentUser?.uid &&
+        Date.now() - profile.checkedAt < 5000 && target.toString() === profile.path
+        ? Promise.resolve(profile.snapshot) : get(target);
+    return !!await window.KolartOffline.start({ app, db, auth, siteID, username, password,
+        get: getForBundle, ref, runTransaction });
+}
+
+// --- GÜVENLİK ANAHTARI ---
+const CONFIG_KEY = "KOLART_SİSTEM_2026_CGA"; 
+const encryptData = (data) => CryptoJS.AES.encrypt(JSON.stringify(data), CONFIG_KEY).toString();
+const decryptData = (encrypted) => {
+    try {
+        const bytes = CryptoJS.AES.decrypt(encrypted, CONFIG_KEY);
+        return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    } catch (e) { return null; }
+};
+
+// MERKEZ FIREBASE
+const merkezConfig = {
+  apiKey: "AIzaSyDCJWz80wWlzNhaM2Qnw_e5UkQoc8DoJaU",
+  authDomain: "merkez-14bf8.firebaseapp.com",
+  databaseURL: "https://merkez-14bf8-default-rtdb.firebaseio.com", 
+  projectId: "merkez-14bf8",
+  storageBucket: "merkez-14bf8.firebasestorage.app",
+  messagingSenderId: "512943111807",
+  appId: "1:512943111807:web:675c769c7ede48216e494a",
+  measurementId: "G-BYS8FPKY7H"
+};
+const merkezApp = getApps().find(a => a.name === "[DEFAULT]") || initializeApp(merkezConfig);
+const merkezDB = getDatabase(merkezApp);
+
+// --- ŞİFRE MASKELER ---
+const maskPass = (p) => btoa("SAD1SJ" + p.substring(0, 2) + "L2LSJDF3JDFL" + p.substring(2) + "L6LSJDFL7");
+const unmaskPass = (m) => {
+    try {
+        let d = atob(m);
+        return d.replace("SAD1SJ", "").replace("L2LSJDF3JDFL", "").replace("L6LSJDFL7", "");
+    } catch (e) { return ""; }
+};
+
+// DOM Elementleri
+const siteNameEl = document.getElementById("siteName");
+const securityBtn = document.getElementById("securityBtn");
+const securityGroup = document.getElementById("securityGroup");
+const msg = document.getElementById("message");
+const secUsername = document.getElementById("secUsername");
+const secPassword = document.getElementById("secPassword");
+const secRemember = document.getElementById("secRemember");
+
+const qrBtn = document.getElementById("startQR");
+const codeBtn = document.getElementById("enterCode");
+const codeModal = document.getElementById("codeModal");
+const codeInput = document.getElementById("codeInput");
+const codeCancel = document.getElementById("codeCancel");
+const codeConfirm = document.getElementById("codeConfirm");
+const qrModal = document.getElementById("qrModal");
+const closeQRModal = document.getElementById("closeQRModal");
+let qrReader = null;
+
+const modal = document.getElementById("disconnectModal");
+const cancelBtn = document.getElementById("cancelDisconnect");
+const confirmBtn = document.getElementById("confirmDisconnect");
+
+const noProjectModal = document.getElementById("noProjectModal");
+const noProjectCloseBtn = document.getElementById("noProjectCloseBtn");
+const noProjectEnterCodeBtn = document.getElementById("noProjectEnterCodeBtn");
+
+noProjectCloseBtn.addEventListener("click", () => {
+    noProjectModal.style.display = "none";
+});
+
+noProjectEnterCodeBtn.addEventListener("click", () => {
+    noProjectModal.style.display = "none"; 
+    setActive(codeBtn);
+    codeModal.classList.remove("hidden"); 
+    codeInput.value = "";
+    codeInput.focus();
+});
+
+let pressTimer;
+
+// DÜZELTME 1: Tamamen orijinal fonksiyona dönüldü, veri tabanındaki bozuk kayıtlarla tam eşleşmesi için.
+function formatToEmail(name) {
+    let text = name.trim().toLowerCase();
+    const mapping = {
+        'ç': 'c', 'ğ': 'g', 'ı': 'i', 'i': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u'
+    };
+    Object.keys(mapping).forEach(key => {
+        text = text.replace(new RegExp(key, 'g'), mapping[key]);
+    });
+    return text.replace(/\s+/g, '') + "@cga.com";
+}
+
+window.togglePass = (id) => {
+    const input = document.getElementById(id);
+    input.type = input.type === "password" ? "text" : "password";
+};
+
+async function forcePasswordChange(username, type, activeDB, auth, reason) {
+    const modalHtml = `
+        <div id="fMod" style="position:fixed; inset:0; background:#0b1a27; z-index:100000; display:flex; align-items:center; justify-content:center; font-family:'Montserrat', sans-serif;">
+            <div style="background:rgba(255,255,255,0.06); backdrop-filter:blur(22px); padding:40px; border-radius:26px; width:90%; max-width:380px; text-align:center; border:1px solid rgba(255,255,255,0.1); box-shadow:0 20px 50px rgba(0,0,0,0.7);">
+                <h2 style="color:#f1c40f; margin-bottom:15px;">🔐 Şifre Standartı</h2>
+                <p style="color:#ecf0f1; font-size:14px; margin-bottom:25px; line-height:1.5;">${reason}</p>
+                <div style="position:relative; margin-bottom:12px;">
+                    <input type="password" id="f_p1" placeholder="Yeni Şifre (6 Hane)" maxlength="6" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="width:100%; padding:15px; border-radius:12px; border:none; background:rgba(255,255,255,0.1); color:white; text-align:center; font-size:18px;">
+                    <button type="button" onclick="togglePass('f_p1')" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; color:#f1c40f; cursor:pointer; font-size:20px;">🙈</button>
+                </div>
+                <div style="position:relative; margin-bottom:12px;">
+                    <input type="password" id="f_p2" placeholder="Şifre Tekrar" maxlength="6" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="width:100%; padding:15px; border-radius:12px; border:none; background:rgba(255,255,255,0.1); color:white; text-align:center; font-size:18px;">
+                    <button type="button" onclick="togglePass('f_p2')" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; color:#f1c40f; cursor:pointer; font-size:20px;">🙈</button>
+                </div>
+                <div id="f_err" style="color:#e74c3c; font-weight:600; font-size:13px; margin-bottom:20px; min-height:18px;"></div>
+                <button id="f_btn" style="width:100%; padding:15px; border-radius:16px; background:linear-gradient(90deg, #27ae60, #2ecc71); color:white; font-weight:800; border:none; cursor:pointer;">GÜNCELLE VE GİRİŞ YAP</button>
+            </div>
+        </div>`;
+    document.body.insertAdjacentHTML('afterbegin', modalHtml);
+
+    document.getElementById('f_btn').onclick = async function() {
+        const p1 = document.getElementById('f_p1').value.trim();
+        const p2 = document.getElementById('f_p2').value.trim();
+        const err = document.getElementById('f_err');
+
+        if(p1.length !== 6) { err.innerText = "ŞİFRE 6 HANELİ OLMALI!"; return; }
+        if(!/^\d+$/.test(p1)) { err.innerText = "ŞİFRE SADECE RAKAMLARDAN OLUŞMALIDIR!"; return; }
+        if(p1 !== p2) { err.innerText = "ŞİFRELER UYUŞMUYOR!"; return; }
+        if(p1 === "123456") { err.innerText = "LÜTFEN BAŞKA BİR ŞİFRE SEÇİN!"; return; }
+
+        this.disabled = true; this.innerText = "GÜNCELLENİYOR...";
+
+        try {
+            if (auth.currentUser) {
+                await updatePassword(auth.currentUser, p1);
+            } else {
+                throw new Error("Kullanıcı oturumu koptu, tekrar giriş yapın!");
+            }
+
+            await update(ref(activeDB, 'users/' + username), { password: p1 });
+
+            const stored = localStorage.getItem("securityUser");
+            if (stored && JSON.parse(stored).username === username) {
+                localStorage.setItem("securityUser", JSON.stringify({ username, password: maskPass(p1) }));
+            }
+            sessionStorage.setItem("currentUser", JSON.stringify({username, type}));
+            const uploadApp = auth.app;
+            const forcedSiteID = localStorage.getItem('siteID');
+            if (!await finishOfflineUploads(uploadApp,activeDB,auth,forcedSiteID)) {
+                this.disabled=false;this.innerText='GÜNCELLE VE GİRİŞ YAP';return;
+            }
+            if (!await preparePatrolBundle(uploadApp,activeDB,auth,forcedSiteID,username,type,p1)) {
+                this.disabled=false;this.innerText='GÜNCELLE VE GİRİŞ YAP';return;
+            }
+            
+            // Tüm gereksiz yetki yönlendirmeleri kaldırıldı, sadece güvenliğe atar
+           // Tüm gereksiz yetki yönlendirmeleri kaldırıldı, sadece güvenlik (veya amir) sayfasına atar
+            if (type === "amir") {
+                window.location.href = "amir.html";
+            } else {
+                window.location.href = "guvenlik.html";
+            }
+            
+        } catch (e) { 
+            console.error(e);
+            err.innerText = "HATA: GÜNCELLEME YAPILAMADI!"; 
+            this.disabled = false; 
+            this.innerText = "GÜNCELLE VE GİRİŞ YAP"; 
+        }
+    };
+}
+
+function hideQRButtons(){
+  qrBtn.style.display="none";
+  codeBtn.style.display="none";
+  const wrapper = document.getElementById("qrButtonsWrapper");
+  if(wrapper) wrapper.style.display = "none"; 
+}
+
+function showQRButtons(){
+  qrBtn.style.display="flex";
+  codeBtn.style.display="flex";
+  const wrapper = document.getElementById("qrButtonsWrapper");
+  if(wrapper) wrapper.style.display = "flex"; 
+}
+
+async function initializeSavedSite() {
+  if(securityBtn) securityBtn.click();
+  let secStored;
+  try { secStored = JSON.parse(localStorage.getItem("securityUser") || "null"); } catch (_) {}
+  if(secStored){ 
+    secUsername.value = secStored.username; 
+    secPassword.value = unmaskPass(secStored.password);
+    secRemember.checked = true; 
+  }
+  const savedSiteID = localStorage.getItem("siteID");
+  const savedConfigEnc = localStorage.getItem("siteConfig");
+  if(savedSiteID && savedConfigEnc){
+    const siteConfig = decryptData(savedConfigEnc); 
+    if(siteConfig) {
+      let siteApp = getApps().find(a => a.name === `siteApp-${savedSiteID}`);
+      if(!siteApp) siteApp = initializeApp(siteConfig, `siteApp-${savedSiteID}`);
+      const siteDB = getDatabase(siteApp);
+      getAuth(siteApp);
+      try {
+        const cachedName = localStorage.getItem('kolart_site_adi|' + savedSiteID);
+        if (cachedName) { siteNameEl.textContent = cachedName; siteNameEl.style.display = 'block'; }
+      } catch (_) {}
+      hideQRButtons();
+      await loadSiteName(siteDB);
+    } else {
+      showQRButtons();
+    }
+  }
+}
+void initializeSavedSite().catch(error => console.warn("Giriş hazırlığı:", error.message));
+
+// Offline Mod'un çevrimiçi girişinde de aynı kayıt onayı kullanılır.
+let openingOffline = false;
+async function openOfflineWithUpload() {
+    const button = document.getElementById('offlineModeBtn');
+    const loginButton = document.getElementById('secLoginBtn');
+    if (openingOffline || loginButton.disabled) return;
+    if (!navigator.onLine) { location.href = button.href; return; }
+    openingOffline = true;
+    loginButton.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    const notice = document.getElementById('message');
+    try {
+        const siteID = localStorage.getItem('siteID');
+        const rows = siteID ? await window.KolartOfflineSync.queueSummary(siteID) : [];
+        if (!rows.length) { location.href = button.href; return; }
+
+        const options = decryptData(localStorage.getItem('siteConfig') || '');
+        if (!options) {
+            notice.textContent = 'Bekleyen kayıtlarınız var. Göndermek için devriye projenizi tanımlayın.';
+            noProjectModal.style.display = 'flex';
+            return;
+        }
+        const app = getApps().find(a => a.name === `siteApp-${siteID}`) || initializeApp(options, `siteApp-${siteID}`);
+        const auth = getAuth(app), db = getDatabase(app);
+        if (typeof auth.authStateReady === 'function') await indexRequestTimeout(auth.authStateReady());
+        else await indexRequestTimeout(new Promise(resolve => {
+            let stop;
+            stop = onAuthStateChanged(auth, () => { queueMicrotask(() => stop?.()); resolve(); });
+        }));
+
+        let pointer, remembered;
+        try { pointer = JSON.parse(localStorage.getItem('kolart_offline_son_kullanici') || 'null'); } catch (_) {}
+        try { remembered = JSON.parse(localStorage.getItem('securityUser') || 'null'); } catch (_) {}
+        const normalized = value => String(value || '').trim().toLocaleUpperCase('tr-TR');
+        const owners = [...new Set(rows.map(row => row.meta.uid))];
+        const expectedUID = (pointer?.siteID === siteID && owners.includes(pointer.uid) ? pointer.uid : null)
+            || (owners.includes(auth.currentUser?.uid) ? auth.currentUser.uid : null)
+            || rows.find(row => remembered?.username && normalized(row.meta.username) === normalized(remembered.username))?.meta.uid
+            || (owners.length === 1 ? owners[0] : null);
+        if (!expectedUID) {
+            notice.textContent = 'Birden fazla hesaba ait devriye kaydı var. Kayıtları göndermek için kendi hesabınızla Giriş Yap butonunu kullanın.';
+            return;
+        }
+        const owner = rows.find(row => row.meta.uid === expectedUID).meta;
+        const c = { ...offlineUploadContext(app, db, auth, siteID), expectedUID };
+        c.authorize = async password => {
+            if (auth.currentUser?.uid !== expectedUID) {
+                if (!password) throw Object.assign(new Error('Giriş gerekli'), { code: 'AUTH_REQUIRED' });
+                const packages = await window.KolartOfflineSync.packages(siteID);
+                const pack = packages.find(item => item.uid === expectedUID);
+                const email = pack?.connection?.email || formatToEmail(owner.username);
+                const credential = await indexRequestTimeout(signInWithEmailAndPassword(auth, email, password));
+                if (credential.user.uid !== expectedUID) throw Object.assign(new Error('Hesap eşleşmiyor'), { code: 'ACCOUNT_MISMATCH' });
+            }
+            const snapshot = await indexRequestTimeout(get(ref(db, 'users/' + owner.username)));
+            if (!snapshot.exists() || (snapshot.val().uid && snapshot.val().uid !== expectedUID)) {
+                throw Object.assign(new Error('Hesap eşleşmiyor'), { code: 'ACCOUNT_MISMATCH' });
+            }
+            if (snapshot.val().isActive === false) throw Object.assign(new Error('Hesap askıya alınmış'), { code: 'ACCOUNT_INACTIVE' });
+            if (auth.currentUser?.uid !== expectedUID) throw Object.assign(new Error('Oturum değişti'), { code: 'AUTH_REQUIRED' });
+        };
+        notice.textContent = '';
+        if (await IndexPatrolUpload.check(c)) location.href = button.href;
+    } catch (error) {
+        notice.textContent = 'Kayıtlar kontrol edilemedi. İnternetinizi kontrol edin ve tekrar deneyin. Telefonunuzdaki kayıtlar korunur.';
+        console.warn('[Offline Mod kayıt kontrolü]', error.code || error.message);
+    } finally {
+        openingOffline = false; loginButton.disabled = false;
+        button.removeAttribute('aria-busy');
+    }
+}
+function indexRequestTimeout(request, ms = 25000) {
+    let timer;
+    return Promise.race([request, new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error('Bağlantı zaman aşımı')), ms);
+    })]).finally(() => clearTimeout(timer));
+}
+window.KolartIndexOpenOffline = openOfflineWithUpload;
+window.dispatchEvent(new Event('kolart-index-ready'));
+
+async function loginUser(rawUsername, password, role) {
+    const cleanUsername = rawUsername.trim();
+    const cleanPassword = password.trim();
+    const dbUsername = cleanUsername.toLocaleUpperCase('tr-TR');
+    const loginBtn = document.getElementById("secLoginBtn");
+    if (loginBtn.disabled) return;
+    
+    const statusModal = document.getElementById("loginStatusModal");
+    const statusText = document.getElementById("loginStatusText");
+
+    msg.textContent = "";
+
+    const savedEnc = localStorage.getItem("siteConfig");
+    const siteConfig = savedEnc ? decryptData(savedEnc) : null;
+
+    if (!siteConfig) {
+        loginBtn.disabled = false;
+        loginBtn.style.opacity = "1";
+        noProjectModal.style.display = "flex";
+        return;
+    }
+
+    const showErrorModal = (hataMesaji) => {
+        if (statusModal) statusModal.style.display = "none";
+        const errorModal = document.getElementById('authErrorModal');
+        const errorTextEl = document.getElementById('authErrorText');
+        if (errorModal && errorTextEl) {
+            errorTextEl.innerHTML = hataMesaji;
+            errorModal.style.display = 'flex';
+        } else {
+            msg.style.color = "#e74c3c";
+            msg.textContent = hataMesaji;
+        }
+        loginBtn.disabled = false;
+        loginBtn.style.opacity = "1";
+    };
+
+    if (!cleanUsername || !cleanPassword) {
+        return showErrorModal("Ad Soyad ve şifre gerekli!");
+    }
+
+    if (statusModal) {
+        statusModal.style.display = "flex";
+        statusText.textContent = "⌛ Bilgileriniz kontrol ediliyor...";
+    }
+
+    loginBtn.disabled = true;
+    loginBtn.style.opacity = "0.7";
+
+    try {
+        const siteId = localStorage.getItem("siteID");
+        let app = getApps().find(a => a.name === `siteApp-${siteId}`);
+        if (!app) app = initializeApp(siteConfig, `siteApp-${siteId}`);
+
+        const activeDB = getDatabase(app);
+        const auth = getAuth(app);
+
+        const targetEmail = formatToEmail(cleanUsername);
+        
+       let authSuccess = false;
+try {
+    await signInWithEmailAndPassword(auth, targetEmail, cleanPassword);
+    authSuccess = true;
+    if (statusText) statusText.textContent = "✅ Bilgileriniz doğrulanıyor…";
+} catch (authErr) {
+    // İnternet hatası kaldırıldı, sadece kullanıcı yok veya şifre hatalı uyarısı bırakıldı
+    return showErrorModal("❌ Kullanıcı kaydı bulunamadı veya şifre hatalı!");
+}
+
+   // DESTEK PERSONEL KONTROLÜ (ŞİFRELİ)
+        if (dbUsername === "DESTEK PERSONEL") {
+            const dSnap = await get(child(ref(activeDB), 'users/' + dbUsername));
+            rememberVerifiedProfile(dSnap, activeDB, dbUsername, auth);
+            if (dSnap.exists()) {
+                // ŞİFREYİ BURADA KONTROL EDİYORUZ
+                if (cleanPassword === String(dSnap.val().password).trim()) {
+                    sessionStorage.setItem("currentUser", JSON.stringify({ username: dbUsername, type: dSnap.val().type }));
+                    
+                    // ---> BENİ HATIRLA EKLENTİSİ BURADA BAŞLIYOR <---
+                    if (secRemember.checked) {
+                        localStorage.setItem("securityUser", JSON.stringify({ username: cleanUsername, password: maskPass(cleanPassword) }));
+                    } else {
+                        localStorage.removeItem("securityUser");
+                    }
+                    // ---> BENİ HATIRLA EKLENTİSİ BURADA BİTİYOR <---
+
+                    if (statusModal) statusModal.style.display = 'none';
+                    if (!await finishOfflineUploads(app,activeDB,auth,siteId)) {
+                        loginBtn.disabled=false;loginBtn.style.opacity='1';return;
+                    }
+                    if (!await preparePatrolBundle(app,activeDB,auth,siteId,dbUsername,dSnap.val().type,cleanPassword)) {
+                        loginBtn.disabled=false;loginBtn.style.opacity='1';return;
+                    }
+                    window.location.href = "guvenlik.html"; // Sadece güvenlik sayfasına yönlendiriyor
+                    return;
+                } else {
+                    return showErrorModal("❌ Destek Personeli Şifresi Hatalı!");
+                }
+            }
+        }
+
+        // DÜZELTME 3: Eğer Admin/Destek değilse ve Auth'tan geçemediyse ŞİMDİ bloke et!
+        if (!authSuccess) {
+            return showErrorModal("❌ AUT Kaydı Bulunamadı veya Şifre Hatalı!");
+        }
+
+        // --- NORMAL KULLANICI KONTROLLERİ ---
+        const userSnap = await get(child(ref(activeDB), 'users/' + dbUsername));
+        rememberVerifiedProfile(userSnap, activeDB, dbUsername, auth);
+        if (!userSnap.exists()) {
+            return showErrorModal("❌ Kullanıcı veritabanında bulunamadı!");
+        }
+
+        const user = userSnap.val();
+        if (user.isActive === false) {
+            return showErrorModal("❌ Hesabınız Askıya Alınmıştır!");
+        }
+
+        const uPass = String(user.password).trim();
+        if (uPass === "123456" || uPass.length < 6) {
+            if (statusModal) statusModal.style.display = "none";
+            let why = uPass === "123456" ? "Şu anki şifreniz varsayılan <b>'123456'</b>'dır. 6 haneli yeni şifre oluşturun. Yeni şifre sadece rakam içermelidir." : `Şifreniz <b>${uPass.length}</b> haneli. En az 6 hane olmalı.`;
+            forcePasswordChange(user.username, user.type, activeDB, auth, why);
+            return;
+        }
+
+        sessionStorage.setItem("currentUser", JSON.stringify({ username: user.username, type: user.type }));
+        if (statusModal) statusModal.style.display = 'none';
+        if (!await finishOfflineUploads(app,activeDB,auth,siteId)) {
+            loginBtn.disabled=false;loginBtn.style.opacity='1';return;
+        }
+        if (!await preparePatrolBundle(app,activeDB,auth,siteId,dbUsername,user.type,cleanPassword)) {
+            loginBtn.disabled=false;loginBtn.style.opacity='1';return;
+        }
+
+        if (role === "security") {
+            if (secRemember.checked) {
+                localStorage.setItem("securityUser", JSON.stringify({ username: cleanUsername, password: maskPass(cleanPassword) }));
+            } else localStorage.removeItem("securityUser");
+
+            // TÜM DİĞER ROLLER KALDIRILDI SADECE GÜVENLİK KONTROLÜ VAR
+           // AMİR VE GÜVENLİK KONTROLÜ
+            if (user.type === "amir") {
+                window.location.href = "amir.html";
+            } else if (user.type === "security") {
+                window.location.href = "guvenlik.html";
+            } else {
+                return showErrorModal("❌ Sadece amir veya güvenlik yetkisine sahip kullanıcılar giriş yapabilir!");
+            }
+        }
+
+    } catch (err) {
+        console.error(err);
+        return showErrorModal("❌ Bağlantı hatası! İnternetinizi kontrol edin.");
+    }
+}
+
+document.getElementById("secLoginBtn").addEventListener("click", ()=> loginUser(secUsername.value, secPassword.value,"security"));
+
+async function loadSiteName(db){
+  try{
+    const snap = await get(child(ref(db),"settings/siteName"));
+    if(snap.exists()){
+      const name=snap.val().trim();
+      if(name!==""){
+        siteNameEl.textContent=name; siteNameEl.style.display="block";
+        try { localStorage.setItem("kolart_site_adi|" + localStorage.getItem("siteID"), name); } catch (_) {}
+      }
+    }
+  }catch(e){ console.error("Site adı yüklenemedi", e); }
+}
+
+let qrLibraryPromise, qrLaunchToken = 0;
+function loadQRLibrary() {
+  if (window.Html5Qrcode) return Promise.resolve();
+  if (!qrLibraryPromise) {
+    const load = src => new Promise((resolve, reject) => {
+      const script = document.createElement('script'); script.src = src; script.async = true;
+      const timer = setTimeout(() => { script.remove(); reject(new Error('Kamera dosyası yüklenemedi')); }, 12000);
+      script.onload = () => { clearTimeout(timer); window.Html5Qrcode ? resolve() : reject(new Error('Kamera kütüphanesi bulunamadı')); };
+      script.onerror = () => { clearTimeout(timer); script.remove(); reject(new Error('Kamera dosyası yüklenemedi')); };
+      document.head.appendChild(script);
+    });
+    qrLibraryPromise = load('./vendor/html5-qrcode.min.js').catch(() => load('https://unpkg.com/html5-qrcode'))
+      .catch(error => { qrLibraryPromise = null; throw error; });
+  }
+  return qrLibraryPromise;
+}
+qrBtn.addEventListener("click", async ()=>{
+  const token = ++qrLaunchToken;
+  setActive(qrBtn); qrModal.style.display = "flex";
+  const qrDiv = document.getElementById("qr-reader");
+  qrDiv.textContent = 'Kamera hazırlanıyor…';
+  try {
+    await loadQRLibrary();
+    if (token !== qrLaunchToken || qrModal.style.display !== 'flex') return;
+    qrDiv.replaceChildren(); qrReader = new Html5Qrcode("qr-reader");
+    const qrBoxSize = Math.min(window.innerWidth*0.8,300);
+    await qrReader.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: qrBoxSize },
+      async (qrCodeMessage)=>{
+        try{ await qrReader.stop(); }catch(e){}
+        qrReader=null; qrModal.style.display = "none";
+        await loadSiteConfig(qrCodeMessage);
+        document.getElementById("qrMessage").textContent="İşlem başarılı, şimdi giriş yapabilirsiniz.";
+      },
+      ()=>{}
+    );
+  } catch(err) {
+    if (token !== qrLaunchToken) return;
+    alert("Kamera açılamadı: "+err); qrModal.style.display = "none";
+  }
+});
+
+codeBtn.addEventListener("click", ()=>{
+  setActive(codeBtn);
+  codeModal.classList.remove("hidden");
+  codeInput.value="";
+  codeInput.focus();
+});
+
+codeCancel.addEventListener("click", ()=> codeModal.classList.add("hidden"));
+codeConfirm.addEventListener("click", async ()=>{
+  const code = codeInput.value.trim();
+  if(!/^\d{4}$/.test(code)){ alert("Lütfen 4 haneli sayı girin!"); return; }
+  codeModal.classList.add("hidden");
+  await loadSiteConfig(code);
+  document.getElementById("qrMessage").textContent="Kod başarıyla yüklendi, giriş yapabilirsiniz!";
+});
+
+siteNameEl.addEventListener("mousedown",()=>{ pressTimer=setTimeout(openDisconnectModal,800); });
+siteNameEl.addEventListener("mouseup",()=>clearTimeout(pressTimer));
+siteNameEl.addEventListener("mouseleave",()=>clearTimeout(pressTimer));
+siteNameEl.addEventListener("touchstart",()=>{ pressTimer=setTimeout(openDisconnectModal,800); });
+siteNameEl.addEventListener("touchend",()=>clearTimeout(pressTimer));
+
+function disconnectProject(){
+  localStorage.removeItem("siteID");
+  localStorage.removeItem("siteConfig");
+  sessionStorage.removeItem("currentUser");
+  siteNameEl.textContent="";
+  siteNameEl.style.display="none";
+  showQRButtons(); 
+  document.getElementById("qrMessage").textContent="Proje bağlantısından ayrıldınız.";
+  msg.textContent="";
+}
+
+function openDisconnectModal(){ modal.classList.remove("hidden"); }
+function closeDisconnectModal(){ modal.classList.add("hidden"); }
+cancelBtn.onclick = closeDisconnectModal;
+confirmBtn.onclick = () => { closeDisconnectModal(); disconnectProject(); };
+
+function setActive(button){ [qrBtn, codeBtn].forEach(b=>b.classList.remove("active")); button.classList.add("active"); }
+
+async function loadSiteConfig(inputCode){
+  try{
+    let siteID;
+    if(/^\d{4}$/.test(inputCode)){
+      const shortSnap = await get(child(ref(merkezDB), `shortCodes/${inputCode}`));
+      if(!shortSnap.exists()){
+        msg.textContent = "Kısa kod geçersiz!";
+        showQRButtons(); return null;
+      }
+      siteID = shortSnap.val();
+    } else {
+      siteID = inputCode;
+    }
+    const siteSnap = await get(child(ref(merkezDB), `sites/${siteID}/config`));
+    if(!siteSnap.exists()){
+      msg.textContent = "Site config bulunamadı!";
+      showQRButtons(); return null;
+    }
+    const siteConfig = siteSnap.val();
+    let siteApp = getApps().find(a => a.name === `siteApp-${siteID}`);
+    if(!siteApp) siteApp = initializeApp(siteConfig, `siteApp-${siteID}`);
+    const siteDB = getDatabase(siteApp);
+    localStorage.setItem("siteID", siteID);
+    localStorage.setItem("siteConfig", encryptData(siteConfig));
+    hideQRButtons(); 
+    await loadSiteName(siteDB);
+    msg.textContent = "Site başarıyla yüklendi!";
+    return siteDB;
+  } catch(err){
+    console.error(err);
+    msg.textContent = "Site yüklenirken hata oluştu!";
+    showQRButtons();
+  }
+}
+
+closeQRModal.addEventListener("click", async () => {
+  ++qrLaunchToken;
+  if(qrReader){
+    try {
+      await qrReader.stop();
+      qrReader.clear();      
+    } catch(e){ console.error("QR durdurulamadı:", e); }
+    qrReader = null;
+  }
+  qrModal.style.display = "none"; 
+});
+
+window.toggleSupport = function() {
+  const wrapper = document.getElementById('supportWrapper');
+  wrapper.classList.toggle('active'); 
+};
+
+document.addEventListener('click', (e) => {
+  const wrapper = document.getElementById('supportWrapper');
+  if (wrapper && !wrapper.contains(e.target) && wrapper.classList.contains('active')) {
+    wrapper.classList.remove('active'); 
+  }
+});
+
+// Çevrimdışıyken index açık kalır; yönlendirme yalnız Offline Mod bağlantısındadır.
+
+let deferredPrompt;
+const installBtn = document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.style.display = 'block';
+});
+installBtn.addEventListener('click', async () => {
+  installBtn.style.display = 'none';
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+  }
+});
+// Servis kaydı yukarıdaki bağımsız scriptte yapılır; Firebase importuna bağlı değildir.
+</script>
+</body>
+</html>
