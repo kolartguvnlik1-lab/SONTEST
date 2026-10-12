@@ -8,6 +8,7 @@
   <!-- kolart-build:20261008-2050 -->
   <!-- kolart-offline-access:4hane-v1 -->
   <!-- kolart-offline-access:4hane-modal-v1 -->
+  <!-- kolart-patrol-behavior:20261013-tolerans-bolge-v1 -->
   <!-- Mevcut offline paket/servis sürümüyle uyumludur. -->
   <script defer src="./offline-sync.js?v=20261009-elit-1"></script>
   <script defer src="./offline-paket.js?v=20261009-elit-1"></script>
@@ -22,6 +23,7 @@
     [hidden]{display:none!important}svg{display:block;flex-shrink:0}button svg{width:20px;height:20px}
     .material-symbols-outlined{font-family:Arial,sans-serif;font-style:normal;display:inline-block;line-height:1}
     .app-container{width:100%;max-width:500px;margin:auto;min-height:100dvh;padding:0 20px calc(110px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#111d22,#0c151a 65%)}
+    .app-container.patrol-running{padding-bottom:calc(175px + env(safe-area-inset-bottom))}
     .masthead{display:flex;align-items:center;justify-content:space-between;padding:calc(24px + env(safe-area-inset-top)) 0 22px;border-bottom:1px solid var(--border)}
     .brand{display:flex;align-items:center;gap:10px}.brand-mark{width:35px;height:40px;color:var(--primary)}.wordmark{font-size:19px;letter-spacing:3px;font-weight:750}.brand-caption{color:var(--text-dim);font-size:8px;letter-spacing:2px;margin-top:4px}
     .date-tag{font-size:11px;color:#b4c2c6;letter-spacing:.4px;text-align:right;line-height:1.6}
@@ -30,16 +32,20 @@
     .info-card{position:relative;border:1px solid var(--border);border-radius:24px;background:var(--card);padding:22px;margin:0 0 14px;box-shadow:0 12px 28px #00000010}
     .route-card{background:radial-gradient(ellipse at 100% 0%,#e5d0a311,transparent 65%),linear-gradient(130deg,#1b2b32,#152128);border-color:#e5d0a325}
     .card-label{margin:0 0 10px;font-size:10px;letter-spacing:1.2px;color:var(--text-dim);font-weight:550}
-    .route-title{margin:0 70px 22px 0;font-size:23px;font-weight:600;line-height:1.3;letter-spacing:-.5px;overflow-wrap:anywhere}
+    .route-title{margin:0 85px 22px 0;font-size:23px;font-weight:600;line-height:1.3;letter-spacing:-.5px;overflow-wrap:anywhere}
     #eliteSelectBadge{display:none;position:absolute;right:20px;top:20px;border:1px solid #e5d0a32b;background:#e5d0a30a;color:var(--primary);font-size:11px;padding:8px 11px;border-radius:10px;font-weight:550}
+    .block-choice.is-current{border-color:#86d7b267;background:#86d7b20d}.block-choice small{display:block;font-size:10px;color:var(--text-dim);margin-top:6px;line-height:1.5}
+    .hour-choice[data-state="ready"]{border-color:#86d7b258;background:#86d7b20b}.hour-choice[data-state="ready"] span{color:var(--success)}.hour-choice[data-state="closed"]{background:#ffffff03;border-color:#ffffff12}.hour-choice[data-state="closed"] strong{color:#a4b5bc}.hour-policy{font-size:11px;line-height:1.7;color:#b5c9d0;margin:0 0 16px;padding:12px;border:1px solid var(--border);border-radius:12px;background:#ffffff03}
     .route-bottom{display:flex;align-items:end;justify-content:space-between;gap:12px}.percent-val{font-size:12px;font-weight:550;color:var(--success)}.timer-caption{display:block;color:var(--text-dim);font-size:10px;margin-bottom:6px;text-align:right}.time-val{font-size:25px;letter-spacing:1px;font-variant-numeric:tabular-nums;font-weight:500}
     .progress-track{height:4px;border-radius:20px;background:#ffffff10;margin-top:17px;overflow:hidden}.progress-fill{height:100%;width:0;background:linear-gradient(90deg,#e5d0a3,#86d7b2);border-radius:inherit;transition:width .3s}
     .stats-card{padding:18px 22px}.stats-grid{display:flex;justify-content:space-between;align-items:center}.stats-card .card-label{margin-bottom:7px}.counter-val{font-size:28px;font-weight:550;letter-spacing:-1px;font-variant-numeric:tabular-nums}.status-box{text-align:right}.status-box h4{margin:0;color:var(--success);font-size:11px;font-weight:600;display:flex;justify-content:end;align-items:center;gap:6px}.status-box h4:before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
     .section-row{display:flex;align-items:center;justify-content:space-between;padding:10px 3px 14px;gap:12px}.section-row h2{margin:0;font-size:13px;font-weight:600}.section-row p{margin:0;font-size:10px;color:var(--text-dim)}
     .qr-card{display:flex;align-items:center;gap:14px;padding:15px;border-radius:18px;margin-bottom:9px;background:#152128b3;border:1px solid var(--border);cursor:pointer;transition:background .2s,border-color .2s}.qr-card:hover{background:#1b2a31;border-color:#e5d0a340}.qr-icon-side{width:43px;height:43px;display:grid;place-items:center;flex-shrink:0;border-radius:13px;background:#e5d0a30e;color:var(--primary);border:1px solid #e5d0a321}.qr-icon-side span{font-size:23px}.qr-info{flex:1;min-width:0}.qr-info h3{margin:0 0 5px;font-size:13px;letter-spacing:.2px;line-height:1.3;font-weight:650;overflow-wrap:anywhere}.qr-info p{margin:0;font-size:10px;line-height:1.4}.waiting{color:var(--text-dim)}.completed{color:var(--success)}.point-arrow{color:#6d828b;font-size:20px}
     .upload-button{width:100%;margin:3px 0 20px;padding:16px 18px;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #86d7b235;background:#86d7b20d;color:#a3e4c6;border-radius:17px;font-size:12px;font-weight:600;transition:background .2s}.upload-button:hover{background:#86d7b217}.upload-button .queue-count{font-size:10px;min-width:23px;padding:4px;border-radius:7px;background:#86d7b21a}
+    #incidentBtn.upload-button{color:var(--primary);background:#e5d0a307;border-color:#e5d0a329;margin:0 0 10px;padding:12px}#incidentBtn .queue-count{background:#e5d0a316}.saved-note{padding:12px;text-align:left;background:#ffffff04;border:1px solid var(--border);border-radius:12px;margin:0 0 8px;overflow-wrap:anywhere}.saved-note small{display:block;font-size:10px;color:var(--primary);margin-bottom:7px}.saved-note p{white-space:pre-wrap;margin:0;font-size:12px;line-height:1.7;color:#b9cbd2}#patrolNoteHistory{max-height:180px;overflow:auto;margin-bottom:16px}
     .patrol-footer{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:500px;padding:16px 20px calc(16px + env(safe-area-inset-bottom));background:#101b21ee;border-top:1px solid var(--border);backdrop-filter:blur(20px);z-index:500}.footer-actions{display:flex;gap:10px}.action-btn{display:flex;align-items:center;justify-content:center;gap:9px;min-height:55px;padding:13px;border-radius:16px;font-size:13px;font-weight:650;border:0;transition:transform .15s}.action-btn:active{transform:scale(.98)}#startBtn,#endBtn{flex:1.8;background:var(--primary);color:var(--on-primary)}#backHomeBtn{flex:1;background:#ffffff05;border:1px solid #ffffff16;color:#c8d3d6}#endBtn,#incidentBtn{display:none}.footer-note{font-size:9px;text-align:center;color:#6e858e;margin:11px 0 0;letter-spacing:.4px}
     .modal,#hourSelectModal,#confirmPatrolModal{display:none;position:fixed;inset:0;z-index:10000;background:#051016d9;backdrop-filter:blur(15px);align-items:center;justify-content:center;padding:24px;overflow:auto}.dialog-card,.custom-alert-box,.critical-box{background:linear-gradient(145deg,#203139,#121e25);border:1px solid #ffffff16;border-radius:28px;width:100%;max-width:400px;padding:27px;box-shadow:0 30px 100px #0007;text-align:center;max-height:calc(100dvh - 48px);overflow:auto}.dialog-card h2,.dialog-card h3,.critical-box h2,.custom-alert-box h3{margin:0 0 12px;font-size:22px;letter-spacing:-.6px;font-weight:600}.dialog-copy{margin:0 0 20px;font-size:12px;line-height:1.7;color:#abbfc7}.dialog-emblem{width:54px;height:54px;display:grid;place-items:center;border:1px solid #e5d0a328;border-radius:17px;background:#e5d0a30c;margin:0 auto 20px;color:var(--primary);font-size:28px}
+    #appModal{z-index:12000}#confirmPatrolModal,#patrolNoteModal{z-index:11000}
     .primary-button,.custom-alert-btn{width:100%;border:0;border-radius:14px;padding:16px;background:var(--primary);color:var(--on-primary);font-size:13px;font-weight:650;cursor:pointer}.secondary-button{width:100%;border:1px solid #ffffff15;border-radius:14px;background:#ffffff04;color:#bbccd2;padding:14px;margin-top:10px;font-size:12px}.text-button{background:none;border:0;color:#91a8b2;font-size:12px;margin-top:20px;padding:8px 12px}.dual-actions{display:flex;gap:10px;margin-top:22px}.dual-actions button{flex:1;margin:0}.custom-alert-box p{font-size:13px;color:#bbccd2;line-height:1.7;overflow-wrap:anywhere;margin:0 0 22px}#appModalIcon{color:var(--primary);font-size:35px;margin-bottom:20px}
     #incidentNote{width:100%;background:#0f1c23;border:1px solid #ffffff20;border-radius:13px;color:var(--text);padding:14px;font-size:14px;min-height:100px;resize:vertical;margin-top:10px}.char-count{display:block;text-align:right;color:#b5c7ce;font-size:11px;margin:7px 0 18px}#forceFinishBtn:disabled{opacity:.4}.field-label{display:block;text-align:left;margin:0 0 8px;color:#c0ced1;font-size:12px;font-weight:550}
     #securityOverlay{display:none;position:fixed;inset:0;z-index:20000;background:#0b171bf5;align-items:center;justify-content:center;flex-direction:column;padding:30px;text-align:center}#securityOverlay h2{font-size:23px;font-weight:500;letter-spacing:-.4px;margin:0}#countdownNumber{font-size:100px;font-weight:350;line-height:1;letter-spacing:-6px;color:var(--primary);font-variant-numeric:tabular-nums;margin:30px 0}#securityOverlay p{max-width:280px;font-size:12px;color:#a9bdc5;line-height:1.8;margin:0}.location-pulse{color:var(--primary);width:65px;height:65px;margin-bottom:26px;border:1px solid #e5d0a337;border-radius:50%;display:grid;place-items:center;box-shadow:0 0 0 12px #e5d0a306}.location-pulse svg{width:28px;height:28px}.stay-note{margin-top:28px!important;background:#ffffff05;border:1px solid var(--border);border-radius:14px;padding:15px}
@@ -92,24 +98,24 @@
   <section class="info-card stats-card"><div class="stats-grid"><div><p class="card-label">KONTROL NOKTALARI</p><div class="counter-val" id="counterDisplay">0/0</div></div><div class="status-box"><p class="card-label">DURUM</p><h4 id="statusLabel">Hazır</h4></div></div></section>
   <div class="section-row"><h2>Kontrol noktaları</h2><p id="selectedHourStatus">Saat seçerek başlat</p></div>
   <div id="qrListContainer"></div>
-  <footer class="patrol-footer"><div class="footer-actions">
+  <footer class="patrol-footer"><button type="button" id="incidentBtn" class="upload-button" hidden><span aria-hidden="true">✎</span><span>Olay notu ekle</span><span id="patrolNoteCount" class="queue-count">0</span></button><div class="footer-actions">
     <button type="button" id="startBtn" class="action-btn" disabled><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m8 5 12 7-12 7V5Z"/></svg><span>Devriyeyi başlat</span></button>
     <button type="button" id="endBtn" class="action-btn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg><span>Devriyeyi bitir</span></button>
     <button type="button" id="backHomeBtn" class="action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M10 5H5v14h5m0-7h10m-4-4 4 4-4 4"/></svg><span>Çıkış</span></button>
-    <button type="button" id="incidentBtn" hidden>Olay bildir</button>
   </div><p class="footer-note">KOLART GÜVENLİK · DEVRİYE TAKİBİ</p></footer>
 </div>
 <div id="appModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="appModalTitle"><div class="custom-alert-box"><span id="appModalIcon" class="material-symbols-outlined" aria-hidden="true">info</span><h3 id="appModalTitle">Bilgi</h3><p id="appModalText"></p><button type="button" class="custom-alert-btn" onclick="closeAppModal()">Tamam</button></div></div>
 <div id="confirmModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="missingTitle"><div class="critical-box"><div class="dialog-emblem" aria-hidden="true">!</div><h2 id="missingTitle">Eksik kontrol noktası</h2><p class="dialog-copy">Bazı kontrol noktaları henüz doğrulanmadı. Devriyeyi bitirmek için eksik noktaların nedenini yazın.</p><label class="field-label" for="incidentNote">Eksik nokta açıklaması</label><textarea id="incidentNote" placeholder="Örn. C blok girişi kilitli olduğu için girilemedi…"></textarea><span id="charWarning" class="char-count">En az 15 karakter açıklama yazın.</span><button type="button" id="forceFinishBtn" class="primary-button" disabled><span id="finishText">Devriyeyi bitir ve kaydet</span></button><button type="button" class="secondary-button" onclick="document.getElementById('confirmModal').style.display='none'">Devriyeye devam et</button></div></div>
+<div id="patrolNoteModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="patrolNoteTitle"><div class="dialog-card"><p class="eyebrow">DEVRİYE NOTU</p><h2 id="patrolNoteTitle">Gördüğün olayı not et</h2><p class="dialog-copy">Notun telefonunda saklanır ve devriye raporuyla merkeze gönderilir.</p><div id="patrolNoteHistory"></div><label class="field-label" for="patrolNoteInput">Olay açıklaması</label><textarea id="patrolNoteInput" maxlength="2000" placeholder="Olayın yerini ve gördüklerini yaz…"></textarea><p id="patrolNoteMessage" class="char-count" role="status" aria-live="polite">En az 15 karakter açıklama yazın.</p><button type="button" id="patrolNoteSubmit" class="primary-button" disabled>Notu telefona kaydet</button><button type="button" id="patrolNoteCancel" class="text-button">Devriyeye dön</button></div></div>
 <div id="securityOverlay" role="status" aria-live="polite"><div class="location-pulse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 1v4m0 14v4M1 12h4m14 0h4"/></svg></div><h2>Nokta doğrulanıyor</h2><div id="countdownNumber">10</div><p>Konum bilgisi kaydediliyor.<br>İşlem tamamlanana kadar bekleyin.</p><p class="stay-note">Doğrulama bitene kadar kontrol noktasında kalın.</p></div>
-<div id="blockSelectModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="blockTitle"><div class="dialog-card"><p class="eyebrow">DEVRİYE ROTASI</p><h2 id="blockTitle">Bölgeni seç</h2><p class="dialog-copy">Devriye yapacağın bölgeyi seçerek devam et.</p><div id="blockListArea"></div><button type="button" class="text-button" onclick="document.getElementById('blockSelectModal').style.display='none'">Vazgeç</button></div></div>
+<div id="blockSelectModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="blockTitle"><div class="dialog-card"><p class="eyebrow">DEVRİYE ROTASI</p><h2 id="blockTitle">Bölgeni seç</h2><p id="blockChangeCopy" class="dialog-copy">Devriye yapacağın bölgeyi seçerek devam et.</p><div id="blockListArea"></div><button type="button" class="text-button" onclick="document.getElementById('blockSelectModal').style.display='none'">Vazgeç</button></div></div>
 <div id="qrScannerModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="scannerTitle"><div class="dialog-card"><h2 id="scannerTitle">QR kodu okut</h2><div id="reader"></div><p class="capture-notice">Nokta doğrulamasında fotoğraf ve konum kaydı alınır.</p><div class="scanner-actions"><button type="button" id="flashBtn" aria-label="Feneri aç veya kapat"><span class="material-symbols-outlined" aria-hidden="true">flashlight_on</span></button><button type="button" class="secondary-button" onclick="closeScanner()">Vazgeç</button></div></div></div>
 <div id="equipmentModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="equipmentTitle"><div class="dialog-card"><p class="eyebrow">BAŞLAMADAN ÖNCE</p><h2 id="equipmentTitle">Son kontroller</h2><p class="dialog-copy">Devriyeye hazır olduğundan emin ol.</p><div class="equipment-list">
   <div class="equipment-item"><p>Konum servisi açık mı?</p><div class="equipment-options"><button type="button" onclick="checkEq('gps',true)" id="gpsEvet">Evet</button><button type="button" onclick="checkEq('gps',false)" id="gpsHayir">Hayır</button></div></div>
   <div class="equipment-item"><p>El fenerini aldın mı?</p><div class="equipment-options"><button type="button" onclick="checkEq('fener',true)" id="fenerEvet">Evet</button><button type="button" onclick="checkEq('fener',false)" id="fenerHayir">Hayır</button></div></div>
   <div class="equipment-item"><p>Reflektör yeleğini giydin mi?</p><div class="equipment-options"><button type="button" onclick="checkEq('yelek',true)" id="yelekEvet">Evet</button><button type="button" onclick="checkEq('yelek',false)" id="yelekHayir">Hayır</button></div></div>
 </div><button type="button" id="finalStartBtn" class="primary-button">Devriyeyi başlat</button><button type="button" class="text-button" onclick="document.getElementById('equipmentModal').style.display='none'">Vazgeç</button></div></div>
-<div id="hourSelectModal" role="dialog" aria-modal="true" aria-labelledby="hourTitle"><div class="dialog-card"><p class="eyebrow">PLANLI DEVRİYE</p><h2 id="hourTitle">Saatini seç</h2><p class="dialog-copy">İstediğin devriye saatini seçerek başla.</p><p id="hourDateLabel"></p><div id="hourListArea"></div><button type="button" class="secondary-button" onclick="document.getElementById('hourSelectModal').style.display='none'">Vazgeç</button></div></div>
+<div id="hourSelectModal" role="dialog" aria-modal="true" aria-labelledby="hourTitle"><div class="dialog-card"><p class="eyebrow">PLANLI DEVRİYE</p><h2 id="hourTitle">Saatini seç</h2><p class="dialog-copy">Tamamlanan saatler listede gösterilmez.</p><p id="hourDateLabel"></p><p id="hourPolicyLabel" class="hour-policy"></p><div id="hourListArea"></div><button type="button" class="secondary-button" onclick="closeHourSelectModal()">Vazgeç</button></div></div>
 <div id="confirmPatrolModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle"><div class="dialog-card"><p class="eyebrow">DEVRİYE BAŞLANGICI</p><h2 id="confirmTitle">Hazır mısın?</h2><p id="confirmPatrolText"></p><div class="dual-actions"><button type="button" id="btnConfirmCancel" class="secondary-button">Vazgeç</button><button type="button" id="btnConfirmOk" class="primary-button">Devam et</button></div></div></div>
 <div id="uploadAccessModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="uploadAccessTitle"><div class="dialog-card"><div class="dialog-emblem" aria-hidden="true">↑</div><h2 id="uploadAccessTitle">Merkeze gönderim</h2><p class="dialog-copy">Çevrimiçi oturumun yenilenmesi gerekiyor. Devriye hesabının profil şifresini gir.</p><form id="uploadAccessForm"><label for="uploadAccessPassword" class="field-label">Profil şifren</label><input type="password" id="uploadAccessPassword" autocomplete="current-password" required><p id="uploadAccessMessage" class="access-status" role="status" aria-live="polite"></p><button type="submit" id="uploadAccessSubmit" class="primary-button">Doğrula ve gönder</button></form><button type="button" id="uploadAccessCancel" class="text-button">Vazgeç</button></div></div>
 <div id="offlineLogin" role="dialog" aria-modal="true" aria-labelledby="offlineLoginTitle"><div class="ol-shell">
@@ -149,8 +155,13 @@
 (() => {
 'use strict';
 document.body.appendChild(document.getElementById('offlineLogin'));
-let currentUser, siteID, patrolMeta, patrolId, activeRoute;
+let currentUser, siteID, patrolMeta, patrolId, activeRoute, displayedRoute;
+let routeSnapshots = {}, blockChanges = [], selectedPlan = null;
+let patrolNotes = [], noteSaving = false;
+let pendingPatrolWrite = Promise.resolve();
 let isPhoneBroken = false, unlocked = false, pointSaving = false;
+let startSaving = false, blockChanging = false, verifyingPoint = false;
+let pointSequence = 0, routeSequence = 0, hourSequence = 0, hourRefreshInterval = null;
 let loginEpoch = 0, loginSubmitting = false, previewEpoch = 0;
 let previewPromise = Promise.resolve(), managerPrompt = null;
 const db = {};
@@ -163,7 +174,38 @@ const get = async reference => {
 const escapeHTML = text => String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function stateForSave() {
   return {patrolId,block:currentBlock,startTime:startTime?.toISOString(),readPoints,
-    hedefSaat:secilenHedefSaat,equipment:eqStatus,meta:patrolMeta,routePoints:activeRoute};
+    hedefSaat:secilenHedefSaat,equipment:eqStatus,meta:patrolMeta,routePoints:activeRoute,
+    routeSnapshots,blockChanges,patrolNotes};
+}
+function trackPatrolWrite(promise) {
+  pendingPatrolWrite=promise.catch(()=>{});
+  return promise;
+}
+const normalName=value=>String(value || '').trim().toLocaleLowerCase('tr-TR');
+function isPointRead(point,block=currentBlock) {
+  return readPoints.some(read=>read.block===block &&
+    (read.qrId!=null && point.qrId!=null ? String(read.qrId).trim()===String(point.qrId).trim()
+      : normalName(read.name)===normalName(point.name)));
+}
+function pointChangeAllowed() {
+  try{return window.KolartOffline.read('settings/allowPointChange').val()===true;}catch(_){return false;}
+}
+function updatePointChangeBadge() {
+  const button=document.getElementById('eliteSelectBadge');
+  button.style.display=pointChangeAllowed()?'block':'none';
+  button.disabled=pointSaving || verifyingPoint || noteSaving || blockChanging || startSaving || isFinalizing || isSyncOutboxRunning;
+}
+function blockPreferenceKey() {return 'kolart_offline_bolge|'+encodeURIComponent(siteID)+'|'+encodeURIComponent(currentUser.uid);}
+function preferredBlock(candidate) {
+  try {
+    const p=JSON.parse(localStorage.getItem(blockPreferenceKey()) || 'null');
+    if(p?.version===candidate.version && p.createdAt===candidate.createdAt && candidate.blocks.includes(p.block))return p.block;
+  }catch(_){}
+  return candidate.block;
+}
+function rememberBlock(block) {
+  const p=window.KolartOffline.bundle;
+  try{localStorage.setItem(blockPreferenceKey(),JSON.stringify({block,version:p.version,createdAt:p.createdAt}));}catch(_){}
 }
 const REMEMBER_PREFIX='kolart_offline_hatirla_v1|';
 const rememberKey=()=>REMEMBER_PREFIX+encodeURIComponent(localStorage.getItem('siteID') || '');
@@ -220,9 +262,11 @@ async function refreshQueueLabel() {
   document.getElementById('offlineUploadCount').textContent=String(pending);
 }
 function stopPosition() {
+  pointSequence++;verifyingPoint=false;
   if(countdownInterval) {clearInterval(countdownInterval);countdownInterval=null;}
-  if(watchId) {navigator.geolocation.clearWatch(watchId);watchId=null;}
+  if(watchId!==null) {navigator.geolocation.clearWatch(watchId);watchId=null;}
   document.getElementById('securityOverlay').style.display='none';
+  updatePointChangeBadge();
 }
 function finishManagerPrompt(approved) {
   const prompt=managerPrompt;
@@ -314,6 +358,7 @@ document.getElementById('offlineManagerGate').addEventListener('keydown',event=>
 function showLockedLogin() {
   loginEpoch++;previewEpoch++;unlocked=false;
   finishManagerPrompt(false);
+  for(const id of ['blockSelectModal','equipmentModal','confirmPatrolModal','confirmModal','patrolNoteModal'])document.getElementById(id).style.display='none';
   document.querySelector('.app-container').inert=true;
   document.getElementById('offlineLogin').style.display='grid';
   document.getElementById('offlinePassword').value='';
@@ -344,27 +389,34 @@ function failedAttempt(key) {
   try{localStorage.setItem(key,JSON.stringify(attempts));}catch(_){}
 }
 async function lockScreen() {
-  if(pointSaving || isFinalizing) {showAppModal('LÜTFEN BEKLEYİN','Telefon kaydı tamamlanıyor.','hourglass_empty');return;}
+  if(pointSaving || noteSaving || startSaving || blockChanging || isFinalizing) {showAppModal('LÜTFEN BEKLEYİN','Telefon kaydı tamamlanıyor.','hourglass_empty');return;}
   showLockedLogin();
   await window.closeScanner();stopPosition();
 }
 async function restorePatrol(candidate) {
+  await pendingPatrolWrite;
+  window.closeHourSelectModal();selectedPlan=null;routeSequence++;
   currentUser=structuredClone(candidate.user);siteID=candidate.siteID;
   isPhoneBroken=candidate.data['telefon/'+candidate.username]===true;
   const data=await window.KolartOfflineSync.active({siteID,uid:currentUser.uid});
   if(data?.patrolId && data.meta?.uid===currentUser.uid && data.startTime) {
     patrolId=data.patrolId;patrolMeta=data.meta;currentBlock=data.block;
-    startTime=new Date(data.startTime);readPoints=data.readPoints || [];
+    startTime=new Date(data.startTime);
+    // Eski aktif kayıtların nokta kimliği, o kaydın bölgesiyle tamamlanır.
+    readPoints=(data.readPoints || []).map(p=>({...p,block:p.block || data.block}));
     secilenHedefSaat=data.hedefSaat;eqStatus=data.equipment || {gps:true,fener:true,yelek:true};
     activeRoute=data.routePoints || candidate.data[currentBlock+'qrcodes'];
+    routeSnapshots=data.routeSnapshots || {[currentBlock]:structuredClone(activeRoute)};
+    blockChanges=data.blockChanges || [];
+    patrolNotes=data.patrolNotes || [];
     if(!activeRoute || !Number.isFinite(startTime.getTime()))throw new Error('Devam eden devriyenin cihaz verisi eksik.');
     devriyeStarted=true;isFinalizing=false;uiStartMode();startTimerLoop();
   } else {
-    devriyeStarted=false;isFinalizing=false;currentBlock=candidate.block;
-    readPoints=[];startTime=null;secilenHedefSaat=null;activeRoute=null;uiReadyMode();
+    devriyeStarted=false;isFinalizing=false;currentBlock=preferredBlock(candidate);
+    readPoints=[];startTime=null;secilenHedefSaat=null;activeRoute=null;routeSnapshots={};blockChanges=[];patrolNotes=[];uiReadyMode();
   }
   await loadQRInterface();
-  document.getElementById('eliteSelectBadge').style.display='block';
+  updatePointChangeBadge();
   await refreshQueueLabel();
 }
 async function bootLogin() {
@@ -522,22 +574,30 @@ window.checkEq = (tip, cevap) => {
     }
 };
 function uiStartMode() {
+    document.querySelector('.app-container').classList.add('patrol-running');
     document.getElementById('backHomeBtn').style.display = "flex";
     document.getElementById('startBtn').style.display = "none";
     document.getElementById('endBtn').style.display = "flex";
-    document.getElementById('incidentBtn').style.display = "none"; 
+    document.getElementById('incidentBtn').hidden=false;document.getElementById('incidentBtn').style.display = "flex";
+    document.getElementById('patrolNoteCount').textContent=String(patrolNotes.length);
     document.getElementById('statusLabel').innerText = "Devam ediyor";
     document.getElementById('selectedHourStatus').textContent=(secilenHedefSaat || '')+' devriyesi';
+    updatePointChangeBadge();
 }
 function uiReadyMode() {
+    document.querySelector('.app-container').classList.remove('patrol-running');
     document.getElementById('backHomeBtn').style.display = "flex";
     document.getElementById('startBtn').style.display = "flex";
     document.getElementById('endBtn').style.display = "none";
-    document.getElementById('incidentBtn').style.display = "none"; 
+    document.getElementById('incidentBtn').hidden=true;document.getElementById('incidentBtn').style.display = "none";
     document.getElementById('statusLabel').innerText = "Hazır";
     document.getElementById('selectedHourStatus').textContent='Saat seçerek başlat';
     document.getElementById('timerDisplay').innerText = "00:00:00";
+    updatePointChangeBadge();
 }async function loadQRInterface() {
+    const sequence=++routeSequence,block=currentBlock;
+    const startButton=document.getElementById('startBtn');
+    startButton.disabled=true;
     // --- EKLENEN KISIM: Veri çekilmeden önce "Yükleniyor" veya "İnternet bekleniyor" mesajı ---
     const loadingContainer = document.getElementById('qrListContainer');
     if (loadingContainer) {
@@ -551,17 +611,21 @@ function uiReadyMode() {
     // ------------------------------------------------------------------------------------------
 
     try {
-        document.getElementById('routeName').innerText = currentBlock.toUpperCase() + "";
-        const qrSnap = await get(ref(db, `${currentBlock}qrcodes`));
+        document.getElementById('routeName').innerText = block.toLocaleUpperCase('tr-TR');
+        const qrSnap = await get(ref(db, `${block}qrcodes`));
+        if(sequence!==routeSequence || block!==currentBlock)return;
         const container = document.getElementById('qrListContainer');
-        if (qrSnap.exists()) {
+        const route=qrSnap.val();
+        if (qrSnap.exists() && route && Object.keys(route).length) {
+            displayedRoute=route;
             container.innerHTML = ''; // Yükleniyor mesajı burada otomatik olarak temizlenir
-            const points = Object.values(qrSnap.val());
+            const points = Object.values(route);
             refreshStats(points.length);
             points.forEach(point => {
-                const isRead = readPoints.some(rp => rp.name.trim().toLocaleLowerCase('tr-TR') === point.name.trim().toLocaleLowerCase('tr-TR'));
+                const isRead = isPointRead(point,block);
                 const div = document.createElement('div');
                 div.className = 'qr-card';div.tabIndex=0;div.setAttribute('role','button');div.setAttribute('aria-label',point.name);
+                div.dataset.qrId=String(point.qrId);div.dataset.block=block;
                 div.onkeydown=event=>{if(event.key==='Enter' || event.key===' '){event.preventDefault();div.click();}};
                 div.innerHTML = `
                     <div class="qr-icon-side" style="${isRead ? 'background:#86d7b221;color:#86d7b2;border-color:#86d7b240' : ''}">
@@ -576,7 +640,8 @@ function uiReadyMode() {
                 `;
 
                 div.onclick = () => { 
-                    const suAnOkunmusMu = readPoints.some(rp => rp.name === point.name);
+                    if(!unlocked || block!==currentBlock || blockChanging || startSaving || noteSaving || pointSaving || verifyingPoint)return;
+                    const suAnOkunmusMu = isPointRead(point,block);
                     if(suAnOkunmusMu) { 
                         showAppModal("TAMAMLANDI", "Bu noktayı zaten başarıyla doğruladınız.", "verified"); 
                         return; 
@@ -584,7 +649,7 @@ function uiReadyMode() {
                     
                     if(devriyeStarted && !isFinalizing) {
                         if (isPhoneBroken) {
-                            launchSecurityOverlay(point.name);
+                            launchSecurityOverlay(point.name,null,point.qrId);
                         } else {
                             openQRScanner(point.qrId, point.name); 
                         }
@@ -597,8 +662,10 @@ function uiReadyMode() {
                 container.appendChild(div);
             });
         } else {
+            displayedRoute=null;refreshStats(0);
             // Veri bulunamazsa yükleniyor mesajını "Bulunamadı" ile değiştir
             if (container) container.innerHTML = '<div style="text-align: center; padding: 20px; color: #7f8c8d;">Bu bölgeye ait kayıtlı nokta bulunamadı.</div>';
+            return;
         }
 
         // --- EKLENEN KISIM: Veriler başarıyla çekildikten hemen sonra butonu parlatıp kilidini açar ---
@@ -612,6 +679,8 @@ function uiReadyMode() {
         // ---------------------------------------------------------------------------------------------
 
     } catch (e) { 
+        if(sequence!==routeSequence)return;
+        displayedRoute=null;refreshStats(0);
         console.error("Arayüz yükleme hatası:", e); 
         
         // --- EKLENEN KISIM: Hata veya internet kopması durumunda kullanıcıyı bilgilendir ---
@@ -628,21 +697,22 @@ function uiReadyMode() {
     }
 }
 function refreshStats(totalCount = null) {
-    const total = totalCount || document.querySelectorAll('.qr-card').length;
-    const current = readPoints.length;
+    const route=Object.values(displayedRoute || {});
+    const total = totalCount ?? route.length;
+    const current = route.filter(point=>isPointRead(point)).length;
     const percent = total > 0 ? Math.round((current / total) * 100) : 0;
     document.getElementById('percentText').innerText = `%${percent} tamamlandı`;
     document.getElementById('progressFill').style.width=Math.min(100,percent)+'%';
     document.getElementById('patrolProgress').setAttribute('aria-valuenow',String(Math.min(100,percent)));
     document.getElementById('counterDisplay').innerText = `${current}/${total}`;
 }
-function updateUIVisually(pointName) {
+function updateUIVisually(pointName,qrId) {
     const cards = document.querySelectorAll('.qr-card');
     cards.forEach(card => {
         const kartIsmi = card.querySelector('h3').innerText.trim().toLocaleLowerCase('tr-TR');
         const gelenIsim = pointName.trim().toLocaleLowerCase('tr-TR');
 
-        if(kartIsmi === gelenIsim) {
+        if(card.dataset.block===currentBlock && (qrId!=null ? card.dataset.qrId===String(qrId) : kartIsmi===gelenIsim)) {
             card.querySelector('.qr-icon-side').style.background = '#86d7b221';
             card.querySelector('.qr-icon-side').style.color = '#86d7b2';
             card.querySelector('.material-symbols-outlined').innerText = 'verified';
@@ -671,104 +741,133 @@ function captureCameraFrame() {
     } catch (e) { return null; }
 }
 async function openQRScanner(targetId, pointName) {
-    if(!unlocked || !devriyeStarted || isFinalizing || pointSaving || qrScanner || countdownInterval)return;
+    if(!unlocked || !devriyeStarted || isFinalizing || noteSaving || blockChanging || pointSaving || verifyingPoint || qrScanner)return;
+    if(typeof Html5Qrcode!=='function') {
+      showAppModal('QR OKUYUCU HAZIR DEĞİL','İnternet varken ana girişten telefon paketini tamamlayın.','error');return;
+    }
+    const block=currentBlock,epoch=loginEpoch;
     document.getElementById('qrScannerModal').style.display = 'flex';
     qrScanner = new Html5Qrcode("reader", { useBarCodeDetectorIfSupported: false });
+    const scanner=qrScanner;
     
     let scanHandled = false;
     try {
-        await qrScanner.start({ facingMode: "environment" }, { fps: 20, qrbox: 250 }, async (txt) => {
-            if (scanHandled) return; scanHandled = true;
+        await scanner.start({ facingMode: "environment" }, { fps: 20, qrbox: 250 }, async (txt) => {
+            if (scanHandled || qrScanner!==scanner || !unlocked || epoch!==loginEpoch || block!==currentBlock) return;
+            scanHandled = true;
             if (txt.trim() === String(targetId).trim()) {
                 const capturedPhoto = captureCameraFrame();
                 await closeScanner();
-                launchSecurityOverlay(pointName, capturedPhoto);
+                if(unlocked && epoch===loginEpoch && block===currentBlock)launchSecurityOverlay(pointName, capturedPhoto,targetId);
             } else {
                 await closeScanner();
                 showAppModal("YANLIŞ NOKTA", `Okuttuğunuz kod bu noktaya (${escapeHTML(pointName)}) ait değil!`, "cancel");
             }
         });
-    } catch (e) { showAppModal("HATA", "QR okuyucu açılamadı. Tarayıcı izinlerini kontrol edip tekrar dene."); }
+        if(qrScanner!==scanner) {try{await scanner.stop();scanner.clear();}catch(_){}return;}
+    } catch (e) {
+      if(qrScanner===scanner)await window.closeScanner();
+      showAppModal("HATA", "QR okuyucu açılamadı. Tarayıcı izinlerini kontrol edip tekrar dene.");return;
+    }
 
     document.getElementById('flashBtn').onclick = async () => {
-        isFlashOn = !isFlashOn;
-        try { await qrScanner.applyVideoConstraints({ advanced: [{ torch: isFlashOn }] }); } catch(e){}
+        if(qrScanner!==scanner)return;
+        try {
+          const next=!isFlashOn;
+          await scanner.applyVideoConstraints({ advanced: [{ torch: next }] });isFlashOn=next;
+          document.getElementById('flashBtn').setAttribute('aria-pressed',String(next));
+        } catch(e){showAppModal('FENER AÇILAMADI','Bu cihaz veya tarayıcı kamera fenerini desteklemiyor.','info');}
     };
 }
 window.closeScanner = async () => {
     if (qrScanner) {
-        try { await qrScanner.stop(); } catch(e){}
+        const scanner=qrScanner;
         qrScanner = null;
+        try { await scanner.stop(); } catch(e){}
+        try { scanner.clear(); } catch(e){}
     }
     document.getElementById('qrScannerModal').style.display = 'none';
     isFlashOn = false;
+    document.getElementById('flashBtn').setAttribute('aria-pressed','false');
 };
-function launchSecurityOverlay(name, photo = null) {
-    if (!unlocked || !devriyeStarted || isFinalizing) return;
+function validPointAttempt(attempt) {
+    return attempt.sequence===pointSequence && attempt.block===currentBlock &&
+      attempt.patrolId===patrolId && attempt.epoch===loginEpoch && unlocked && devriyeStarted && !isFinalizing;
+}
+function launchSecurityOverlay(name, photo = null,qrId=null) {
+    if (!unlocked || !devriyeStarted || isFinalizing || noteSaving || pointSaving || verifyingPoint || blockChanging) return;
+    const attempt={sequence:++pointSequence,block:currentBlock,patrolId,epoch:loginEpoch,qrId};
+    verifyingPoint=true;updatePointChangeBadge();
     const overlay = document.getElementById('securityOverlay');
     const num = document.getElementById('countdownNumber');
     overlay.style.display = 'flex';   
     if (countdownInterval) clearInterval(countdownInterval);
-    if (watchId) navigator.geolocation.clearWatch(watchId);
+    if (watchId!==null) navigator.geolocation.clearWatch(watchId);
     let left = 10;
     num.innerText = left;
     bestLocation = null;
-    watchId = navigator.geolocation.watchPosition(
+    if(navigator.geolocation)try{watchId = navigator.geolocation.watchPosition(
         (pos) => {
-            if (isFinalizing) { if (watchId) navigator.geolocation.clearWatch(watchId); return; }
+            if (!validPointAttempt(attempt))return;
             const acc = pos.coords.accuracy;
             if (!bestLocation || acc < bestLocation.acc) {
                 bestLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: acc };
-                if (acc <= 10) finalizeGpsSearch(name, photo);
+                if (acc <= 10) finalizeGpsSearch(name, photo,attempt);
             }
         },
         (e) => console.warn("GPS Hatası:", e.message),
         { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
-    );
+    );}catch(e){console.warn('Konum servisi başlatılamadı.');}
     countdownInterval = setInterval(() => {
         left--; 
         num.innerText = left;
-        if (left <= 0) finalizeGpsSearch(name, photo);
+        if (left <= 0) finalizeGpsSearch(name, photo,attempt);
     }, 1000);
 }
-function finalizeGpsSearch(name, photo = null) {
+function finalizeGpsSearch(name, photo,attempt) {
+    if(!validPointAttempt(attempt) || attempt.finishing)return;
+    attempt.finishing=true;
     if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
-    if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+    if (watchId!==null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
     document.getElementById('securityOverlay').style.display = 'none';    
     if (isFinalizing) return;
     if (bestLocation) {
-        pushPoint(name, bestLocation.lat, bestLocation.lng, bestLocation.acc, photo);
+        void pushPoint(name, bestLocation.lat, bestLocation.lng, bestLocation.acc, photo,attempt);
     } else {
-        saveFinalAttempt(name, photo);
+        saveFinalAttempt(name, photo,attempt);
     }
 }
-function saveFinalAttempt(name, photo = null) {
-    if (isFinalizing) return;
-    navigator.geolocation.getCurrentPosition(
+function saveFinalAttempt(name, photo,attempt) {
+    if (!validPointAttempt(attempt))return;
+    if(!navigator.geolocation){void pushPoint(name,0,0,0,photo,attempt);return;}
+    try{navigator.geolocation.getCurrentPosition(
         (pos) => {
-            if (isFinalizing) return;
-            pushPoint(name, pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, photo);
+            if (!validPointAttempt(attempt)) return;
+            void pushPoint(name, pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, photo,attempt);
         },
         () => {
-            if (isFinalizing) return;
-            pushPoint(name, 0, 0, 0, photo);
+            if (!validPointAttempt(attempt)) return;
+            void pushPoint(name, 0, 0, 0, photo,attempt);
         },
         { enableHighAccuracy: true, timeout: 3000 }
-    );
+    );}catch(e){void pushPoint(name,0,0,0,photo,attempt);}
 }
-async function pushPoint(name, lat, lng, acc, base64Photo = null) {
-    if (pointSaving || isFinalizing || !devriyeStarted || readPoints.some(p => p.name === name)) return;
+async function pushPoint(name, lat, lng, acc, base64Photo,attempt) {
+    if(!validPointAttempt(attempt))return;
+    if(pointSaving || isPointRead({name,qrId:attempt.qrId},attempt.block)) {
+      verifyingPoint=false;updatePointChangeBadge();return;
+    }
     pointSaving=true;
-    const yeniNokta = {block:currentBlock,name,time:new Date().toLocaleTimeString('tr-TR'),
+    const yeniNokta = {block:attempt.block,name,qrId:attempt.qrId,time:new Date().toLocaleTimeString('tr-TR'),
       lat,lng,acc,photoUrl:null,offlineBase64:base64Photo || null};
     const nextPoints = [...readPoints,yeniNokta];
     try {
-      await window.KolartOfflineSync.saveActive(patrolMeta,{...stateForSave(),readPoints:nextPoints});
+      await trackPatrolWrite(window.KolartOfflineSync.saveActive(patrolMeta,{...stateForSave(),readPoints:nextPoints}));
       readPoints=nextPoints;
-      updateUIVisually(name);
+      updateUIVisually(name,attempt.qrId);
     } catch(error) {
       showAppModal('KAYIT YAPILAMADI','Nokta telefon hafızasına kaydedilemedi. Lütfen tekrar okutun.','error');
-    } finally {pointSaving=false;}
+    } finally {pointSaving=false;verifyingPoint=false;updatePointChangeBadge();}
 }
 function startTimerLoop() {
     if (mainTimerInterval) clearInterval(mainTimerInterval);
@@ -781,53 +880,123 @@ function startTimerLoop() {
         document.getElementById('timerDisplay').innerText = `${h}:${m}:${s}`;
     }, 1000);
 }
+function patrolPlan(date=new Date()) {
+  if(!Number.isFinite(date.getTime()))throw new Error('Cihaz tarihi okunamadı.');
+  const shiftDate=new Date(date);
+  if(shiftDate.getHours()<8)shiftDate.setDate(shiftDate.getDate()-1);
+  const isSunday=shiftDate.getDay()===0;
+  const pazar=isSunday?window.KolartOffline.read('sistemAyarlari/pazarSaatleri'):null;
+  const hours=pazar?.exists()?pazar.val():window.KolartOffline.read('sistemAyarlari/planliSaatler').val();
+  const rawTolerance=window.KolartOffline.read('sistemAyarlari/dakikaToleransi').val();
+  const parsed=rawTolerance==null?0:parseInt(rawTolerance,10);
+  if(!Number.isSafeInteger(parsed) || parsed<0)throw new Error('Paketteki dakika toleransı geçerli değil. İnternet varken paketi yenileyin.');
+  return {shiftDate,shiftKey:window.KolartOffline.shiftKey(date),isSunday,tolerance:parsed,
+    mode:window.KolartOffline.read('sistemAyarlari/saatModu').val() || 'tekli',
+    hours:Array.isArray(hours)?[...new Set(hours)].filter(s=>typeof s==='string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(s)):[]};
+}
+function hourWindow(hour,plan,now=new Date()) {
+  const [h,m]=hour.split(':').map(Number),begin=new Date(plan.shiftDate);
+  if(h<8)begin.setDate(begin.getDate()+1);
+  begin.setHours(h,m,0,0);
+  // Orijinal pencere: hedef saat + 59 dakika + yönetici toleransı.
+  // Son dakikanın saniyeleri de dahildir; 23:xx sonrası ertesi güne taşınır.
+  const end=new Date(begin);end.setMinutes(end.getMinutes()+59+plan.tolerance);
+  const endExclusive=new Date(end);endExclusive.setMinutes(endExclusive.getMinutes()+1);
+  const format=d=>String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  const currentMinute=now.getHours()*60+now.getMinutes(),beginMinute=h*60+m;
+  const endMinute=beginMinute+59+plan.tolerance;
+  // Orijinal sayfadaki saat karşılaştırması birebir korunur.
+  const allowed=endMinute<1440 ? currentMinute>=beginMinute && currentMinute<=endMinute
+    : currentMinute>=beginMinute || currentMinute<=endMinute-1440;
+  return {begin,end,endExclusive,endText:format(end),allowed};
+}
+function rejectSelectedTime(selection,now=new Date()) {
+  if(!selection || selection.block!==currentBlock) {
+    showAppModal('SAAT SEÇİN','Seçili bölge için devriye saatini yeniden seçin.','timer_off');return true;
+  }
+  const plan=patrolPlan(now);
+  if(plan.shiftKey!==selection.shiftKey || plan.mode!==selection.mode || !plan.hours.includes(selection.hour)) {
+    selectedPlan=null;secilenHedefSaat=null;
+    document.getElementById('confirmPatrolModal').style.display='none';
+    document.getElementById('equipmentModal').style.display='none';
+    window.closeHourSelectModal();
+    showAppModal('VARDİYA DEĞİŞTİ','Güncel vardiyanın devriye saatini yeniden seçin.','timer_off');return true;
+  }
+  const range=hourWindow(selection.hour,plan,now);
+  if(!range.allowed) {
+    showAppModal('GEÇERSİZ ZAMAN!',`${escapeHTML(selection.hour)} devriyesini sadece ${escapeHTML(selection.hour)} ile ${range.endText} saatleri arasında başlatabilirsiniz!`,'timer_off');return true;
+  }
+  return false;
+}
+window.closeHourSelectModal=()=>{
+  hourSequence++;
+  if(hourRefreshInterval){clearInterval(hourRefreshInterval);hourRefreshInterval=null;}
+  document.getElementById('hourSelectModal').style.display='none';
+};
 window.openHourSelectModal = async () => {
-  if(!unlocked || devriyeStarted || isFinalizing)return;
+  if(!unlocked || devriyeStarted || isFinalizing || startSaving || blockChanging)return;
+  window.closeHourSelectModal();selectedPlan=null;secilenHedefSaat=null;
+  const sequence=++hourSequence,block=currentBlock;
   const modal=document.getElementById('hourSelectModal'),area=document.getElementById('hourListArea');
   modal.style.display='flex';area.innerHTML='<div class="hour-empty">Devriye saatleri hazırlanıyor…</div>';
-  const shiftDate=new Date();
-  if(shiftDate.getHours()<8)shiftDate.setDate(shiftDate.getDate()-1);
-  const vardiyaTarihi=window.KolartOffline.shiftKey(new Date()),isSunday=shiftDate.getDay()===0;
-  document.getElementById('hourDateLabel').textContent=shiftDate.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})+' · '+(isSunday?'Pazar planı':'Normal plan');
   try {
-    const pazarSnap=isSunday ? await get(ref(db,'sistemAyarlari/pazarSaatleri')) : null;
-    const plan=pazarSnap?.exists() ? pazarSnap.val() : (await get(ref(db,'sistemAyarlari/planliSaatler'))).val();
-    const tumSaatler=Array.isArray(plan) ? [...new Set(plan)] : [];
-    const mode=(await get(ref(db,'sistemAyarlari/saatModu'))).val() || 'tekli';
-    const path='tamamlananDevriyeSaatleri/'+vardiyaTarihi+(mode==='blok'?'/'+currentBlock:'');
+    const plan=patrolPlan();
+    document.getElementById('hourDateLabel').textContent=plan.shiftDate.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})+' · '+(plan.isSunday?'Pazar planı':'Normal plan');
+    document.getElementById('hourPolicyLabel').textContent=`Devriye saati başladıktan sonra 59 dakika + ${plan.tolerance} dakika tolerans içinde başlayabilirsin.`;
+    const path='tamamlananDevriyeSaatleri/'+plan.shiftKey+(plan.mode==='blok'?'/'+block:'');
     const bitenSaatler=(await completedSnapshot(path)).val();
+    if(sequence!==hourSequence || block!==currentBlock || !unlocked)return;
     const weight=saat=>{const [h,m]=saat.split(':').map(Number);return (h<8?h+24:h)*60+m;};
-    const secilebilirSaatler=tumSaatler.filter(saat=>/^([01]\d|2[0-3]):[0-5]\d$/.test(saat) && !bitenSaatler[saat]).sort((a,b)=>weight(a)-weight(b));
+    const hours=plan.hours.filter(saat=>!bitenSaatler[saat]).sort((a,b)=>weight(a)-weight(b));
     area.replaceChildren();
-    if(!secilebilirSaatler.length) {
+    if(!hours.length) {
       const empty=document.createElement('div');empty.className='hour-empty';
-      empty.textContent=tumSaatler.length ? 'Bu vardiyanın tüm saatleri bu cihazda kaydedildi. Yeni vardiyada saatler yeniden görünecek.' : 'Bu güne ait planlı devriye saati bulunmuyor.';
+      empty.textContent=plan.hours.length?'Bu vardiyanın tüm saatleri bu cihazda kaydedildi. Yeni vardiyada saatler yeniden görünecek.':'Bu güne ait planlı devriye saati bulunmuyor.';
       area.appendChild(empty);return;
     }
-    for(const saat of secilebilirSaatler) {
+    const refresh=[];
+    for(const saat of hours) {
       const button=document.createElement('button');button.type='button';button.className='hour-choice';
       const title=document.createElement('strong');title.textContent=saat;
-      const label=document.createElement('span');label.textContent='Devriye için seç';button.append(title,label);
-      // Offline modda paketteki tüm saatler seçilebilir; eski zaman penceresi uygulanmaz.
+      const label=document.createElement('span');button.append(title,label);
+      refresh.push(now=>{
+        const range=hourWindow(saat,plan,now);button.dataset.state=range.allowed?'ready':'closed';
+        label.textContent=(range.allowed?'Şimdi başlayabilirsin':'Başlatma aralığı')+' · '+saat+'–'+range.endText;
+      });
       button.onclick=()=>{
-        document.getElementById('confirmPatrolText').innerHTML=`<span class="confirm-hour">${saat}</span>Bu saat için devriyeye başlayacaksın.`;
+        if(!unlocked || block!==currentBlock || devriyeStarted || startSaving || blockChanging)return;
+        const selection={hour:saat,block,shiftKey:plan.shiftKey,mode:plan.mode,tolerance:plan.tolerance};
+        if(rejectSelectedTime(selection))return;
+        const range=hourWindow(saat,plan);
+        document.getElementById('confirmPatrolText').innerHTML=`<span class="confirm-hour">${escapeHTML(saat)}</span>Bu saat için devriyeye başlayacaksın.<br>Başlatma aralığı: ${escapeHTML(saat)}–${range.endText}`;
         const confirm=document.getElementById('confirmPatrolModal');confirm.style.display='flex';
         document.getElementById('btnConfirmCancel').onclick=()=>{confirm.style.display='none';};
         document.getElementById('btnConfirmOk').onclick=()=>{
-          confirm.style.display='none';modal.style.display='none';secilenHedefSaat=saat;
+          if(!unlocked || rejectSelectedTime(selection))return;
+          selectedPlan=selection;secilenHedefSaat=saat;confirm.style.display='none';window.closeHourSelectModal();
           document.getElementById('equipmentModal').style.display='flex';
         };
       };
       area.appendChild(button);
     }
+    const refreshHours=()=>{
+      if(!unlocked || modal.style.display!=='flex' || sequence!==hourSequence) {
+        if(hourRefreshInterval)clearInterval(hourRefreshInterval);hourRefreshInterval=null;return;
+      }
+      const now=new Date();
+      if(window.KolartOffline.shiftKey(now)!==plan.shiftKey){void window.openHourSelectModal();return;}
+      refresh.forEach(fn=>fn(now));
+    };
+    refreshHours();hourRefreshInterval=setInterval(refreshHours,15000);
   } catch(error) {
-    area.innerHTML='<div class="hour-empty">Devriye saatleri cihazdan okunamadı. Tekrar deneyin.</div>';
+    if(sequence!==hourSequence)return;
+    area.innerHTML='<div class="hour-empty">'+escapeHTML(error.message || 'Devriye saatleri cihazdan okunamadı. Tekrar deneyin.')+'</div>';
     console.warn('[Devriye saatleri]',error.message);
   }
 };
 
 document.getElementById('startBtn').onclick=()=>{
-  if(!unlocked || devriyeStarted || isFinalizing)return;
+  if(!unlocked || devriyeStarted || isFinalizing || startSaving || blockChanging)return;
   eqStatus={gps:null,fener:null,yelek:null};
   for(const t of ['gps','fener','yelek'])for(const answer of ['Evet','Hayir']) {
     const b=document.getElementById(t+answer);b.style.background='none';b.style.color='#fff';
@@ -836,34 +1005,46 @@ document.getElementById('startBtn').onclick=()=>{
   window.openHourSelectModal();
 };
 document.getElementById('finalStartBtn').onclick=async()=>{
-  if(!unlocked || devriyeStarted || isFinalizing)return;
+  if(!unlocked || devriyeStarted || isFinalizing || startSaving || blockChanging)return;
   if(!eqStatus.gps || !eqStatus.fener || !eqStatus.yelek) {
     showAppModal('EKSİK KONTROL','GPS, Fener ve Yelek onayı olmadan devriye başlatılamaz!','warning');return;
   }
-  if(!secilenHedefSaat)return;
-  const button=document.getElementById('finalStartBtn');button.disabled=true;
+  if(!secilenHedefSaat || !selectedPlan)return;
+  const button=document.getElementById('finalStartBtn');button.disabled=true;startSaving=true;updatePointChangeBadge();
   try {
-    startTime=new Date();readPoints=[];
+    const now=new Date();
+    if(rejectSelectedTime(selectedPlan,now))return;
+    const mode=selectedPlan.mode,shiftDate=selectedPlan.shiftKey,block=currentBlock;
+    const closed=await window.KolartOfflineSync.localCompleted({siteID,uid:currentUser.uid,shiftDate,saatModu:mode},block);
+    if(closed.includes(secilenHedefSaat)) {
+      showAppModal('SAAT TAMAMLANMIŞ','Bu saat için cihazda bir devriye kaydı var. Başka bir saat seçin.','verified');return;
+    }
+    if(!unlocked || rejectSelectedTime(selectedPlan))return;
+    activeRoute=window.KolartOffline.read(block+'qrcodes').val();
+    if(!activeRoute || !Object.keys(activeRoute).length)throw new Error('Seçilen bölgede kayıtlı kontrol noktası yok.');
+    startTime=new Date();readPoints=[];blockChanges=[];patrolNotes=[];
+    routeSnapshots={[block]:structuredClone(activeRoute)};
     patrolId='P_'+Date.now()+'_'+crypto.randomUUID().replace(/-/g,'').slice(0,12);
     patrolMeta={siteID,uid:currentUser.uid,username:currentUser.username,
-      shiftDate:window.KolartOffline.shiftKey(startTime),
-      saatModu:window.KolartOffline.read('sistemAyarlari/saatModu').val() || 'tekli'};
-    activeRoute=window.KolartOffline.read(currentBlock+'qrcodes').val();
-    await window.KolartOfflineSync.saveActive(patrolMeta,stateForSave());
+      shiftDate, saatModu:mode,startBlock:block};
+    await trackPatrolWrite(window.KolartOfflineSync.saveActive(patrolMeta,stateForSave()));
     devriyeStarted=true;isFinalizing=false;
     document.getElementById('equipmentModal').style.display='none';
     uiStartMode();startTimerLoop();await loadQRInterface();
   } catch(error) {
     devriyeStarted=false;startTime=null;
     showAppModal('KAYIT YAPILAMADI','Devriye telefon hafızasına kaydedilemedi: '+escapeHTML(error.message),'error');
-  } finally {button.disabled=false;}
+  } finally {startSaving=false;button.disabled=false;updatePointChangeBadge();}
 };
 function missingPoints() {
-  return Object.values(activeRoute || {}).filter(p=>!readPoints.some(r=>r.name.trim().toLocaleLowerCase('tr-TR')===p.name.trim().toLocaleLowerCase('tr-TR'))).map(p=>p.name);
+  return Object.values(activeRoute || {}).filter(p=>!isPointRead(p)).map(p=>p.name);
 }
 document.getElementById('endBtn').onclick=()=>{
   if(!unlocked || isFinalizing || !devriyeStarted)return;
-  if(pointSaving || countdownInterval || qrScanner){showAppModal('DOĞRULAMA SÜRÜYOR','Nokta doğrulamasının bitmesini bekleyin.','hourglass_empty');return;}
+  if(pointSaving || noteSaving || verifyingPoint || blockChanging || qrScanner){showAppModal('DOĞRULAMA SÜRÜYOR','Nokta doğrulamasının veya telefon kaydının bitmesini bekleyin.','hourglass_empty');return;}
+  if(!activeRoute || !Object.keys(activeRoute).length) {
+    showAppModal('NOKTALAR HAZIR DEĞİL','Kontrol noktaları yüklenmeden devriye bitirilemez.','warning');return;
+  }
   const missed=missingPoints();
   if(!missed.length){void finalizeOffline('Eksiksiz tamamlandı.',[]);return;}
   const note=document.getElementById('incidentNote'),submit=document.getElementById('forceFinishBtn');
@@ -875,14 +1056,24 @@ document.getElementById('endBtn').onclick=()=>{
     document.getElementById('charWarning').textContent=length>=15?'Yeterli açıklama yazıldı ✓':`En az ${15-length} karakter daha…`;
   };
   submit.onclick=()=>{
-    if(note.value.trim().length<15 || isFinalizing)return;
+    if(note.value.trim().length<15 || isFinalizing || noteSaving || pointSaving || verifyingPoint || blockChanging || qrScanner)return;
     document.getElementById('confirmModal').style.display='none';
-    void finalizeOffline(note.value.trim(),missed);
+    void finalizeOffline(note.value.trim(),missingPoints());
   };
 };
+function reportPointCount() {
+  // Orijinalde bölge değişince eksikler son seçilen rotadan hesaplanır.
+  // Önceki bölgelerde okutulan noktalar da raporda ve toplamda saklanır.
+  const keys=new Set(readPoints.map(p=>p.block+'|'+(p.qrId!=null?'qr:'+String(p.qrId).trim():'ad:'+normalName(p.name))));
+  for(const point of Object.values(activeRoute || {})) {
+    if(isPointRead(point))continue;
+    keys.add(currentBlock+'|qr:'+String(point.qrId).trim());
+  }
+  return keys.size;
+}
 async function finalizeOffline(note,missed) {
-  if(isFinalizing || !devriyeStarted)return;
-  isFinalizing=true;
+  if(!unlocked || isFinalizing || !devriyeStarted || noteSaving || pointSaving || verifyingPoint || blockChanging || qrScanner)return;
+  isFinalizing=true;updatePointChangeBadge();
   const button=document.getElementById('endBtn');button.disabled=true;button.textContent='TELEFONA KAYDEDİLİYOR…';
   if(mainTimerInterval)clearInterval(mainTimerInterval);stopPosition();
   const dateKey=`${startTime.getFullYear()}-${String(startTime.getMonth()+1).padStart(2,'0')}-${String(startTime.getDate()).padStart(2,'0')}`;
@@ -891,33 +1082,77 @@ async function finalizeOffline(note,missed) {
     start:startTime.toLocaleTimeString('tr-TR'),end:new Date().toLocaleTimeString('tr-TR'),
     startISO:startTime.toISOString(),points:structuredClone(readPoints),missedPoints:missed,
     ekipmanlar:{...eqStatus},status:missed.length?'Eksik Devriye':'TAM DEVRİYE',
-    eksikNotu:note,okunanSayi:readPoints.length,toplamNokta:Object.keys(activeRoute || {}).length,
+    eksikNotu:note+(patrolNotes.length?'\n\nDevriye olay notları:\n'+patrolNotes.map(n=>`[${n.time} · ${n.block}] ${n.note}`).join('\n'):''),
+    devriyeNotlari:structuredClone(patrolNotes),okunanSayi:readPoints.length,toplamNokta:reportPointCount(),
+    baslangicBolgesi:patrolMeta.startBlock || currentBlock,bolgeDegisimleri:structuredClone(blockChanges),
     timestamp:Date.now(),dateKey,'kayıt':'offline devriye'};
   try {
-    await window.KolartOfflineSync.enqueue(log,patrolMeta);
+    await trackPatrolWrite(window.KolartOfflineSync.enqueue(log,patrolMeta));
     // IndexedDB işlemi tamamlanmadan ekran ve aktif devriye temizlenmez.
-    devriyeStarted=false;isFinalizing=false;readPoints=[];startTime=null;secilenHedefSaat=null;activeRoute=null;
+    devriyeStarted=false;isFinalizing=false;readPoints=[];startTime=null;secilenHedefSaat=null;selectedPlan=null;activeRoute=null;routeSnapshots={};blockChanges=[];patrolNotes=[];
     uiReadyMode();await loadQRInterface();await refreshQueueLabel();
-    showAppModal('Devriyen kaydedildi','Kayıt telefonunda saklanıyor. Merkeze aktarmak için internet varken “Verileri merkeze gönder” butonuna bas.','check_circle');
+    showAppModal('Devriyen kaydedildi',(log.okunanSayi===0?'Hiçbir nokta okutulmadığı için devriye saati yeniden kullanılabilir.<br><br>':'')+
+      'Kayıt telefonunda saklanıyor. Merkeze aktarmak için internet varken “Verileri merkeze gönder” butonuna bas.','check_circle');
   } catch(error) {
     isFinalizing=false;startTimerLoop();
     showAppModal('KAYIT TAMAMLANAMADI','Aktif devriyeniz korunuyor. Tekrar bitirmeyi deneyin: '+escapeHTML(error.message),'error');
-  } finally {button.disabled=false;button.textContent='DEVRİYEYİ BİTİR';}
+  } finally {button.disabled=false;button.textContent='DEVRİYEYİ BİTİR';updatePointChangeBadge();}
+}
+async function changeBlock(block) {
+  if(!unlocked || !pointChangeAllowed() || blockChanging || startSaving || isFinalizing)return;
+  if(pointSaving || noteSaving || verifyingPoint || qrScanner || isSyncOutboxRunning) {
+    showAppModal('İŞLEM SÜRÜYOR','Nokta doğrulamasının veya gönderimin bitmesini bekleyin.','hourglass_empty');return;
+  }
+  if(block===currentBlock){document.getElementById('blockSelectModal').style.display='none';return;}
+  if(!window.KolartOffline.bundle.blocks.includes(block))return;
+  blockChanging=true;updatePointChangeBadge();
+  const buttons=Array.from(document.querySelectorAll('#blockListArea button'));buttons.forEach(b=>b.disabled=true);
+  try {
+    const route=devriyeStarted && routeSnapshots[block] ? structuredClone(routeSnapshots[block]):window.KolartOffline.read(block+'qrcodes').val();
+    if(!route || !Object.keys(route).length)throw new Error('Bu bölgenin kontrol noktaları pakette yok.');
+    const snapshots={...routeSnapshots,[block]:structuredClone(route)};
+    const changes=[...blockChanges,{from:currentBlock,to:block,at:new Date().toISOString()}];
+    if(devriyeStarted) {
+      if(patrolMeta.saatModu==='blok') {
+        const done=await window.KolartOfflineSync.localCompleted(patrolMeta,block);
+        if(done.includes(secilenHedefSaat))throw new Error('Seçili devriye saati bu bölgede daha önce tamamlanmış. Başka bir bölge seçin.');
+      }
+      await trackPatrolWrite(window.KolartOfflineSync.saveActive(patrolMeta,{...stateForSave(),block,
+        routePoints:route,routeSnapshots:snapshots,blockChanges:changes}));
+      activeRoute=route;routeSnapshots=snapshots;blockChanges=changes;
+    } else {
+      selectedPlan=null;secilenHedefSaat=null;
+      window.closeHourSelectModal();document.getElementById('confirmPatrolModal').style.display='none';
+      document.getElementById('equipmentModal').style.display='none';
+    }
+    currentBlock=block;rememberBlock(block);
+    document.getElementById('blockSelectModal').style.display='none';
+    await loadQRInterface();
+  } catch(error) {
+    showAppModal('BÖLGE DEĞİŞTİRİLEMEDİ',escapeHTML(error.message)+'<br>Devam eden devriyen ve okumaların korunuyor.','warning');
+  } finally {blockChanging=false;buttons.forEach(b=>b.disabled=false);updatePointChangeBadge();}
 }
 window.openBlockModal=async()=>{
   if(!unlocked)return;
-  if(devriyeStarted){showAppModal('AKTİF DEVRİYE','Bölge değiştirmeden önce devriyeyi bitirin.','warning');return;}
+  if(!pointChangeAllowed()){showAppModal('BÖLGE DEĞİŞİMİ KAPALI','Yönetici bu paket için bölge değiştirme iznini açmamış.','warning');return;}
+  if(pointSaving || noteSaving || verifyingPoint || qrScanner || isFinalizing || blockChanging || startSaving || isSyncOutboxRunning) {
+    showAppModal('İŞLEM SÜRÜYOR','Devam eden işlemin bitmesini bekleyin.','hourglass_empty');return;
+  }
+  document.getElementById('blockChangeCopy').textContent=devriyeStarted
+    ? 'Bölgeni değiştirebilirsin. Devriye saatin, süren ve önceki okumaların korunur.'
+    : 'Devriye yapacağın bölgeyi seçerek devam et.';
   const area=document.getElementById('blockListArea');area.replaceChildren();
   for(const block of window.KolartOffline.bundle.blocks) {
     const button=document.createElement('button');button.textContent=block;
-    button.type='button';button.className='block-choice';
-    button.onclick=async()=>{currentBlock=block;secilenHedefSaat=null;document.getElementById('blockSelectModal').style.display='none';await loadQRInterface();};
+    button.type='button';button.className='block-choice'+(block===currentBlock?' is-current':'');
+    if(block===currentBlock){const label=document.createElement('small');label.textContent='Şu an seçili bölge';button.append(label);}
+    button.onclick=()=>void changeBlock(block);
     area.appendChild(button);
   }
   document.getElementById('blockSelectModal').style.display='flex';
 };
 async function toIndex() {
-  if(pointSaving || isFinalizing || isSyncOutboxRunning) {
+  if(pointSaving || noteSaving || startSaving || blockChanging || isFinalizing || isSyncOutboxRunning) {
     showAppModal('İşlem sürüyor','Kaydın tamamlanmasını bekle.','hourglass_empty');return;
   }
   // Çıkış yalnız index.html'e yönlendirir. Auth/hatırlama/aktif kayıt silinmez.
@@ -998,7 +1233,7 @@ async function manualContext(candidate) {
 }
 document.getElementById('offlineUploadBtn').onclick=async()=>{
   if(!unlocked || !navigator.onLine || isSyncOutboxRunning)return;
-  if(pointSaving || isFinalizing || countdownInterval || qrScanner) {
+  if(pointSaving || noteSaving || verifyingPoint || startSaving || blockChanging || isFinalizing || qrScanner) {
     showAppModal('Doğrulama sürüyor','Nokta kaydının tamamlanmasını bekle.','hourglass_empty');return;
   }
   isSyncOutboxRunning=true;
@@ -1014,7 +1249,41 @@ document.getElementById('offlineUploadBtn').onclick=async()=>{
     showAppModal('Gönderim tamamlanamadı',escapeHTML(uploadError(error)),'info');
   } finally {isSyncOutboxRunning=false;await refreshQueueLabel();}
 };
-document.getElementById('incidentBtn').style.display='none';
+document.getElementById('incidentBtn').onclick=()=>{
+  if(!unlocked || !devriyeStarted || isFinalizing || blockChanging || noteSaving)return;
+  if(pointSaving || verifyingPoint || qrScanner || isSyncOutboxRunning) {
+    showAppModal('İŞLEM SÜRÜYOR','Nokta doğrulamasının veya gönderimin bitmesini bekle.','hourglass_empty');return;
+  }
+  const history=document.getElementById('patrolNoteHistory');history.replaceChildren();
+  for(const note of patrolNotes) {
+    const card=document.createElement('div');card.className='saved-note';
+    const label=document.createElement('small');label.textContent=note.time+' · '+note.block;
+    const text=document.createElement('p');text.textContent=note.note;card.append(label,text);history.append(card);
+  }
+  document.getElementById('patrolNoteInput').value='';document.getElementById('patrolNoteSubmit').disabled=true;
+  document.getElementById('patrolNoteMessage').textContent='En az 15 karakter açıklama yazın.';
+  document.getElementById('patrolNoteModal').style.display='flex';document.getElementById('patrolNoteInput').focus();
+};
+document.getElementById('patrolNoteInput').oninput=event=>{
+  const length=event.target.value.trim().length;document.getElementById('patrolNoteSubmit').disabled=length<15;
+  document.getElementById('patrolNoteMessage').textContent=length>=15?'Notun kaydedilmeye hazır.':`En az ${15-length} karakter daha yazın.`;
+};
+document.getElementById('patrolNoteCancel').onclick=()=>{if(!noteSaving)document.getElementById('patrolNoteModal').style.display='none';};
+document.getElementById('patrolNoteSubmit').onclick=async()=>{
+  if(!unlocked || !devriyeStarted || noteSaving || isFinalizing || pointSaving || verifyingPoint || blockChanging)return;
+  const text=document.getElementById('patrolNoteInput').value.trim();if(text.length<15 || text.length>2000)return;
+  const button=document.getElementById('patrolNoteSubmit'),cancel=document.getElementById('patrolNoteCancel');
+  button.disabled=true;cancel.disabled=true;button.textContent='Notun kaydediliyor…';noteSaving=true;updatePointChangeBadge();
+  const now=new Date(),next=[...patrolNotes,{id:'N_'+crypto.randomUUID(),block:currentBlock,
+    atISO:now.toISOString(),time:now.toLocaleTimeString('tr-TR'),note:text}];
+  try {
+    await trackPatrolWrite(window.KolartOfflineSync.saveActive(patrolMeta,{...stateForSave(),patrolNotes:next}));
+    patrolNotes=next;document.getElementById('patrolNoteCount').textContent=String(next.length);
+    document.getElementById('patrolNoteModal').style.display='none';
+    showAppModal('Olay notun kaydedildi','Notun bu devriyenin raporuna eklenecek.','check_circle');
+  }catch(error){document.getElementById('patrolNoteMessage').textContent='Not kaydedilemedi. Yazdığın açıklama korunuyor; tekrar dene.';}
+  finally{noteSaving=false;button.disabled=false;cancel.disabled=false;button.textContent='Notu telefona kaydet';updatePointChangeBadge();}
+};
 window.addEventListener('online',()=>void refreshQueueLabel());
 window.addEventListener('offline',()=>void refreshQueueLabel());
 window.addEventListener('kolart-queue-change',()=>void refreshQueueLabel());
