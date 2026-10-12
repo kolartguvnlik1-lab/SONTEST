@@ -111,10 +111,13 @@
   }
   function completedSlot(log,meta) {
     if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(log.hedefSaat || ''))return null;
+    // Orijinal devriye gibi, sıfır noktalı bir rapor saati kapatmaz.
+    // Daha önceki sürümlerde sayısı olmayan kayıtlar ise korunur.
+    if(log.okunanSayi===0 || (log.okunanSayi==null && Array.isArray(log.points) && !log.points.length))return null;
     const block=meta.saatModu==='blok' ? log.bolge : '';
     return {id:idFor(meta,[meta.shiftDate,meta.saatModu || 'tekli',block,log.hedefSaat].map(encodeURIComponent).join('|')),
       siteID:meta.siteID,uid:meta.uid,shiftDate:meta.shiftDate,saatModu:meta.saatModu || 'tekli',
-      block,hour:log.hedefSaat,patrolId:log.patrolId,savedAt:Date.now()};
+      block,hour:log.hedefSaat,patrolId:log.patrolId,okunanSayi:log.okunanSayi,savedAt:Date.now()};
   }
   async function localCompleted(meta,block='') {
     const slots=await transaction(['completedSlots'],'readonly',(tx,done)=>{
