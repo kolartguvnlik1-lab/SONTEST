@@ -75,20 +75,14 @@
 <body>
 <div class="app-container" inert>
   <header class="masthead">
-    <div class="brand">
-      <div>
-        <div class="wordmark">KOD</div>
-        <div class="brand-caption">KOLART ONLİNE DENETİM</div>
-      </div>
-    </div>
+    <div class="brand"><svg class="brand-mark" viewBox="0 0 32 38" fill="none" aria-hidden="true"><path d="M16 2 29 7v11c0 8-6 14-13 18C9 32 3 26 3 18V7L16 2Z" stroke="currentColor" stroke-width="1.5"/><path d="m11 14 5 5 7-8M16 19v8" stroke="currentColor" stroke-width="1.5"/></svg><div><div class="wordmark">KOLART</div><div class="brand-caption">GÜVENLİK & DENETİM</div></div></div>
     <div id="patrolDateLabel" class="date-tag"></div>
   </header>
-</div>
   <section class="user-row" aria-label="Güvenlik görevlisi">
     <div id="offlineUserAvatar" class="user-avatar" aria-hidden="true">K</div>
     <div class="user-copy"><p class="eyebrow">Offline devriye kaydı</p><h1 id="offlineUserName">Devriye hesabı</h1><div id="offlineUserLabel" class="queue-label" aria-live="polite"></div></div>
   </section>
-  <button type="button" id="offlineUploadBtn" class="upload-button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 17H5a4 4 0 0 1-.4-8A7 7 0 0 1 18 8a4.5 4.5 0 0 1 1 9h-2M12 21V11m-4 4 4-4 4 4"/></svg><span>Verileri Merkeze Gönder</span><span id="offlineUploadCount" class="queue-count">0</span></button>
+  <button type="button" id="offlineUploadBtn" class="upload-button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 17H5a4 4 0 0 1-.4-8A7 7 0 0 1 18 8a4.5 4.5 0 0 1 1 9h-2M12 21V11m-4 4 4-4 4 4"/></svg><span>Verileri merkeze gönder</span><span id="offlineUploadCount" class="queue-count">0</span></button>
   <section class="info-card route-card">
     <button type="button" id="eliteSelectBadge" onclick="openBlockModal()">Bölge seç</button>
     <p class="card-label">DEVRİYE ROTASI</p><h2 class="route-title" id="routeName">Rota hazırlanıyor</h2>
@@ -103,7 +97,7 @@
     <button type="button" id="endBtn" class="action-btn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg><span>Devriyeyi bitir</span></button>
     <button type="button" id="backHomeBtn" class="action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M10 5H5v14h5m0-7h10m-4-4 4 4-4 4"/></svg><span>Çıkış</span></button>
     <button type="button" id="incidentBtn" hidden>Olay bildir</button>
-  </div><p class="footer-note">KOLART ONLİNE DENETİM </p></footer>
+  </div><p class="footer-note">KOLART GÜVENLİK · DEVRİYE TAKİBİ</p></footer>
 </div>
 <div id="appModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="appModalTitle"><div class="custom-alert-box"><span id="appModalIcon" class="material-symbols-outlined" aria-hidden="true">info</span><h3 id="appModalTitle">Bilgi</h3><p id="appModalText"></p><button type="button" class="custom-alert-btn" onclick="closeAppModal()">Tamam</button></div></div>
 <div id="confirmModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="missingTitle"><div class="critical-box"><div class="dialog-emblem" aria-hidden="true">!</div><h2 id="missingTitle">Eksik kontrol noktası</h2><p class="dialog-copy">Bazı kontrol noktaları henüz doğrulanmadı. Devriyeyi bitirmek için eksik noktaların nedenini yazın.</p><label class="field-label" for="incidentNote">Eksik nokta açıklaması</label><textarea id="incidentNote" placeholder="Örn. C blok girişi kilitli olduğu için girilemedi…"></textarea><span id="charWarning" class="char-count">En az 15 karakter açıklama yazın.</span><button type="button" id="forceFinishBtn" class="primary-button" disabled><span id="finishText">Devriyeyi bitir ve kaydet</span></button><button type="button" class="secondary-button" onclick="document.getElementById('confirmModal').style.display='none'">Devriyeye devam et</button></div></div>
@@ -120,29 +114,29 @@
 <div id="uploadAccessModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="uploadAccessTitle"><div class="dialog-card"><div class="dialog-emblem" aria-hidden="true">↑</div><h2 id="uploadAccessTitle">Merkeze gönderim</h2><p class="dialog-copy">Çevrimiçi oturumun yenilenmesi gerekiyor. Devriye hesabının profil şifresini gir.</p><form id="uploadAccessForm"><label for="uploadAccessPassword" class="field-label">Profil şifren</label><input type="password" id="uploadAccessPassword" autocomplete="current-password" required><p id="uploadAccessMessage" class="access-status" role="status" aria-live="polite"></p><button type="submit" id="uploadAccessSubmit" class="primary-button">Doğrula ve gönder</button></form><button type="button" id="uploadAccessCancel" class="text-button">Vazgeç</button></div></div>
 <div id="offlineLogin" role="dialog" aria-modal="true" aria-labelledby="offlineLoginTitle"><div class="ol-shell">
   <div class="login-brand"><svg class="brand-mark" viewBox="0 0 32 38" fill="none" aria-hidden="true"><path d="M16 2 29 7v11c0 8-6 14-13 18C9 32 3 26 3 18V7L16 2Z" stroke="currentColor" stroke-width="1.5"/><path d="m11 14 5 5 7-8M16 19v8" stroke="currentColor" stroke-width="1.5"/></svg><div><div class="wordmark">KOLART</div><div class="brand-caption">GÜVENLİK & DENETİM</div></div></div>
-  <div class="ol-card"><p class="login-kicker">OFFLINE DEVRİYE</p><h2 id="offlineLoginTitle">KOD Offline Devriye.</h2><p class="login-intro">Offline devriye başlatmak için yetkiliyle iletişime geçiniz.<br>0553 707 48 82.</p>
+  <div class="ol-card"><p class="login-kicker">OFFLINE DEVRİYE</p><h2 id="offlineLoginTitle">Görevine hazır ol.</h2><p class="login-intro">Hesabına giriş yap, devriyene devam et.<br>İnternet olmadan da çalışır.</p>
   <form id="offlineLoginForm">
     <label class="field-label" for="offlineUsername">Kullanıcı adı</label><div class="input-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="7" r="3.5"/><path d="M5 21v-3a7 7 0 0 1 14 0v3"/></svg><input id="offlineUsername" name="username" autocomplete="username" placeholder="Kullanıcı adın" required></div>
     <label class="field-label" for="offlinePassword">Profil şifren</label><div class="input-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><input id="offlinePassword" name="password" type="password" autocomplete="current-password" placeholder="Profil şifreni gir" required><button type="button" id="offlinePasswordToggle" class="password-toggle" aria-label="Şifreyi göster" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
     <label class="remember-row"><input type="checkbox" id="offlineRemember"><span><strong>Beni hatırla</strong><small>Bu cihazda sonraki girişte şifre sorma.<br>Yeni paket sürümünde yeniden doğrula.</small></span></label>
-    <p id="offlineLoginMessage" role="status" aria-live="polite">Telefon paketi kontrol ediliyor…</p><button type="submit" id="offlineLoginBtn" class="primary-button"><span>Offline Devriyeye Giriş </span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></button>
-  </form><button type="button" id="offlineLoginOnline">Çıkış<span aria-hidden="true">↗</span></button></div>
-  <p class="login-bottom">Kolart Online Denetim</p>
+    <p id="offlineLoginMessage" role="status" aria-live="polite">Telefon paketi kontrol ediliyor…</p><button type="submit" id="offlineLoginBtn" class="primary-button"><span>Devriyeye giriş yap</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></button>
+  </form><button type="button" id="offlineLoginOnline">Ana giriş ekranını aç <span aria-hidden="true">↗</span></button></div>
+  <p class="login-bottom">KOLART GÜVENLİK · SAHADA YANINDA</p>
 </div></div>
 <div id="offlineManagerGate" hidden role="dialog" aria-modal="true" aria-labelledby="offlineManagerTitle" aria-describedby="offlineManagerHelp">
   <div class="manager-dialog">
-    <div class="manager-top"><span class="manager-brand">KOD</span><button type="button" id="offlineManagerCancel" class="manager-close" aria-label="Kod onayını iptal et, girişe dön"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+    <div class="manager-top"><span class="manager-brand">KOLART</span><button type="button" id="offlineManagerCancel" class="manager-close" aria-label="Kod onayını iptal et, girişe dön"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
     <div class="manager-verified"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg><span>Hesap doğrulandı</span><strong id="offlineManagerUser"></strong></div>
     <div class="manager-emblem" aria-hidden="true"><svg viewBox="0 0 32 38" fill="none"><path d="M16 2 29 7v11c0 8-6 14-13 18C9 32 3 26 3 18V7L16 2Z" stroke="currentColor" stroke-width="1.35"/><path d="M11 20v-3a5 5 0 0 1 10 0v3" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="20" width="14" height="10" rx="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M16 24v3" stroke="currentColor" stroke-width="1.5"/></svg></div>
-    <p class="manager-kicker">İNTERNETSİZ DEVRİYE · YETKİLİ ONAYI</p><h2 id="offlineManagerTitle">KOD ONLİNE DENETİM</h2>
-    <p id="offlineManagerHelp">İnternetsiz devriye atmak için<br><strong>Denetim sorumlusundan 4 haneli kod alınız.</strong></p>
+    <p class="manager-kicker">İNTERNETSİZ DEVRİYE · YETKİLİ ONAYI</p><h2 id="offlineManagerTitle">Devriyeye bir<br>adım kaldı.</h2>
+    <p id="offlineManagerHelp">İnternetsiz devriye atmak için<br><strong>denetim sorumlusundan 4 haneli kod alınız.</strong></p>
     <form id="offlineManagerForm" novalidate>
       <label for="offlineManagerPassword" class="manager-code-label">4 HANELİ ONAY KODU</label>
       <input id="offlineManagerPassword" name="managerPassword" type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" autocomplete="off" enterkeyhint="go" aria-describedby="offlineManagerHelp offlineManagerMessage" placeholder="••••" required disabled>
       <p id="offlineManagerMessage" role="status" aria-live="polite"></p>
       <button type="submit" id="offlineManagerSubmit" class="primary-button"><span id="offlineManagerSubmitText">Kodu doğrula ve devam et</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></button>
     </form>
-    <a id="offlineManagerCall" class="manager-contact" href="tel:05537074882" aria-label="Denetim sorumlusunu ara: 0553 707 48 82"><span class="manager-contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 3H4a1 1 0 0 0-1 1c0 9.4 7.6 17 17 17a1 1 0 0 0 1-1v-3l-5-2-2 2a13 13 0 0 1-7-7l2-2-2-5Z" stroke-linejoin="round"/></svg></span><span class="manager-contact-copy"><strong>Denetim Sorumlusunu Ara</strong><span>0553 707 48 82</span></span><span class="manager-call-label">Ara</span></a>
+    <a id="offlineManagerCall" class="manager-contact" href="tel:05537074882" aria-label="Denetim sorumlusunu ara: 0553 707 48 82"><span class="manager-contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 3H4a1 1 0 0 0-1 1c0 9.4 7.6 17 17 17a1 1 0 0 0 1-1v-3l-5-2-2 2a13 13 0 0 1-7-7l2-2-2-5Z" stroke-linejoin="round"/></svg></span><span class="manager-contact-copy"><strong>Denetim sorumlusunu ara</strong><span>0553 707 48 82</span></span><span class="manager-call-label">Ara</span></a>
     <p class="manager-footnote">Bu onay mevcut offline paket için bir kez istenir.<br>Kod doğrulaması internet bağlantısı gerektirmez.</p>
   </div>
 </div>
