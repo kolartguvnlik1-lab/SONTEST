@@ -7,7 +7,8 @@
   // BUILD uyumluluğu korunur; yönetici parolası eklenen dosyaların önbelleği yenilenir.
   const REVISION = '20261009-0030';
   const PREVIOUS_REVISION = '20261008-2311';
-  const UI_REVISION = '20261009-elit-1';
+  const UI_REVISION = '20261013-devriye-uyum-1';
+  const PATROL_RULES_REVISION = '20261013-1';
 
   const base = new URL('./', document.currentScript.src);
   const POINTER = 'kolart_offline_son_kullanici';
@@ -756,6 +757,13 @@
     const connection=connectionFor(c,authUser);
     if(local) {
       local.connection=connection;
+      // Eski paketin v1/v2 bayrağı, parolaları ve devam eden kayıtları korunur.
+      // Önceden true olarak sabitlenen bölge izni bir kez gerçek ayardan alınır.
+      if(local.patrolRulesRevision!==PATROL_RULES_REVISION) {
+        progress(5,'Devriye bölge değiştirme ayarı güncelleniyor…');
+        local.data['settings/allowPointChange']=(await readServer(c,'settings/allowPointChange'))===true;
+        local.patrolRulesRevision=PATROL_RULES_REVISION;
+      }
       // Aynı veri sürümünü koruyarak güncel ekran dosyalarını bir kez yenile.
       if(local.revision===REVISION && hasManagerPassword(local) && local.uiRevision!==UI_REVISION) {
         progress(5,'Devriye ekranları güncelleniyor…');
@@ -910,6 +918,7 @@
       'nobetRecords',
       'activeDevriye/' + username,
       'telefon/' + username,
+      'settings/allowPointChange',
       'sistemAyarlari/saatModu',
       'sistemAyarlari/pazarSaatleri',
       'sistemAyarlari/planliSaatler',
@@ -1033,7 +1042,7 @@
       blocks.map(b => [b, true])
     );
 
-    data['settings/allowPointChange'] = true;
+    data['settings/allowPointChange'] = data['settings/allowPointChange'] === true;
 
     const hours = data['sistemAyarlari/planliSaatler'];
 
@@ -1086,6 +1095,7 @@
       build: BUILD,
       revision: REVISION,
       uiRevision: UI_REVISION,
+      patrolRulesRevision: PATROL_RULES_REVISION,
       connection,
       complete: true,
       version: targetVersion,
