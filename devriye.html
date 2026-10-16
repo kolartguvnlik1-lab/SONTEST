@@ -1216,29 +1216,28 @@ async function queuePreviouslyFinishedActive(active) {
         _historyConfirmed: true, _notificationSent: true });
     return true;
 }
+function belongsToFinishedPatrol(active, log) {
+    if (!active) return false;
+    if (log._startTime) {
+        if (active.startTime === log._startTime) return true;
+        const expected = new Date(log._startTime).getTime();
+        const actual = new Date(active.startTime).getTime();
+        return Number.isFinite(expected) && Number.isFinite(actual) && expected === actual;
+    }
+    // Önceki sürümden kalan raporda gün, başlangıç saati ve hedef birlikte eşleşir.
+    const started = new Date(active.startTime);
+    if (!Number.isFinite(started.getTime())) return false;
+    const day = `${started.getFullYear()}-${String(started.getMonth() + 1).padStart(2, '0')}-${String(started.getDate()).padStart(2, '0')}`;
+    return day === log.dateKey && started.toLocaleTimeString('tr-TR') === log.start && active.hedefSaat === log.hedefSaat;
+}
 async function clearFinishedCloudPatrol(log) {
-    // Eski rapor aktarılırken yeni başlatılmış devriye silinemez.
-    const belongsToFinishedPatrol = active => {
-        if (!active) return false;
-        if (log._startTime) {
-            if (active.startTime === log._startTime) return true;
-            const expected = new Date(log._startTime).getTime();
-            const actual = new Date(active.startTime).getTime();
-            return Number.isFinite(expected) && Number.isFinite(actual) && expected === actual;
-        }
-        // Önceki sürümden kalan raporda gün, başlangıç saati ve hedef birlikte eşleşir.
-        const started = new Date(active.startTime);
-        if (!Number.isFinite(started.getTime())) return false;
-        const day = `${started.getFullYear()}-${String(started.getMonth() + 1).padStart(2, '0')}-${String(started.getDate()).padStart(2, '0')}`;
-        return day === log.dateKey && started.toLocaleTimeString('tr-TR') === log.start && active.hedefSaat === log.hedefSaat;
-    };
+    // Eski sürümde geçmişi yazılıp temizliği eksik kalmış raporlar için güvenli yeniden deneme.
     const result = await runTransaction(activeDevriyeRef, active => {
-        // Önbellek boşken de null yazımı sunucudaki gerçek değerle doğrulanır.
-        return active === null || belongsToFinishedPatrol(active) ? null : undefined;
+        return active === null || belongsToFinishedPatrol(active, log) ? null : undefined;
     }, { applyLocally: false });
-    if (result.committed) return; // Silme sunucu tarafından onaylandı.
+    if (result.committed) return;
     const remaining = result.snapshot.val();
-    if (remaining && !belongsToFinishedPatrol(remaining)) return; // Farklı/yeni aktif devriye korunur.
+    if (remaining && !belongsToFinishedPatrol(remaining, log)) return;
     throw new Error('Aktif devriye temizliği onaylanmadı; tamamlanmış rapor telefonda korunarak yeniden denenecek.');
 }
 async function uploadOutboxPhoto(log, point) {
@@ -1267,24 +1266,35 @@ function syncOutbox() {
                 try {
                     if (!log._historyConfirmed) {
                         const changes = { [`devriyeHistory/${log.dateKey}/${log.user}/${outboxId(log)}`]: historyPayload(log) };
-                        const hourPath = await outboxHourPath(log);
+                        const [hourPath, activeSnapshot] = await Promise.all([
+                            outboxHourPath(log), get(activeDevriyeRef)
+                        ]);
+                        const active = activeSnapshot.exists() ? activeSnapshot.val() : null;
+                        // Bu kullanıcı adına farklı/yeni bir aktif devriye varsa onun kaydı korunur.
+                        if (active === null || belongsToFinishedPatrol(active, log)) {
+                            changes[`activeDevriye/${currentUser.username}`] = null;
+                        }
                         if (hourPath) {
                             const name = log.name || log.user || 'Bilinmiyor';
                             changes[hourPath] = log.okunanSayi === 0 ? null
                                 : name + (log.status === 'Eksik Devriye' ? ' - Eksik Devriye' : '');
                         }
-                        // Rapor ve son saat durumu tek atomik işlemle yazılır.
-                        // Promise yalnızca SUNUCU yazmayı onayladığında tamamlanır.
+                        // RAPOR + SAAT + EŞLEŞEN AKTİF KAYDIN SİLİNMESİ AYNI SUNUCU İŞLEMİDİR.
+                        // Uygulama gönderimden hemen sonra kapansa da bu işlem kısmen uygulanamaz.
                         await update(ref(db), changes);
                         confirmedPatrolIds.add(outboxId(log));
                         log._historyConfirmed = true;
+                        log._activeCleanupConfirmed = true;
                         await saveOutboxProgress(log);
                     } else {
                         confirmedPatrolIds.add(outboxId(log));
                     }
-                    // Rapor onaylandıktan hemen sonra aktif kaydı temizle.
-                    // Fotoğraf yüklemesi veya fotoğraf adresi güncellemesi bu adımı geciktiremez.
-                    await clearFinishedCloudPatrol(log);
+                    // Önceki sürümde raporu zaten yazılmış fakat aktif temizliği eksik kalmışsa tamamla.
+                    if (!log._activeCleanupConfirmed) {
+                        await clearFinishedCloudPatrol(log);
+                        log._activeCleanupConfirmed = true;
+                        await saveOutboxProgress(log);
+                    }
                 } catch (error) {
                     console.error('Rapor gönderilemedi; telefon kaydı korunuyor:', error);
                     log._attemptFailed = true;
@@ -1374,7 +1384,7 @@ async function finalizePatrol(note = '', eksikListesi = []) {
     if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
     readPoints = []; startTime = null; secilenHedefSaat = null;
     localStorage.removeItem(OFFLINE_STORAGE_KEY);
-    // activeDevriye burada silinmez: temizliği yalnızca raporun sunucu onayından sonra yapılır.
+    // Aktif kayıt telefon yedeğinden sonra, raporla AYNI atomik sunucu güncellemesinde silinir.
     let secondsLeft = 20;
     let timeoutId;
     const renderCountdown = () => {
