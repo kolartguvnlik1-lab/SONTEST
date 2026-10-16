@@ -361,10 +361,8 @@
     <div id="supportModal" class="modal-overlay">
         <div class="modal-content warning">
             <h2 style="color: var(--warning); margin-top:0; font-weight: 900; letter-spacing: 2px; font-size: 18px;">DESTEK PERSONEL</h2>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px; line-height: 1.6;">Lütfen adınızı, soyadınızı ve iletişim numaranızı giriniz. (Zorunludur)</p>
-            <input type="text" id="supportFirstName" placeholder="ADINIZ" maxlength="50" autocomplete="given-name" style="text-align: center; font-size: 16px;">
-            <input type="text" id="supportLastName" placeholder="SOYADINIZ" maxlength="50" autocomplete="family-name" style="text-align: center; font-size: 16px;">
-            <input type="tel" id="supportPhone" placeholder="05XX XXX XX XX" maxlength="11" autocomplete="tel" style="text-align: center; font-size: 18px; letter-spacing: 2px;">
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px; line-height: 1.6;">Lütfen iletişim numaranızı giriniz. (Zorunludur)</p>
+            <input type="tel" id="supportPhone" placeholder="05XX XXX XX XX" maxlength="11" style="text-align: center; font-size: 18px; letter-spacing: 2px;">
             <button id="saveSupportBtn" style="background: var(--warning); color: #000;">NUMARAYI KAYDET</button>
         </div>
     </div>
@@ -466,7 +464,7 @@ const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
 const securitySelect = document.getElementById('securitySelect'), deliverSelect = document.getElementById('deliverSelect');
 const timerEl = document.getElementById('timer'), qrModal = document.getElementById('qrScannerModal');
 const successModal = document.getElementById('successModal'), successText = document.getElementById('successText');
-const supportModal = document.getElementById('supportModal'), supportPhoneInput = document.getElementById('supportPhone'), supportFirstNameInput = document.getElementById('supportFirstName'), supportLastNameInput = document.getElementById('supportLastName'), saveSupportBtn = document.getElementById('saveSupportBtn');
+const supportModal = document.getElementById('supportModal'), supportPhoneInput = document.getElementById('supportPhone'), saveSupportBtn = document.getElementById('saveSupportBtn');
 const manualBtn = document.getElementById('manualBtn');
 const startBtn = document.getElementById('startBtn');
 const deliverBtn = document.getElementById('deliverBtn');
@@ -884,7 +882,7 @@ async function handleDeliverFlow(reportMessage) {
         newArchiveRef = await push(ref(db, `tamamnbt/${klasorAdi}`), tamamlananKayit);
         await remove(baslangicRef);
 
-        if(currentUser.username === "DESTEK PERSONEL") { try { await update(ref(db, 'users/DESTEK PERSONEL'), { name: "DESTEK PERSONEL", phone: "" }); } catch(e){} }
+        if(currentUser.username === "DESTEK PERSONEL") { try { await update(ref(db, 'users/DESTEK PERSONEL'), { phone: "" }); } catch(e){} }
 
     } catch (error) { 
         showAppError("⚠️ İNTERNET VEYA SUNUCU HATASI:\n" + error.message);
@@ -968,16 +966,12 @@ document.getElementById('cancelManualBtn').addEventListener('click', () => {
 });
 
 saveSupportBtn.addEventListener('click', async () => {
-    const firstName = supportFirstNameInput.value.trim();
-    const lastName = supportLastNameInput.value.trim();
-    const fullName = `${firstName} ${lastName}`.trim();
     const phone = supportPhoneInput.value.trim();
-    if(!firstName || !lastName) return showAppError("Lütfen adınızı ve soyadınızı giriniz!");
     if(phone.length < 10) return showAppError("Lütfen geçerli bir telefon numarası giriniz!");
     saveSupportBtn.disabled = true;
     
     try {
-        await update(ref(db, 'users/DESTEK PERSONEL'), { name: fullName, phone: phone });
+        await update(ref(db, 'users/DESTEK PERSONEL'), { phone: phone });
         supportModal.style.display = 'none';
         const isPhoneBroken = manualBtn.style.display === 'block';
 
