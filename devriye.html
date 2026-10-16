@@ -617,14 +617,21 @@ window.checkEq = (tip, cevap) => {
             const snap = await get(activeDevriyeRef);
             if (snap.exists() && pendingOutbox.length === 0) {
                 const cloudData = snap.val();
-                startTime = new Date(cloudData.startTime);
-                readPoints = cloudData.readPoints || [];
-				secilenHedefSaat = cloudData.hedefSaat || null;
-                devriyeStarted = true;
-                isFinalizing = false;
-                saveToLocal();
-                uiStartMode();
-                startTimerLoop();
+                if (await queuePreviouslyFinishedActive(cloudData)) {
+                    // Önceki sürümden kalmış bitmiş devriyeyi yeniden aktif açma.
+                    devriyeStarted = false;
+                    isFinalizing = false;
+                    uiReadyMode();
+                } else {
+                    startTime = new Date(cloudData.startTime);
+                    readPoints = cloudData.readPoints || [];
+                    secilenHedefSaat = cloudData.hedefSaat || null;
+                    devriyeStarted = true;
+                    isFinalizing = false;
+                    saveToLocal();
+                    uiStartMode();
+                    startTimerLoop();
+                }
             } else {
                 // --- GHOST BUSTER KORUMASI 2 ---
                 if(navigator.onLine && pendingOutbox.length === 0) { set(activeDevriyeRef, null).catch(()=>{}); }
@@ -697,7 +704,7 @@ function uiReadyMode() {
                     <div class="qr-info">
                         <h3>${point.name}</h3>
                         <p class="${isRead ? 'completed' : 'waiting'}">
-                            ${isRead ? 'NOKTA DOĞRULANDI' : (isPhoneBroken ? 'DOKUN VE DOĞRULA ' : 'TARAMAA BEKLENİYOR...')}
+                            ${isRead ? 'NOKTA DOĞRULANDI' : (isPhoneBroken ? 'DOKUN VE DOĞRULA ' : 'TARAMA BEKLENİYOR...')}
                         </p>
                     </div>
                 `;
@@ -1189,21 +1196,50 @@ async function outboxHourPath(log) {
         ? `tamamlananDevriyeSaatleri/${vTarihi}/${log.bolge}/${log.hedefSaat}`
         : `tamamlananDevriyeSaatleri/${vTarihi}/${log.hedefSaat}`;
 }
+async function queuePreviouslyFinishedActive(active) {
+    // Yalnızca telefonda aktif yedek/bekleyen rapor yokken buluttan geri açılacak kaydı doğrula.
+    const started = new Date(active.startTime);
+    if (!Number.isFinite(started.getTime())) return false;
+    const day = `${started.getFullYear()}-${String(started.getMonth() + 1).padStart(2, '0')}-${String(started.getDate()).padStart(2, '0')}`;
+    let snapshot;
+    try { snapshot = await get(ref(db, `devriyeHistory/${day}/${currentUser.username}`)); }
+    catch (error) { console.warn('Aktif kaydın tamamlandığı doğrulanamadı; kayıt korunuyor:', error); return false; }
+    const match = Object.entries(snapshot.val() || {}).find(([, record]) => record &&
+        record.start === started.toLocaleTimeString('tr-TR') && record.end &&
+        String(record.hedefSaat || 'Belirtilmedi') === String(active.hedefSaat || 'Belirtilmedi') &&
+        (record.status === 'TAM DEVRİYE' || record.status === 'Eksik Devriye'));
+    if (!match) return false;
+    const [key, record] = match;
+    // Geçmiş kaydı doğrulandı: aynı kimlikle yalnızca kalan temizliği tekrar sıraya al.
+    await saveOutboxProgress({ ...record, patrolId: record.patrolId || key,
+        user: currentUser.username, dateKey: day, _siteId: siteID, _startTime: active.startTime,
+        _historyConfirmed: true, _notificationSent: true });
+    return true;
+}
 async function clearFinishedCloudPatrol(log) {
     // Eski rapor aktarılırken yeni başlatılmış devriye silinemez.
-    await runTransaction(activeDevriyeRef, active => {
-        // null dönmek, önbellek boşken de sunucudaki gerçek değerle kontrol yapılmasını sağlar.
-        if (active === null) return null;
-        if (log._startTime) return active.startTime === log._startTime ? null : undefined;
-        // Önceki sürümden kalan raporda ISO başlangıç yoksa gün, saat ve hedefin
-        // tümü eşleşmelidir; farklı/yeni bir aktif devriye silinmez.
-        const started = new Date(active.startTime);
-        if (Number.isFinite(started.getTime())) {
-            const day = `${started.getFullYear()}-${String(started.getMonth() + 1).padStart(2, '0')}-${String(started.getDate()).padStart(2, '0')}`;
-            if (day === log.dateKey && started.toLocaleTimeString('tr-TR') === log.start && active.hedefSaat === log.hedefSaat) return null;
+    const belongsToFinishedPatrol = active => {
+        if (!active) return false;
+        if (log._startTime) {
+            if (active.startTime === log._startTime) return true;
+            const expected = new Date(log._startTime).getTime();
+            const actual = new Date(active.startTime).getTime();
+            return Number.isFinite(expected) && Number.isFinite(actual) && expected === actual;
         }
-        return undefined;
+        // Önceki sürümden kalan raporda gün, başlangıç saati ve hedef birlikte eşleşir.
+        const started = new Date(active.startTime);
+        if (!Number.isFinite(started.getTime())) return false;
+        const day = `${started.getFullYear()}-${String(started.getMonth() + 1).padStart(2, '0')}-${String(started.getDate()).padStart(2, '0')}`;
+        return day === log.dateKey && started.toLocaleTimeString('tr-TR') === log.start && active.hedefSaat === log.hedefSaat;
+    };
+    const result = await runTransaction(activeDevriyeRef, active => {
+        // Önbellek boşken de null yazımı sunucudaki gerçek değerle doğrulanır.
+        return active === null || belongsToFinishedPatrol(active) ? null : undefined;
     }, { applyLocally: false });
+    if (result.committed) return; // Silme sunucu tarafından onaylandı.
+    const remaining = result.snapshot.val();
+    if (remaining && !belongsToFinishedPatrol(remaining)) return; // Farklı/yeni aktif devriye korunur.
+    throw new Error('Aktif devriye temizliği onaylanmadı; tamamlanmış rapor telefonda korunarak yeniden denenecek.');
 }
 async function uploadOutboxPhoto(log, point) {
     if (!storage) throw new Error('Fotoğraf servisine erişilemiyor. Fotoğraf telefonda korunuyor.');
@@ -1246,6 +1282,9 @@ function syncOutbox() {
                     } else {
                         confirmedPatrolIds.add(outboxId(log));
                     }
+                    // Rapor onaylandıktan hemen sonra aktif kaydı temizle.
+                    // Fotoğraf yüklemesi veya fotoğraf adresi güncellemesi bu adımı geciktiremez.
+                    await clearFinishedCloudPatrol(log);
                 } catch (error) {
                     console.error('Rapor gönderilemedi; telefon kaydı korunuyor:', error);
                     log._attemptFailed = true;
@@ -1266,7 +1305,6 @@ function syncOutbox() {
                     await update(ref(db, `devriyeHistory/${log.dateKey}/${log.user}/${outboxId(log)}`), {
                         points: historyPayload(log).points
                     });
-                    await clearFinishedCloudPatrol(log);
                     if (!log._notificationSent && log._startTime) {
                         await sendWhatsappNotification(log);
                         log._notificationSent = true;
