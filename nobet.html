@@ -361,9 +361,10 @@
     <div id="supportModal" class="modal-overlay">
         <div class="modal-content warning">
             <h2 style="color: var(--warning); margin-top:0; font-weight: 900; letter-spacing: 2px; font-size: 18px;">DESTEK PERSONEL</h2>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px; line-height: 1.6;">Lütfen iletişim numaranızı giriniz. (Zorunludur)</p>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px; line-height: 1.6;">Lütfen adınızı, soyadınızı ve iletişim numaranızı giriniz. (Zorunludur)</p>
+            <input type="text" id="supportName" placeholder="Adınız ve soyadınız" autocomplete="name" style="text-align: center; font-size: 16px;">
             <input type="tel" id="supportPhone" placeholder="05XX XXX XX XX" maxlength="11" style="text-align: center; font-size: 18px; letter-spacing: 2px;">
-            <button id="saveSupportBtn" style="background: var(--warning); color: #000;">NUMARAYI KAYDET</button>
+            <button id="saveSupportBtn" style="background: var(--warning); color: #000;">BİLGİLERİ KAYDET</button>
         </div>
     </div>
 
@@ -460,11 +461,79 @@ catch (e) { app = getApps().find(a => a.name === `siteApp-${siteID}`); }
 const db = getDatabase(app);
 const storage = getStorage(app); 
 const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+const SUPPORT_USERNAME = "DESTEK PERSONEL";
+let isSupportUser = currentUser.username === SUPPORT_USERNAME || currentUser.supportBaseUsername === SUPPORT_USERNAME;
+let supportOriginalKey = currentUser.supportOriginalKey || SUPPORT_USERNAME;
+
+function isSupportRecord(key, user) {
+    return !!user && (key === SUPPORT_USERNAME || key === "DESTEK_PERSONEL" || user.username === SUPPORT_USERNAME || user.supportBaseUsername === SUPPORT_USERNAME);
+}
+
+function rememberSupportUser(key, user) {
+    currentUser.username = user.username || key;
+    currentUser.phone = user.phone || "";
+    if (user.uid) currentUser.uid = user.uid;
+    supportOriginalKey = user.supportOriginalKey || (currentUser.username === SUPPORT_USERNAME ? key : supportOriginalKey);
+    if (user.supportBaseUsername === SUPPORT_USERNAME) {
+        currentUser.supportBaseUsername = SUPPORT_USERNAME;
+        currentUser.supportOriginalKey = supportOriginalKey;
+    } else {
+        delete currentUser.supportBaseUsername;
+        delete currentUser.supportOriginalKey;
+    }
+    isSupportUser = true;
+    try { sessionStorage.setItem('currentUser', JSON.stringify(currentUser)); } catch (e) {}
+}
+
+// Kayıt anahtarı ve username birlikte değişir; hesabın diğer bilgileri korunur.
+async function renameSupportUser(username, phone, extraUpdates = {}) {
+    if (!username || /[.#$\[\]\/\u0000-\u001F\u007F]/.test(username) || new TextEncoder().encode(username).length > 768) {
+        throw new Error("Ad-soyad içinde . # $ [ ] / veya kontrol karakteri kullanılamaz; ad-soyad çok uzun olmamalıdır.");
+    }
+    const usersSnap = await get(ref(db, 'users'));
+    const users = usersSnap.val() || {};
+    const authUID = currentUser.uid || auth.currentUser?.uid;
+    const entries = Object.entries(users);
+    const source = entries.find(([key, user]) => user && authUID && user.uid === authUID && isSupportRecord(key, user))
+        || entries.find(([key, user]) => isSupportRecord(key, user) && (key === currentUser.username || user.username === currentUser.username));
+    if (!source) throw new Error("Destek personel hesabı bulunamadı. Lütfen yeniden giriş yapınız.");
+    const [oldKey, userData] = source;
+    const originalKey = userData.supportOriginalKey || oldKey;
+    const isResetting = username === SUPPORT_USERNAME;
+    const newKey = isResetting ? originalKey : username;
+    if (newKey !== oldKey && Object.prototype.hasOwnProperty.call(users, newKey)) {
+        throw new Error("Bu ad-soyad ile kayıtlı başka bir kullanıcı var. Mevcut kullanıcının üzerine yazılmadı.");
+    }
+    const renamedUser = { ...userData, username: username, phone: phone };
+    if (isResetting) {
+        delete renamedUser.supportBaseUsername;
+        delete renamedUser.supportOriginalKey;
+        delete renamedUser.supportOriginalUIDValue;
+    } else {
+        renamedUser.supportBaseUsername = SUPPORT_USERNAME;
+        renamedUser.supportOriginalKey = originalKey;
+    }
+    const updates = { ...extraUpdates, [`users/${newKey}`]: renamedUser };
+    if (oldKey !== newKey) updates[`users/${oldKey}`] = null;
+    const uid = userData.uid || authUID;
+    if (uid) {
+        const uidSnap = await get(ref(db, `securityUIDs/${uid}`));
+        if (typeof uidSnap.val() === 'string' && (uidSnap.val() === oldKey || uidSnap.val() === userData.username)) {
+            if (!isResetting && !Object.prototype.hasOwnProperty.call(renamedUser, 'supportOriginalUIDValue')) {
+                renamedUser.supportOriginalUIDValue = uidSnap.val();
+            }
+            updates[`securityUIDs/${uid}`] = isResetting ? (userData.supportOriginalUIDValue || SUPPORT_USERNAME) : username;
+        }
+    }
+    // Taşıma, UID eşlemesi ve varsa nöbet teslimi aynı anda kaydedilir.
+    await update(ref(db), updates);
+    rememberSupportUser(newKey, renamedUser);
+}
 
 const securitySelect = document.getElementById('securitySelect'), deliverSelect = document.getElementById('deliverSelect');
 const timerEl = document.getElementById('timer'), qrModal = document.getElementById('qrScannerModal');
 const successModal = document.getElementById('successModal'), successText = document.getElementById('successText');
-const supportModal = document.getElementById('supportModal'), supportPhoneInput = document.getElementById('supportPhone'), saveSupportBtn = document.getElementById('saveSupportBtn');
+const supportModal = document.getElementById('supportModal'), supportNameInput = document.getElementById('supportName'), supportPhoneInput = document.getElementById('supportPhone'), saveSupportBtn = document.getElementById('saveSupportBtn');
 const manualBtn = document.getElementById('manualBtn');
 const startBtn = document.getElementById('startBtn');
 const deliverBtn = document.getElementById('deliverBtn');
@@ -576,18 +645,31 @@ onAuthStateChanged(auth, (authUser) => {
 function initializeSecuritySystems() {
     onValue(ref(db,'users'), snap => {
         const val = snap.val();
+        const selectedSecurity = securitySelect.value, selectedDelivery = deliverSelect.value;
+        if (val) {
+            const authUID = currentUser.uid || auth.currentUser?.uid;
+            const ownEntry = Object.entries(val).find(([, user]) => user && authUID && user.uid === authUID)
+                || Object.entries(val).find(([key, user]) => user && (key === currentUser.username || user.username === currentUser.username));
+            if (ownEntry && isSupportRecord(ownEntry[0], ownEntry[1])) {
+                rememberSupportUser(ownEntry[0], ownEntry[1]);
+            }
+        }
         securitySelect.innerHTML=''; deliverSelect.innerHTML='';
-        if(val) Object.values(val).forEach(u => {
+        if(val) Object.entries(val).forEach(([key, u]) => {
             if(u.type==='security' && u.isActive !== false){
-                const name = u.name || u.username;
-                securitySelect.add(new Option(name, u.username || u.name));
-                deliverSelect.add(new Option(name, u.username || u.name));
+                const isSupport = isSupportRecord(key, u);
+                const name = isSupport ? (u.username || key) : (u.name || u.username);
+                const username = isSupport ? (u.username || key) : (u.username || u.name);
+                securitySelect.add(new Option(name, username));
+                deliverSelect.add(new Option(name, username));
             }
         });
+        if (isSupportUser && Array.from(securitySelect.options).some(option => option.value === selectedSecurity)) securitySelect.value = selectedSecurity;
+        if (isSupportUser && Array.from(deliverSelect.options).some(option => option.value === selectedDelivery)) deliverSelect.value = selectedDelivery;
 
         onValue(ref(db, 'telefon'), telSnap => {
             const telList = telSnap.val();
-            const isBroken = telList && telList[currentUser.username] === true;
+            const isBroken = telList && (telList[currentUser.username] === true || (isSupportUser && (telList[SUPPORT_USERNAME] === true || telList[supportOriginalKey] === true)));
             if (isBroken) { startBtn.style.display = 'none'; deliverBtn.style.display = 'none'; manualBtn.style.display = 'block'; } 
             else { manualBtn.style.display = 'none'; }
         });
@@ -595,10 +677,11 @@ function initializeSecuritySystems() {
 
     onValue(ref(db,'nobetRecords'), snapshot => {
         const val = snapshot.val();
-        const myActive = val ? Object.entries(val).find(([k, s]) => s.status === 'started' && s.startBy === currentUser.username) : null;
+        const myActive = val ? Object.entries(val).find(([k, s]) => s.status === 'started' && (s.startBy === currentUser.username || (isSupportUser && (s.startBy === SUPPORT_USERNAME || s.startBy === supportOriginalKey || (s.supportUserUID && s.supportUserUID === (currentUser.uid || auth.currentUser?.uid)))))) : null;
         
         get(ref(db, 'telefon')).then(telSnap => {
-            const isBroken = telSnap.val() && telSnap.val()[currentUser.username] === true;
+            const telList = telSnap.val();
+            const isBroken = telList && (telList[currentUser.username] === true || (isSupportUser && (telList[SUPPORT_USERNAME] === true || telList[supportOriginalKey] === true)));
             if(myActive){
                 currentShiftKey = myActive[0];
                 document.getElementById('shiftSection').style.display='none';
@@ -754,7 +837,7 @@ async function openScanner(callback) {
 startBtn.addEventListener('click', () => {
     if(!securitySelect.value) return showAppError("Lütfen listenden personel seçin!");
     startBtn.disabled = true;
-    if(currentUser.username === "DESTEK PERSONEL") { supportModal.style.display = 'flex'; startBtn.disabled = false; } 
+    if(isSupportUser) { supportModal.style.display = 'flex'; startBtn.disabled = false; } 
     else { proceedToStartShift(); }
 });
 
@@ -775,6 +858,11 @@ async function handleStartFlow(pointName, capturedBase64) {
         startLat: "Arka planda alınıyor...", startLng: "Arka planda alınıyor...",
         device_id: fingerprintID, start_qr_image: "Arka planda alınıyor..."
     };
+    if (isSupportUser) {
+        record.supportBaseUsername = SUPPORT_USERNAME;
+        const supportUID = currentUser.uid || auth.currentUser?.uid;
+        if (supportUID) record.supportUserUID = supportUID;
+    }
     
     let newRecordRef;
     try {
@@ -879,10 +967,16 @@ async function handleDeliverFlow(reportMessage) {
             durum: manualBtn.style.display === 'block' ? 'tamamlandi_manuel' : 'tamamlandi', nobet_notu: reportMessage 
         };
 
-        newArchiveRef = await push(ref(db, `tamamnbt/${klasorAdi}`), tamamlananKayit);
-        await remove(baslangicRef);
-
-        if(currentUser.username === "DESTEK PERSONEL") { try { await update(ref(db, 'users/DESTEK PERSONEL'), { phone: "" }); } catch(e){} }
+        if (isSupportUser) {
+            newArchiveRef = push(ref(db, `tamamnbt/${klasorAdi}`));
+            await renameSupportUser(SUPPORT_USERNAME, "", {
+                [`tamamnbt/${klasorAdi}/${newArchiveRef.key}`]: tamamlananKayit,
+                [`nobetRecords/${currentShiftKey}`]: null
+            });
+        } else {
+            newArchiveRef = await push(ref(db, `tamamnbt/${klasorAdi}`), tamamlananKayit);
+            await remove(baslangicRef);
+        }
 
     } catch (error) { 
         showAppError("⚠️ İNTERNET VEYA SUNUCU HATASI:\n" + error.message);
@@ -946,7 +1040,7 @@ document.getElementById('confirmManualBtn').addEventListener('click', () => {
     document.getElementById('manualBlockModal').style.display = 'none';
 
     if (isManualActionType === "START") {
-        if(currentUser.username === "DESTEK PERSONEL") {
+        if(isSupportUser) {
             supportModal.style.display = 'flex';
             window.selectedManualBlock = selectedBlock; 
         } else {
@@ -966,12 +1060,14 @@ document.getElementById('cancelManualBtn').addEventListener('click', () => {
 });
 
 saveSupportBtn.addEventListener('click', async () => {
+    const fullName = supportNameInput.value.trim().replace(/\s+/g, ' ');
+    if(fullName.split(' ').length < 2) return showAppError("Lütfen adınızı ve soyadınızı giriniz!");
     const phone = supportPhoneInput.value.trim();
     if(phone.length < 10) return showAppError("Lütfen geçerli bir telefon numarası giriniz!");
     saveSupportBtn.disabled = true;
     
     try {
-        await update(ref(db, 'users/DESTEK PERSONEL'), { phone: phone });
+        await renameSupportUser(fullName, phone);
         supportModal.style.display = 'none';
         const isPhoneBroken = manualBtn.style.display === 'block';
 
