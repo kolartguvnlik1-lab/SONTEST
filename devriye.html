@@ -1372,7 +1372,7 @@ async function removeConfirmedFromOutbox(log) {
     const records=await readJournal();
     const extra=records.filter(row=>row._kind==='point' && row.patrolId===outboxId(log) &&
         !(log.points || []).some(point=>point.name===row.point.name && (!row.point.offlineBase64 || point.photoUrl)));
-    if(extra.length){await saveOutboxProgress({...includeDurablePoints(log,extra),_photosConfirmed:false});return false;}
+    if(extra.length){await saveOutboxProgress({...includeDurablePoints(log,extra),_photosConfirmed:false,_historyNeedsUpdate:true});return false;}
     try {
         const legacy = readLegacyOutbox();
         const next = legacy.filter(item=>outboxId(item)!==outboxId(log) || item._siteId && item._siteId!==siteID);
@@ -1402,6 +1402,7 @@ const transferView = { rows:new Map(), photoFractions:new Map(), initialized:fal
     visible:false, mode:'sending', origin:'resume', startedAt:0, timer:null, timedOut:false, fault:null };
 const reportSaveTails = new Map();
 const photoUploadJobs = new Map();
+const transferConnections={reports:null,notifications:null};
 function trackTransferReport(log) {
     transferView.rows.set(outboxId(log), log);
     renderTransferView();
@@ -1482,7 +1483,7 @@ function renderTransferView() {
     const stageFlags={history:'_historyConfirmed',notification:'_notificationSent',photos:'_photosConfirmed',cleanup:'_activeCleanupConfirmed',local:'_outboxCleared'};
     // Daha sonra onaylanmış bir işlemin eski hatası, yeni bir yetki hatası sayılmaz.
     const errorEntries=pending.flatMap(log=>Object.entries(log._transferErrors || {})
-        .filter(([stage])=>!log[stageFlags[stage]])
+        .filter(([stage])=>stage==='history' && log._historyNeedsUpdate || !log[stageFlags[stage]])
         .map(([stage,error])=>({stage,...error})));
     const errors=errorEntries;
     const permissionError=errors.some(error=>/permission|unauthorized|unauthenticated/i.test(error.code+' '+error.message));
@@ -1543,10 +1544,13 @@ function renderTransferView() {
     renderTransferStep('transferStepPhotos',rows,'_photosConfirmed','photos');
     renderTransferStep('transferStepCleanup',rows,'_activeCleanupConfirmed','cleanup');
     const diagnostics=document.getElementById('patrolTransferDiagnostics');
-    diagnostics.hidden=!errorEntries.length;
+    diagnostics.hidden=!errorEntries.length && state!=='waiting';
     const stageNames={history:'Devriye raporu',notification:'WhatsApp bildirimi',photos:'Fotoğraf aktarımı',cleanup:'Saat / aktif kayıt',local:'Telefon kuyruğu'};
     const lines=[...new Set(errorEntries.map(error=>`${stageNames[error.stage] || error.stage}: ${error.code || 'Hata'} — ${error.message}`))];
-    document.getElementById('patrolTransferErrors').textContent=lines.join('\n\n');
+    const connectionText=value=>value===true?'Bağlı':value===false?'Bağlantı yok':'Bağlantı bilgisi bekleniyor';
+    const connectionLines=[`Devriye sunucusu: ${connectionText(transferConnections.reports)}`,`WhatsApp bildirim sunucusu: ${connectionText(transferConnections.notifications)}`];
+    if(!lines.length && state==='waiting')lines.push('Henüz bir hata kodu dönmedi. Bekleyen işlemlerin sunucu yanıtı bekleniyor.');
+    document.getElementById('patrolTransferErrors').textContent=[...connectionLines,...lines].join('\n\n');
     document.getElementById('patrolTransferActions').style.display=state==='sending' && !allHistory?'none':'flex';
     document.getElementById('patrolTransferRetry').style.display=state==='waiting'?'block':'none';
     document.getElementById('patrolTransferDismiss').textContent=allHistory?(transferView.origin==='finish'?'ANASAYFAYA DÖN':'DEVAM ET'):'ANLADIM';
@@ -1635,19 +1639,25 @@ function syncOutbox() {
             if(!batch.length)break;
             registerTransferBatch(batch);
             const ready=[];
-            // Önce tüm raporlar, fotoğraf aktarımını beklemeden geçmişe yazılır.
+            // Yeni rapor önce geçmişe yazılır. Daha önce ACK alınmış rapor tekrar yazıma zorlanmaz.
             for(const log of batch){
                 attempted.add(outboxId(log));
                 delete log._attemptFailed;
                 try{
                     clearTransferError(log,'history');
-                    const canonical=await writeConfirmedHistory(log);
-                    log._historyConfirmed=true;
-                    log.points=mergePoints(log.points,canonical.points);
-                    log.missedPoints=canonical.missedPoints || [];
-                    log.status=canonical.status;log.okunanSayi=canonical.okunanSayi;
-                    log._photosConfirmed=!(log.points || []).some(point=>point.offlineBase64 && !point.photoUrl);
-                    await saveOutboxProgress(log);
+                    if(!log._historyConfirmed || log._historyNeedsUpdate){
+                        const canonical=await writeConfirmedHistory(log);
+                        log._historyConfirmed=true;
+                        log._historyNeedsUpdate=false;
+                        log.points=mergePoints(log.points,canonical.points);
+                        log.missedPoints=canonical.missedPoints || [];
+                        log.status=canonical.status;log.okunanSayi=canonical.okunanSayi;
+                        log._photosConfirmed=!(log.points || []).some(point=>point.offlineBase64 && !point.photoUrl);
+                        try{await saveOutboxProgress(log);}
+                        catch(error){await transferError(log,'local',error);}
+                    }else if(!(log.points || []).some(point=>point.offlineBase64 || point.photoUrl)){
+                        log._photosConfirmed=true;
+                    }
                     ready.push(log);trackTransferReport(log);
                 }catch(error){await transferError(log,'history',error);}
             }
@@ -1920,8 +1930,8 @@ function retryPatrolTransfers() {
     syncActivePatrolToCloud();
     syncOutbox().catch(error=>console.error('Gönderim kuyruğu korundu:',error));
 }
-onValue(ref(db,'.info/connected'),snapshot=>{if(snapshot.val()===true)retryPatrolTransfers();});
-onValue(ref(bildirimDb,'.info/connected'),snapshot=>{if(snapshot.val()===true)retryPatrolTransfers();});
+onValue(ref(db,'.info/connected'),snapshot=>{transferConnections.reports=snapshot.val()===true;renderTransferView();if(snapshot.val()===true)retryPatrolTransfers();});
+onValue(ref(bildirimDb,'.info/connected'),snapshot=>{transferConnections.notifications=snapshot.val()===true;renderTransferView();if(snapshot.val()===true)retryPatrolTransfers();});
 setInterval(()=>{if(navigator.onLine && document.visibilityState!=='hidden')retryPatrolTransfers();},30000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible' && navigator.onLine)retryPatrolTransfers();});
 
