@@ -1607,6 +1607,48 @@ window.addEventListener('beforeunload',event=>{
     if(isSyncOutboxRunning && unconfirmed && transferView.visible && transferView.mode==='sending') {event.preventDefault();event.returnValue='';}
 });
 
+async function writeConfirmedPhotoUrls(log) {
+    // Ana rapor değişmez; yalnızca mevcut doğru noktanın photoUrl alanı yazılır.
+    const photos=(log.points || []).filter(point=>typeof point.photoUrl==='string' && point.photoUrl.length>0);
+    if(!photos.length)return;
+    const pointsPath=`devriyeHistory/${log.dateKey}/${log.user}/${outboxId(log)}/points`;
+    let snapshot;
+    try{snapshot=await get(ref(db,pointsPath));}
+    catch(error){
+        const failure=new Error('Fotoğraf adresi için devriye geçmişi okunamadı: '+(error?.message || error));
+        failure.code=error?.code || 'photo/history-read-failed';throw failure;
+    }
+    const cloudPoints=Object.entries(snapshot.val() || {});
+    for(const point of photos){
+        const matches=cloudPoints.filter(([,saved])=>saved && saved.name===point.name &&
+            (!saved.block || !point.block || saved.block===point.block));
+        if(matches.length!==1){
+            const failure=new Error('Fotoğrafın ait olduğu nokta devriye geçmişinde tek olarak bulunamadı. Telefon yedeği korundu.');
+            failure.code='photo/history-point-mismatch';throw failure;
+        }
+        const photoRef=ref(db,`${pointsPath}/${matches[0][0]}/photoUrl`);
+        let result;
+        try{
+            result=await runTransaction(photoRef,current=>{
+                // Diğer cihazın onaylanmış fotoğraf adresi üzerine yazılmaz.
+                if(typeof current==='string' && current.length>0)return current;
+                if(current!==null && current!=='')return undefined;
+                return point.photoUrl;
+            },{applyLocally:false});
+        }catch(error){
+            const failure=new Error('Fotoğraf adresi devriye geçmişine eklenemedi: '+(error?.message || error));
+            failure.code=error?.code || 'photo/history-write-failed';throw failure;
+        }
+        const confirmed=result.snapshot.val();
+        if(!result.committed || typeof confirmed!=='string' || !confirmed){
+            const failure=new Error('Fotoğraf adresinin sunucu onayı alınamadı. Telefon yedeği korundu.');
+            failure.code='photo/history-ack-missing';throw failure;
+        }
+        point.photoUrl=confirmed;
+        await saveOutboxProgress(log);
+    }
+}
+
 async function uploadOutboxPhoto(log,point) {
     if(!storage) throw new Error('Fotoğraf servisine erişilemiyor.');
     const key=outboxId(log)+':'+point.name;
@@ -1697,7 +1739,7 @@ function syncOutbox() {
                             await saveOutboxProgress(log);trackTransferReport(log);
                         }
                         // Fotoğrafın hem Storage hem geçmiş adresi onaylanmadan özgün veri temizlenmez.
-                        if(!log._photosConfirmed){await writeConfirmedHistory(log);log._photosConfirmed=true;}
+                        if(!log._photosConfirmed){await writeConfirmedPhotoUrls(log);log._photosConfirmed=true;}
                         for(const point of log.points || [])if(point.photoUrl)point.offlineBase64=null;
                         await saveOutboxProgress(log);trackTransferReport(log);
                     }catch(error){await transferError(log,'photos',error);}
