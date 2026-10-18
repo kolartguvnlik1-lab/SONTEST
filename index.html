@@ -2108,432 +2108,6 @@ function offlineUploadContext(app, db, auth, siteID) {
     return { app, db, auth, siteID, ref, get, set, update, onAuthStateChanged };
 }
 
-// Normal devriye deposu için ek giriş kapısı. Offline paket/giriş motoru değişmez.
-const IndexPatrolQueues = (() => {
-    const instances = new Map();
-    const authError = message => Object.assign(new Error(message), { code: 'AUTH_REQUIRED' });
-    async function normal(c, uid) {
-        if (!uid || c.auth.currentUser?.uid !== uid) return null;
-        let user;
-        try { user = JSON.parse(sessionStorage.getItem('currentUser') || 'null'); } catch (_) {}
-        if (!user?.username) return null;
-        const username = user.username;
-        const path = ref(c.db, 'users/' + username).toString();
-        const profile = typeof verifiedProfile !== 'undefined' ? verifiedProfile : null;
-        let verified = profile?.uid === uid && profile.path === path;
-        if (!verified) {
-            const snap = await get(ref(c.db, 'users/' + username));
-            const account = snap.val();
-            if (!snap.exists() || account.isActive === false) return null;
-            verified = account.uid ? account.uid === uid
-                : c.auth.currentUser.email && c.auth.currentUser.email === formatToEmail(username);
-        }
-        if (!verified) return null;
-        const key = JSON.stringify([c.siteID, c.app.options?.projectId || c.app.config?.projectId, username, uid]);
-        if (!instances.has(key)) instances.set(key, createNormal(c, username, uid));
-        return instances.get(key);
-    }
-    function createNormal(c, username, uid) {
-        const siteID = c.siteID;
-        const siteConfig = c.app.options || c.app.config;
-        const currentUser = { username };
-        const db = c.db;
-        const activeDevriyeRef = ref(db, `activeDevriye/${username}`);
-        const OFFLINE_STORAGE_KEY = `patrol_data_${username}`;
-        const OUTBOX_STORAGE_KEY = `patrol_outbox_${username}`;
-        // Telefon deposu: her rapor ayrı kayıt; toplu kuyruk üzerine yazılmaz.
-const PATROL_SCOPE = JSON.stringify([siteID, siteConfig.projectId, currentUser.username]);
-const ACTIVE_LOCAL_KEY = `patrol_active_v2_${PATROL_SCOPE}`;
-const REPORT_LOCAL_PREFIX = `patrol_report_v2_${PATROL_SCOPE}_`;
-const RECEIPT_LOCAL_PREFIX = `patrol_receipt_v2_${PATROL_SCOPE}_`;
-let patrolStorePromise = null;
-let activeSavePromise = Promise.resolve();
-let outboxSyncPromise = null;
-let activePatrolId = null;
-let activeCloudSyncPromise = null;
-let patrolInitPromise = null;
-const clonePatrol = value => JSON.parse(JSON.stringify(value));
-const patrolIdForStart = value => `P_${new Date(value).getTime()}`;
-
-function openPatrolStore() {
-    if (!patrolStorePromise) {
-        patrolStorePromise = new Promise((resolve, reject) => {
-            const request = indexedDB.open('kolart-patrol-delivery-v2', 1);
-            request.onupgradeneeded = () => {
-                for (const name of ['reports', 'active', 'meta']) {
-                    request.result.createObjectStore(name, { keyPath: 'key' });
-                }
-            };
-            request.onsuccess = () => {
-                const database = request.result;
-                database.onversionchange = () => { database.close(); patrolStorePromise = null; };
-                resolve(database);
-            };
-            request.onerror = () => { patrolStorePromise = null; reject(request.error); };
-            request.onblocked = () => { patrolStorePromise = null; reject(new Error('Telefon deposu başka bir sekmede açık.')); };
-        }).catch(error => { patrolStorePromise = null; throw error; });
-    }
-    return patrolStorePromise;
-}
-async function patrolTransaction(stores, mode, action) {
-    const database = await openPatrolStore();
-    return new Promise((resolve, reject) => {
-        let transaction;
-        try { transaction = database.transaction(stores, mode, { durability: 'strict' }); }
-        catch (_) { transaction = database.transaction(stores, mode); }
-        let result;
-        transaction.oncomplete = () => resolve(result);
-        transaction.onabort = transaction.onerror = () => reject(transaction.error || new Error('Telefon kaydı tamamlanamadı.'));
-        try { action(transaction, value => { result = value; }); }
-        catch (error) { transaction.abort(); reject(error); }
-    });
-}
-const reportKey = id => `${PATROL_SCOPE}|${id}`;
-async function getPatrolReceipt(id) {
-    let receipt = null;
-    try {
-        receipt = await patrolTransaction(['meta'], 'readonly', (tx, done) => {
-            const request = tx.objectStore('meta').get(`sent|${reportKey(id)}`);
-            request.onsuccess = () => done(request.result || null);
-        });
-    } catch (_) { /* LocalStorage yedeği aşağıda okunur. */ }
-    if (receipt) return receipt;
-    const raw = localStorage.getItem(RECEIPT_LOCAL_PREFIX + id);
-    return raw ? JSON.parse(raw) : null;
-}
-async function persistPatrolReport(log) {
-    if (await getPatrolReceipt(log.patrolId)) return;
-    const row = { key: reportKey(log.patrolId), scope: PATROL_SCOPE, log: clonePatrol(log) };
-    try {
-        await patrolTransaction(['reports'], 'readwrite', tx => {
-            const store = tx.objectStore('reports');
-            const request = store.get(row.key);
-            // İkinci sekme aynı devriyenin ilk bitiş kaydını değiştiremez.
-            request.onsuccess = () => { if (!request.result) store.put(row); };
-        });
-    } catch (error) {
-        const key = REPORT_LOCAL_PREFIX + log.patrolId;
-        if (!localStorage.getItem(key)) localStorage.setItem(key, JSON.stringify(row));
-        if (!localStorage.getItem(key)) throw error;
-    }
-}
-async function listPatrolReports() {
-    const rows = new Map();
-    try {
-        const saved = await patrolTransaction(['reports'], 'readonly', (tx, done) => {
-            const request = tx.objectStore('reports').getAll();
-            request.onsuccess = () => done(request.result);
-        });
-        saved.filter(row => row.scope === PATROL_SCOPE).forEach(row => rows.set(row.log.patrolId, row));
-    } catch (error) { console.warn('Telefon deposu okunamadı; yedek kuyruk deneniyor.', error); }
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith(REPORT_LOCAL_PREFIX)) {
-            const row = JSON.parse(localStorage.getItem(key));
-            if (!rows.has(row.log.patrolId)) rows.set(row.log.patrolId, row);
-        }
-    }
-    return [...rows.values()].sort((a, b) => a.log.timestamp - b.log.timestamp);
-}
-async function updatePatrolReport(row) {
-    const localKey = REPORT_LOCAL_PREFIX + row.log.patrolId;
-    if (localStorage.getItem(localKey)) {
-        localStorage.setItem(localKey, JSON.stringify(row));
-        return;
-    }
-    await patrolTransaction(['reports'], 'readwrite', tx => {
-        const store = tx.objectStore('reports');
-        const request = store.get(row.key);
-        request.onsuccess = () => { if (request.result) store.put(clonePatrol(row)); };
-    });
-}
-async function acknowledgePatrolReport(row) {
-    const receipt = { key: `sent|${row.key}`, patrolId: row.log.patrolId, sentAt: Date.now() };
-    try {
-        await patrolTransaction(['reports', 'meta'], 'readwrite', tx => {
-            tx.objectStore('meta').put(receipt);
-            tx.objectStore('reports').delete(row.key);
-        });
-    } catch (error) {
-        // Makbuz kalıcı yazılamadıysa raporu silme: aynı kimlikle tekrar denenir.
-        localStorage.setItem(RECEIPT_LOCAL_PREFIX + row.log.patrolId, JSON.stringify(receipt));
-        if (!localStorage.getItem(RECEIPT_LOCAL_PREFIX + row.log.patrolId)) throw error;
-    }
-    localStorage.removeItem(REPORT_LOCAL_PREFIX + row.log.patrolId);
-}
-async function readActivePatrolBackup() {
-    let data = null;
-    try {
-        data = await patrolTransaction(['active'], 'readonly', (tx, done) => {
-            const request = tx.objectStore('active').get(PATROL_SCOPE);
-            request.onsuccess = () => done(request.result?.data || null);
-        });
-    } catch (_) { /* Küçük cihazlarda LocalStorage yedeği kullanılabilir. */ }
-    const raw = localStorage.getItem(ACTIVE_LOCAL_KEY) || localStorage.getItem(OFFLINE_STORAGE_KEY);
-    const fallback = raw ? JSON.parse(raw) : null;
-    if (!data) return fallback;
-    if (!fallback) return data;
-    const a = data.patrolId || patrolIdForStart(data.startTime);
-    const b = fallback.patrolId || patrolIdForStart(fallback.startTime);
-    if (a !== b) return new Date(data.startTime) >= new Date(fallback.startTime) ? data : fallback;
-    const latest = (fallback.savedAt || 0) > (data.savedAt || 0) ? fallback : data;
-    // Fallback deposuna geçişte daha eski yedek hiçbir okutulmuş noktayı kaybettiremez.
-    const points = new Map();
-    for (const point of [...(data.readPoints || []), ...(fallback.readPoints || [])]) {
-        const previous = points.get(point.name);
-        points.set(point.name, { ...previous, ...point,
-            photoUrl: point.photoUrl || previous?.photoUrl || null,
-            offlineBase64: point.offlineBase64 || previous?.offlineBase64 || null });
-    }
-    return { ...latest, readPoints: [...points.values()] };
-}
-async function clearActivePatrolBackup(id) {
-    try {
-        await patrolTransaction(['active'], 'readwrite', tx => {
-            const store = tx.objectStore('active');
-            const request = store.get(PATROL_SCOPE);
-            request.onsuccess = () => {
-                const data = request.result?.data;
-                if (data && (data.patrolId || patrolIdForStart(data.startTime)) === id) store.delete(PATROL_SCOPE);
-            };
-        });
-    } catch (error) { console.warn('Aktif yedek temizliği sonraki açılışta tekrar denenecek.', error); }
-    for (const key of [ACTIVE_LOCAL_KEY, OFFLINE_STORAGE_KEY]) {
-        const raw = localStorage.getItem(key);
-        if (raw) {
-            const data = JSON.parse(raw);
-            if ((data.patrolId || patrolIdForStart(data.startTime)) === id) localStorage.removeItem(key);
-        }
-    }
-}
-async function migrateLegacyPatrolOutbox() {
-    // Kullanıcının teyidi: her telefon yalnız kendi projesinde kullanılıyor.
-    const raw = localStorage.getItem(OUTBOX_STORAGE_KEY);
-    if (!raw) return;
-    const logs = JSON.parse(raw);
-    if (!Array.isArray(logs)) throw new Error('Eski devriye kuyruğu okunamadı. Kayıt korunuyor.');
-    for (const oldLog of logs) {
-        if (oldLog.siteID && oldLog.siteID !== siteID) throw new Error('Eski kayıt başka projeye ait; kuyruk korunuyor.');
-        const log = clonePatrol(oldLog);
-        log.patrolId = log.patrolId || `P_${log.timestamp}`;
-        log.siteID = siteID;
-        if (!await getPatrolReceipt(log.patrolId)) await persistPatrolReport(log);
-    }
-    // Taşıma bitene kadar kaynak korunur; eşzamanlı değişiklik varsa kaynak silinmez.
-    if (localStorage.getItem(OUTBOX_STORAGE_KEY) === raw) localStorage.removeItem(OUTBOX_STORAGE_KEY);
-}
-async function withPatrolSyncLock(action) {
-    if (navigator.locks?.request) return navigator.locks.request(`patrol-sync|${PATROL_SCOPE}`, action);
-    // Web Locks olmayan tarayıcılar için atomik, süreli IndexedDB kilidi.
-    const owner = `${Date.now()}_${Math.random()}`;
-    const key = `sync|${PATROL_SCOPE}`;
-    let claimed;
-    try {
-        claimed = await patrolTransaction(['meta'], 'readwrite', (tx, done) => {
-            const store = tx.objectStore('meta');
-            const request = store.get(key);
-            request.onsuccess = () => {
-                if (request.result && request.result.expiresAt > Date.now()) { done(false); return; }
-                store.put({ key, owner, expiresAt: Date.now() + 90000 });
-                done(true);
-            };
-        });
-    } catch (error) {
-        // Her iki kilit API'si de yoksa kayıt bazında sabit kimlikli işlemler kullanılır.
-        // Paylaşılan bir kuyruk dizisi yazılmadığı için başka rapor silinemez.
-        return action();
-    }
-    if (!claimed) return;
-    const renewal = setInterval(() => {
-        patrolTransaction(['meta'], 'readwrite', tx => {
-            const store = tx.objectStore('meta');
-            const request = store.get(key);
-            request.onsuccess = () => {
-                if (request.result?.owner === owner) store.put({ key, owner, expiresAt: Date.now() + 90000 });
-            };
-        }).catch(console.warn);
-    }, 30000);
-    try { return await action(); }
-    finally {
-        clearInterval(renewal);
-        await patrolTransaction(['meta'], 'readwrite', tx => {
-            const store = tx.objectStore('meta');
-            const request = store.get(key);
-            request.onsuccess = () => { if (request.result?.owner === owner) store.delete(key); };
-        });
-    }
-}
-async function clearMatchingCloudPatrol(log) {
-    await runTransaction(activeDevriyeRef, data => {
-        if (!data) return;
-        const matches = data.patrolId ? data.patrolId === log.patrolId
-            : log.startTimeISO && data.startTime === log.startTimeISO;
-        if (matches) return null;
-        // Başka devriye başlamışsa onu koru; eski rapor temizliği tamamlanmıştır.
-        return;
-    }, { applyLocally: false });
-}
-async function writePatrolHistory(log) {
-    const cloudLog = clonePatrol(log);
-    cloudLog.points = cloudLog.points.map(({ offlineBase64, ...point }) => point);
-    const { points, ...patch } = cloudLog;
-    points.forEach((point, index) => {
-        for (const [name, value] of Object.entries(point)) {
-            // Geç dönen eski deneme, daha önce yazılmış fotoğraf URL'sini silemez.
-            if (name === 'photoUrl' && !value) continue;
-            patch[`points/${index}/${name}`] = value;
-        }
-    });
-    if (points.length === 0) patch.points = null;
-    // Sunucu onayı beklenir. History için eski set() gibi yalnız yazma yetkisi yeterlidir.
-    await update(ref(db, `devriyeHistory/${log.dateKey}/${log.user}/${log.patrolId}`), patch);
-}
-
-        function authorize() {
-            if (c.auth.currentUser?.uid !== uid) throw authError('Devriye hesabının oturumu değişti.');
-        }
-        function timeout(promise, milliseconds = 40000) {
-            let timer;
-            return Promise.race([promise, new Promise((_, reject) => {
-                timer = setTimeout(() => reject(new Error('Gönderim zaman aşımı')), milliseconds);
-            })]).finally(() => clearTimeout(timer));
-        }
-        async function photograph(row, index, storageAPI) {
-            const point = row.log.points[index];
-            if (!point.offlineBase64 || point.photoUrl) return;
-            authorize();
-            const comma = point.offlineBase64.indexOf(',');
-            if (comma < 0) throw new Error('Fotoğraf verisi okunamadı.');
-            const encoded = point.offlineBase64;
-            const bytes = Uint8Array.from(atob(encoded.slice(comma + 1)), char => char.charCodeAt(0));
-            const type = (encoded.slice(0, comma).match(/^data:([^;]+)/) || [])[1] || 'image/jpeg';
-            const path = `devriye_fotolari/${row.log.dateKey}/${siteID}/${username}_${row.log.patrolId}_${index}.jpg`;
-            const task = storageAPI.uploadBytesResumable(storageAPI.sRef(storageAPI.getStorage(c.app), path), new Blob([bytes], { type }), { contentType: type });
-            try {
-                await timeout(new Promise((resolve, reject) => task.on('state_changed', () => {}, reject, resolve)), 90000);
-            } catch (error) { task.cancel(); throw error; }
-            point.photoUrl = await timeout(storageAPI.getDownloadURL(task.snapshot.ref));
-            authorize();
-            // Fotoğrafın telefon kopyası teslim makbuzuna kadar saklanır.
-            await updatePatrolReport(row);
-        }
-        async function notify(log) {
-            try {
-                const bildirimConfig = {
-    apiKey: "AIzaSyC76H1bV84vSWhX8Z-Y_mR4P6e1L2o3A4B",
-    authDomain: "bildirim-75212.firebaseapp.com",
-    projectId: "bildirim-75212",
-    databaseURL: "https://bildirim-75212-default-rtdb.firebaseio.com"
-};
-const bildirimApp = getApps().find(a => a.name === "bildirimApp") || initializeApp(bildirimConfig, "bildirimApp");
-const bildirimDb = getDatabase(bildirimApp);
-
-async function sendWhatsappNotification(logData) {
-    try {
-        const durationMin = logData.startTimeISO ? Math.round((logData.timestamp - new Date(logData.startTimeISO).getTime()) / 60000) : 0;
-        const notificationPayload = {
-            BİLDİRİM: true,
-            TUR: logData.status === "Eksik Devriye" ? "EKSİK_DEVRİYE" : "TAM_DEVRİYE",
-            HEDEF_SAAT: logData.hedefSaat || "Belirtilmedi", // <--- İŞTE BURASI!
-            GÜVENLİK: logData.name,
-            BÖLGE: logData.bolge,
-            BAŞLANGIÇ: logData.start,
-            BİTİŞ: logData.end,
-            SÜRE: durationMin + " Dakika",
-            OKUNAN_SAYI: logData.okunanSayi,
-            TOPLAM_NOKTA: logData.toplamNokta,
-            EKSİK_NOKTALAR: logData.missedPoints.length > 0 ? logData.missedPoints.join(", ") : "Yok",
-            NOT: logData.eksikNotu || "Açıklama yok.",
-            ZAMAN: Date.now()
-        };
-        await set(ref(bildirimDb, `bildirimler/${siteID}`), notificationPayload);
-    } catch (err) {
-        console.error("Bildirim hatası:", err);
-    }
-}
-
-                await sendWhatsappNotification(log);
-            } catch (error) { console.warn('Devriye bildirimi:', error); }
-        }
-        async function summary() {
-            authorize();
-            const rows = await listPatrolReports();
-            const pending = [];
-            for (const row of rows) {
-                if (!await getPatrolReceipt(row.log.patrolId)) pending.push({
-                    id: row.key, source: 'normal', meta: { siteID, uid, username },
-                    log: { dateKey: row.log.dateKey, timestamp: row.log.timestamp }
-                });
-            }
-            return pending;
-        }
-        async function upload(storageAPI) {
-            authorize();
-            if (!navigator.onLine) throw new Error('İnternet kesildi');
-            await withPatrolSyncLock(async () => {
-                authorize();
-                const rows = await listPatrolReports();
-                for (let i = 0; i < rows.length; i++) {
-                    const row = rows[i], log = row.log;
-                    authorize();
-                    if (await getPatrolReceipt(log.patrolId)) continue;
-                    if (log.user !== username || (log.siteID && log.siteID !== siteID)) throw authError('Devriye kaydı hesapla eşleşmiyor.');
-                    await timeout(writePatrolHistory(log));
-                    authorize();
-                    await timeout(clearMatchingCloudPatrol(log));
-                    for (let p = 0; p < log.points.length; p++) await photograph(row, p, storageAPI);
-                    authorize();
-                    await timeout(writePatrolHistory(log));
-                    if (log.hedefSaat && log.hedefSaat !== 'Belirtilmedi') {
-                        const shiftDate = new Date(log.timestamp);
-                        if (shiftDate.getHours() < 8) shiftDate.setDate(shiftDate.getDate() - 1);
-                        const dateKey = `${shiftDate.getFullYear()}-${String(shiftDate.getMonth() + 1).padStart(2, '0')}-${String(shiftDate.getDate()).padStart(2, '0')}`;
-                        const modeSnap = await timeout(get(ref(db, 'sistemAyarlari/saatModu')));
-                        const mode = modeSnap.exists() ? modeSnap.val() : 'tekli';
-                        const path = mode === 'blok' ? `tamamlananDevriyeSaatleri/${dateKey}/${log.bolge}/${log.hedefSaat}`
-                            : `tamamlananDevriyeSaatleri/${dateKey}/${log.hedefSaat}`;
-                        const name = log.name || log.user || 'Bilinmiyor';
-                        const value = log.okunanSayi === 0 ? null : log.status === 'Eksik Devriye' ? name + ' - Eksik Devriye' : name;
-                        authorize();
-                        await timeout(set(ref(db, path), value));
-                    }
-                    authorize();
-                    await acknowledgePatrolReport(row);
-                    window.dispatchEvent(new CustomEvent('kolart-sync-progress', { detail: {
-                        percent: Math.min(99, Math.floor(100 * (i + 1) / rows.length)), step: `${i + 1}/${rows.length} normal devriye kaydedildi`
-                    } }));
-                    await timeout(notify(log), 5000).catch(() => {});
-                }
-            });
-            return (await summary()).length === 0;
-        }
-        return { summary, upload };
-    }
-    return {
-        async summary(c, uid) {
-            const offline = await window.KolartOfflineSync.queueSummary(c.siteID, uid);
-            const bridge = await normal(c, uid);
-            const online = bridge ? await bridge.summary() : [];
-            return [...offline, ...online].sort((a, b) => a.log.timestamp - b.log.timestamp);
-        },
-        async sync(c, options) {
-            if (!options?.userInitiated) return true;
-            const uid = c.auth.currentUser?.uid;
-            if (!uid) throw authError('Giriş gerekli');
-            const offline = await window.KolartOfflineSync.sync(c, options);
-            if (!offline) return false;
-            const bridge = await normal(c, uid);
-            if (bridge && (await bridge.summary()).length) {
-                window.KolartOfflineSync.hideModal();
-                window.dispatchEvent(new CustomEvent('kolart-sync-progress', { detail: {
-                    percent: 0, step: 'Normal devriye kayıtları aktarılıyor'
-                } }));
-            }
-            return bridge ? bridge.upload(c) : true;
-        }
-    };
-})();
-
 // Kuyruğun sahibi ve proje kimliği birlikte kontrol edilir. Gönderim yükleme isteğiyle başlar.
 const IndexPatrolUpload = (() => {
     const dialog = document.getElementById('indexTransferModal');
@@ -2673,8 +2247,8 @@ const IndexPatrolUpload = (() => {
                 timer = setTimeout(() => reject(new Error('Gönderim bağlantısı zaman aşımı')), 20000);
             })]).finally(() => clearTimeout(timer));
             if (context.auth.currentUser?.uid !== uid) throw Object.assign(new Error('Oturum değişti'), { code: 'AUTH_REQUIRED' });
-            const completed = await IndexPatrolQueues.sync({ ...context, ...storage }, { userInitiated: true });
-            const remaining = await IndexPatrolQueues.summary(context, uid);
+            const completed = await window.KolartOfflineSync.sync({ ...context, ...storage }, { userInitiated: true });
+            const remaining = await window.KolartOfflineSync.queueSummary(context.siteID, uid);
             if (completed && !remaining.length) {
                 marker('clear'); transition('success'); ui.symbol.innerHTML = tick;
                 ui.title.textContent = 'Şirkete iletildi';
@@ -2689,7 +2263,7 @@ const IndexPatrolUpload = (() => {
                 failure(friendlyError(document.getElementById('ks-text')?.textContent || 'Gönderim tamamlanamadı'));
             }
         } catch (error) {
-            try { renderRecords(await IndexPatrolQueues.summary(context, uid)); } catch (_) {}
+            try { renderRecords(await window.KolartOfflineSync.queueSummary(context.siteID, uid)); } catch (_) {}
             failure(friendlyError(error));
             console.warn('[Index devriye aktarımı]', error.code || error.message);
         } finally {
@@ -2734,7 +2308,7 @@ const IndexPatrolUpload = (() => {
             if (pending) return pending;
             context = c; uid = c.expectedUID || c.auth.currentUser?.uid;
             if (!uid) return false;
-            const rows = await IndexPatrolQueues.summary(c, uid);
+            const rows = await window.KolartOfflineSync.queueSummary(c.siteID, uid);
             if (!c.authorize && c.auth.currentUser?.uid !== uid) return false;
             if (!rows.length) { marker('clear'); return true; }
             pending = new Promise(resolve => { resolver = resolve; });
@@ -3119,82 +2693,60 @@ async function loginUser(rawUsername, password, role) {
         const activeDB = getDatabase(app);
         const auth = getAuth(app);
 
-        const targetEmail = formatToEmail(cleanUsername);
-        
-       let authSuccess = false;
-try {
-    await signInWithEmailAndPassword(auth, targetEmail, cleanPassword);
-    authSuccess = true;
-    if (statusText) statusText.textContent = "✅ Bilgileriniz doğrulanıyor…";
-} catch (authErr) {
-    // İnternet hatası kaldırıldı, sadece kullanıcı yok veya şifre hatalı uyarısı bırakıldı
-    return showErrorModal("❌ Kullanıcı kaydı bulunamadı veya şifre hatalı!");
-}
+        // 1. ÖNCE VERİTABANINDAN KULLANICIYI KONTROL ET
+        const userSnap = await get(child(ref(activeDB), 'users/' + dbUsername));
+        let isSupportRecord = false;
+        let userData = null;
 
-   // DESTEK PERSONEL KONTROLÜ (ŞİFRELİ)
-        if (dbUsername === "DESTEK PERSONEL") {
-            const dSnap = await get(child(ref(activeDB), 'users/' + dbUsername));
-            rememberVerifiedProfile(dSnap, activeDB, dbUsername, auth);
-            if (dSnap.exists()) {
-                // ŞİFREYİ BURADA KONTROL EDİYORUZ
-                if (cleanPassword === String(dSnap.val().password).trim()) {
-                    sessionStorage.setItem("currentUser", JSON.stringify({ username: dbUsername, type: dSnap.val().type }));
-                    
-                    // ---> BENİ HATIRLA EKLENTİSİ BURADA BAŞLIYOR <---
-                    if (secRemember.checked) {
-                        localStorage.setItem("securityUser", JSON.stringify({ username: cleanUsername, password: maskPass(cleanPassword) }));
-                    } else {
-                        localStorage.removeItem("securityUser");
-                    }
-                    // ---> BENİ HATIRLA EKLENTİSİ BURADA BİTİYOR <---
-
-                    if (statusModal) statusModal.style.display = 'none';
-                    if (!await finishOfflineUploads(app,activeDB,auth,siteId)) {
-                        loginBtn.disabled=false;loginBtn.style.opacity='1';return;
-                    }
-                    if (!await preparePatrolBundle(app,activeDB,auth,siteId,dbUsername,dSnap.val().type,cleanPassword)) {
-                        loginBtn.disabled=false;loginBtn.style.opacity='1';return;
-                    }
-                    window.location.href = "guvenlik.html"; // Sadece güvenlik sayfasına yönlendiriyor
-                    return;
-                } else {
-                    return showErrorModal("❌ Destek Personeli Şifresi Hatalı!");
-                }
+        if (userSnap.exists()) {
+            userData = userSnap.val();
+            // Eğer bu kullanıcı geçici destek personeli kaydı ise
+            if (userData.supportBaseUsername === "DESTEK PERSONEL" || dbUsername === "DESTEK PERSONEL") {
+                isSupportRecord = true;
             }
         }
 
-        // DÜZELTME 3: Eğer Admin/Destek değilse ve Auth'tan geçemediyse ŞİMDİ bloke et!
-        if (!authSuccess) {
-            return showErrorModal("❌ AUT Kaydı Bulunamadı veya Şifre Hatalı!");
+        // 2. AUTH E-POSTA BELİRLEME
+        // Eğer kullanıcı destek personeli ise Auth girişi "DESTEK PERSONEL" e-postası ile yapılır.
+        const authUsername = isSupportRecord ? "DESTEK PERSONEL" : cleanUsername;
+        const targetEmail = formatToEmail(authUsername);
+        
+        let authSuccess = false;
+        try {
+            await signInWithEmailAndPassword(auth, targetEmail, cleanPassword);
+            authSuccess = true;
+            if (statusText) statusText.textContent = "✅ Bilgileriniz doğrulanıyor…";
+        } catch (authErr) {
+            return showErrorModal("❌ Kullanıcı kaydı bulunamadı veya şifre hatalı!");
         }
 
-        // --- NORMAL KULLANICI KONTROLLERİ ---
-        const userSnap = await get(child(ref(activeDB), 'users/' + dbUsername));
-        rememberVerifiedProfile(userSnap, activeDB, dbUsername, auth);
-        if (!userSnap.exists()) {
+        if (!authSuccess) {
+            return showErrorModal("❌ Auth Kaydı Bulunamadı veya Şifre Hatalı!");
+        }
+
+        // 3. KULLANICI VERİSİ KONTROLÜ
+        if (!userData) {
             return showErrorModal("❌ Kullanıcı veritabanında bulunamadı!");
         }
 
-        const user = userSnap.val();
-        if (user.isActive === false) {
+        if (userData.isActive === false) {
             return showErrorModal("❌ Hesabınız Askıya Alınmıştır!");
         }
 
-        const uPass = String(user.password).trim();
-        if (uPass === "123456" || uPass.length < 6) {
-            if (statusModal) statusModal.style.display = "none";
-            let why = uPass === "123456" ? "Şu anki şifreniz varsayılan <b>'123456'</b>'dır. 6 haneli yeni şifre oluşturun. Yeni şifre sadece rakam içermelidir." : `Şifreniz <b>${uPass.length}</b> haneli. En az 6 hane olmalı.`;
-            forcePasswordChange(user.username, user.type, activeDB, auth, why);
-            return;
-        }
+        // Session hazırlığı
+        sessionStorage.setItem("currentUser", JSON.stringify({ 
+            username: userData.username || dbUsername, 
+            type: userData.type,
+            ...(isSupportRecord ? { supportBaseUsername: "DESTEK PERSONEL" } : {})
+        }));
 
-        sessionStorage.setItem("currentUser", JSON.stringify({ username: user.username, type: user.type }));
         if (statusModal) statusModal.style.display = 'none';
-        if (!await finishOfflineUploads(app,activeDB,auth,siteId)) {
-            loginBtn.disabled=false;loginBtn.style.opacity='1';return;
+
+        if (!await finishOfflineUploads(app, activeDB, auth, siteId)) {
+            loginBtn.disabled = false; loginBtn.style.opacity = '1'; return;
         }
-        if (!await preparePatrolBundle(app,activeDB,auth,siteId,dbUsername,user.type,cleanPassword)) {
-            loginBtn.disabled=false;loginBtn.style.opacity='1';return;
+        if (!await preparePatrolBundle(app, activeDB, auth, siteId, dbUsername, userData.type, cleanPassword)) {
+            loginBtn.disabled = false; loginBtn.style.opacity = '1'; return;
         }
 
         if (role === "security") {
@@ -3202,11 +2754,9 @@ try {
                 localStorage.setItem("securityUser", JSON.stringify({ username: cleanUsername, password: maskPass(cleanPassword) }));
             } else localStorage.removeItem("securityUser");
 
-            // TÜM DİĞER ROLLER KALDIRILDI SADECE GÜVENLİK KONTROLÜ VAR
-           // AMİR VE GÜVENLİK KONTROLÜ
-            if (user.type === "amir") {
+            if (userData.type === "amir") {
                 window.location.href = "amir.html";
-            } else if (user.type === "security") {
+            } else if (userData.type === "security") {
                 window.location.href = "guvenlik.html";
             } else {
                 return showErrorModal("❌ Sadece amir veya güvenlik yetkisine sahip kullanıcılar giriş yapabilir!");
