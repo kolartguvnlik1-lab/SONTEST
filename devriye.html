@@ -163,27 +163,28 @@ body { background-color: var(--bg-dark); color: var(--text-main); }
 .transfer-banner[data-state="sending"] { background:linear-gradient(135deg,#10293c,#101c28); border-color:#285776; color:#d0eeff; }
 .transfer-banner[data-state="supplement"] { background:linear-gradient(135deg,#302513,#1d1910); border-color:#806330; color:#ffe0a3; }
 .transfer-banner > .material-symbols-outlined { font-size:25px; flex-shrink:0; }
-.transfer-banner strong { display:block; font-size:12px; line-height:1.5; }
-.transfer-banner small { display:block; margin-top:3px; font-size:11px; opacity:.8; line-height:1.5; }
+.transfer-banner strong { display:block; font-size:15px; line-height:1.5; }
+.transfer-banner small { display:block; margin-top:4px; font-size:13px; color:inherit; line-height:1.5; }
 .transfer-overlay { display:none; position:fixed; inset:0; z-index:30000; padding:20px 16px; overflow-y:auto; background:rgba(3,7,12,.92); backdrop-filter:blur(14px); align-items:center; justify-content:center; }
 .transfer-overlay[data-open="true"] { display:flex; }
-.transfer-card { --transfer-accent:#63c7ff; --transfer-line:#285471; --transfer-tint:#122c40; position:relative; width:100%; max-width:410px; max-height:calc(100vh - 40px); max-height:calc(100dvh - 40px); overflow-y:auto; border:1px solid var(--transfer-line); border-radius:28px; padding:24px; background:radial-gradient(ellipse at 50% 0%,var(--transfer-tint),transparent 65%),#0c121c; box-shadow:0 24px 90px #0009; }
+.transfer-card { --transfer-accent:#63c7ff; --transfer-line:#285471; --transfer-tint:#122c40; position:relative; width:100%; max-width:410px; max-height:calc(100vh - 40px); max-height:calc(100dvh - 40px); overflow-y:auto; border:1px solid var(--transfer-line); border-radius:28px; padding:28px 24px; background:radial-gradient(ellipse at 50% 0%,var(--transfer-tint),transparent 65%),#0c121c; box-shadow:0 24px 90px #0009; text-align:center; }
 .transfer-card[data-state="waiting"] { --transfer-accent:#ff8298; --transfer-line:#a1374b; --transfer-tint:#3d1622; }
 .transfer-card[data-state="success"] { --transfer-accent:#60e7b0; --transfer-line:#276c54; --transfer-tint:#12382e; }
-.transfer-eyebrow { color:#a4b0c3; font-size:9px; font-weight:900; letter-spacing:2px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
-.transfer-chip { border:1px solid var(--transfer-line); background:#0003; padding:6px 9px; border-radius:30px; color:var(--transfer-accent); font-size:9px; letter-spacing:.3px; white-space:nowrap; }
-.transfer-emblem { width:68px; height:68px; margin:25px 0 19px; display:flex; align-items:center; justify-content:center; border:1px solid var(--transfer-line); background:var(--transfer-tint); border-radius:22px; box-shadow:0 0 35px #0003; color:var(--transfer-accent); }
-.transfer-emblem .material-symbols-outlined { font-size:35px; }
+.transfer-eyebrow { color:#b4bfd0; font-size:11px; font-weight:800; letter-spacing:.5px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; }
+.transfer-chip { border:1px solid var(--transfer-line); background:#0003; padding:7px 10px; border-radius:30px; color:var(--transfer-accent); font-size:10px; letter-spacing:.2px; white-space:nowrap; }
+.transfer-emblem { width:80px; height:80px; margin:30px auto 22px; display:flex; align-items:center; justify-content:center; border:1px solid var(--transfer-line); background:var(--transfer-tint); border-radius:26px; box-shadow:0 0 35px #0003; color:var(--transfer-accent); }
+.transfer-emblem .material-symbols-outlined { font-size:44px; }
 .transfer-card[data-state="sending"] .transfer-emblem .material-symbols-outlined { animation:spin 2.5s linear infinite; }
-.transfer-title { font-size:25px; line-height:1.16; font-weight:900; letter-spacing:-.8px; color:#fff; margin-bottom:12px; }
+.transfer-title { font-size:31px; line-height:1.2; font-weight:900; letter-spacing:-.6px; color:#fff; margin-bottom:16px; overflow-wrap:break-word; }
 .transfer-card[data-state="waiting"] .transfer-title { color:#ffb5c3; }
 .transfer-card[data-state="success"] .transfer-title { color:#a2f3d1; }
-.transfer-description { font-size:12px; color:#c1ccdc; line-height:1.8; }
-.transfer-meter-label { margin-top:22px; font-size:8px; letter-spacing:1px; font-weight:900; color:#9facbe; }
+.transfer-description { font-size:17px; color:#e1e8f2; line-height:1.65; }
+.transfer-meter { margin-top:27px; padding:18px; border:1px solid #ffffff0d; border-radius:18px; background:#060b124d; }
+.transfer-meter[hidden],.transfer-footnote[hidden],.transfer-internal { display:none !important; }
 .transfer-meter-head { display:flex; justify-content:space-between; align-items:flex-end; gap:10px; margin:10px 0 9px; }
 .transfer-meter-head strong { font-size:31px; letter-spacing:-1px; color:var(--transfer-accent); line-height:1; }
-.transfer-meter-head span { font-size:10px; color:#a8b4c7; line-height:1.5; text-align:right; }
-.transfer-track { height:9px; background:#ffffff0c; border-radius:20px; overflow:hidden; }
+.transfer-meter-head span { font-size:14px; color:#c6d2e2; line-height:1.5; text-align:right; }
+.transfer-track { height:11px; background:#ffffff12; border-radius:20px; overflow:hidden; }
 .transfer-fill { width:0; height:100%; border-radius:inherit; background:var(--transfer-accent); transition:width .35s ease; box-shadow:0 0 14px var(--transfer-accent); }
 .transfer-detail { margin-top:10px; font-size:10px; line-height:1.6; color:#9fadc1; min-height:16px; }
 .transfer-steps { display:flex; flex-direction:column; gap:0; margin:18px 0; border:1px solid #ffffff0b; border-radius:17px; background:#060b124d; padding:0 14px; }
@@ -194,16 +195,18 @@ body { background-color: var(--bg-dark); color: var(--text-main); }
 .transfer-step[data-done="true"] { color:#e0efe8; }
 .transfer-step[data-done="true"] .material-symbols-outlined,.transfer-step[data-done="true"] b { color:#60e7b0; }
 .transfer-step[data-error="true"] .material-symbols-outlined,.transfer-step[data-error="true"] b { color:#ff8298; }
-.transfer-footnote { border-radius:13px; padding:11px 12px; background:#ffffff06; color:#a8b4c6; font-size:10px; line-height:1.7; }
+.transfer-footnote { margin-top:18px; border-radius:13px; padding:12px 14px; background:#ffffff06; color:#c6d2e2; font-size:15px; line-height:1.6; }
 .transfer-card[data-state="waiting"] .transfer-footnote { background:#ff506d12; color:#ffb5c3; border:1px solid #ff506d24; }
 .transfer-diagnostics { margin:0 0 14px; padding:11px 12px; border:1px solid #ad7e383f; border-radius:13px; color:#efc788; background:#d3a5480a; }
 .transfer-diagnostics summary { font-size:10px; font-weight:700; cursor:pointer; }
 .transfer-diagnostics pre { white-space:pre-wrap; overflow-wrap:anywhere; font:10px/1.65 monospace; color:#eedbc0; margin-top:10px; user-select:text; -webkit-user-select:text; }
-.transfer-actions { display:none; gap:9px; flex-direction:column; margin-top:17px; }
-.transfer-actions button { width:100%; min-height:47px; border:0; border-radius:14px; padding:12px; color:#0c121c; background:var(--transfer-accent); font-weight:900; font-size:11px; letter-spacing:.4px; cursor:pointer; }
+.transfer-actions { display:none; gap:12px; flex-direction:column; margin-top:26px; }
+.transfer-actions button { width:100%; min-height:56px; border:0; border-radius:15px; padding:15px; color:#0c121c; background:var(--transfer-accent); font-weight:900; font-size:16px; letter-spacing:.2px; cursor:pointer; touch-action:manipulation; }
 .transfer-actions .transfer-secondary { color:#d0d9e7; background:#ffffff08; border:1px solid #ffffff12; }
-@media (max-width:360px) { .transfer-card { padding:20px; border-radius:23px; } .transfer-title { font-size:23px; } .transfer-emblem { margin:18px 0 15px; width:58px; height:58px; } }
-@media (max-height:760px) { .transfer-card { padding:19px; } .transfer-emblem { width:50px; height:50px; border-radius:16px; margin:16px 0 13px; } .transfer-title { font-size:23px; } .transfer-description { font-size:11px; line-height:1.65; } .transfer-steps { margin:14px 0; } .transfer-step { padding:9px 0; } .transfer-meter-head { margin-top:17px; } }
+.transfer-actions .transfer-secondary[data-primary="true"] { color:#0c121c; background:var(--transfer-accent); border-color:transparent; }
+.transfer-actions button:focus-visible { outline:3px solid #fff; outline-offset:4px; }
+@media (max-width:360px) { .transfer-card { padding:24px 20px; border-radius:23px; } .transfer-title { font-size:28px; } .transfer-eyebrow { justify-content:center; column-gap:14px; } }
+@media (max-height:640px) { .transfer-card { padding:22px 20px; } .transfer-emblem { width:64px; height:64px; border-radius:21px; margin:20px auto 17px; } .transfer-emblem .material-symbols-outlined { font-size:37px; } .transfer-meter { margin-top:20px; } .transfer-actions { margin-top:20px; } }
 @media (prefers-reduced-motion:reduce) { .transfer-card * { animation:none !important; transition:none !important; } }
 
     </style>
@@ -284,13 +287,15 @@ body { background-color: var(--bg-dark); color: var(--text-main); }
 
 <div id="patrolTransferOverlay" class="transfer-overlay" role="dialog" aria-modal="true" aria-labelledby="patrolTransferTitle" data-open="false">
     <section id="patrolTransferCard" class="transfer-card" data-state="sending">
-        <div class="transfer-eyebrow"><span>KOLART / DEVRİYE KAYDI</span><span id="patrolTransferChip" class="transfer-chip">TELEFON YEDEĞİ HAZIR</span></div>
+        <div class="transfer-eyebrow"><span>KOLART / DEVRİYE</span><span id="patrolTransferChip" class="transfer-chip">GÖNDERİLİYOR</span></div>
         <div class="transfer-emblem"><span id="patrolTransferIcon" class="material-symbols-outlined" aria-hidden="true">sync</span></div>
-        <h2 id="patrolTransferTitle" class="transfer-title">Devriyeniz<br>sunucuya yükleniyor.</h2>
+        <h2 id="patrolTransferTitle" class="transfer-title">Devriyeniz<br>gönderiliyor.</h2>
         <p id="patrolTransferDescription" class="transfer-description" role="status" aria-live="polite"></p>
-        <p class="transfer-meter-label">RAPOR, FOTOĞRAF VE BİLDİRİM AKTARIMI</p>
-        <div class="transfer-meter-head"><strong id="patrolTransferPercent">%0</strong><span id="patrolTransferCount">Sunucu onayı bekleniyor</span></div>
-        <div id="patrolTransferProgress" class="transfer-track" role="progressbar" aria-label="Devriye aktarımı" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="patrolTransferFill" class="transfer-fill"></div></div>
+        <div id="patrolTransferMeter" class="transfer-meter">
+            <div class="transfer-meter-head"><strong id="patrolTransferPercent">%0</strong><span id="patrolTransferCount">Gönderiliyor</span></div>
+            <div id="patrolTransferProgress" class="transfer-track" role="progressbar" aria-label="Devriye gönderimi" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="patrolTransferFill" class="transfer-fill"></div></div>
+        </div>
+        <div class="transfer-internal" hidden aria-hidden="true">
         <p id="patrolTransferDetail" class="transfer-detail"></p>
         <div class="transfer-steps">
             <div id="transferStepHistory" class="transfer-step"><span class="material-symbols-outlined">schedule</span><span>Devriye raporu</span><b>Bekliyor</b></div>
@@ -299,10 +304,11 @@ body { background-color: var(--bg-dark); color: var(--text-main); }
             <div id="transferStepCleanup" class="transfer-step"><span class="material-symbols-outlined">schedule</span><span>Saat ve aktif kayıt</span><b>Bekliyor</b></div>
         </div>
         <details id="patrolTransferDiagnostics" class="transfer-diagnostics" hidden><summary>Aktarım hata ayrıntıları</summary><pre id="patrolTransferErrors"></pre></details>
+        </div>
         <p id="patrolTransferFootnote" class="transfer-footnote"></p>
         <div id="patrolTransferActions" class="transfer-actions">
             <button id="patrolTransferRetry" type="button">TEKRAR DENE</button>
-            <button id="patrolTransferDismiss" type="button" class="transfer-secondary">ANLADIM</button>
+            <button id="patrolTransferDismiss" type="button" class="transfer-secondary">TAMAM</button>
         </div>
     </section>
 </div>
@@ -1490,10 +1496,10 @@ function renderTransferView() {
     const banner=document.getElementById('patrolTransferBanner');
     banner.style.display=pending.length?'flex':'none';
     banner.dataset.state=allHistory?'supplement':state;
-    banner.querySelector('strong').textContent=allHistory?'Raporlar sunucuda · Ek aktarım bekliyor':state==='sending'?`${pending.length} devriye aktarılıyor · %${percent}`:`${pending.length} devriye telefonda bekliyor`;
-    banner.querySelector('small').textContent=state==='sending'?'Aktarımın durumunu görmek için dokunun.':'İnternetinizin çektiği yerde bu sayfayı açın. Ayrıntılar için dokunun.';
+    banner.querySelector('strong').textContent=allHistory?'Devriye kaydınız merkeze ulaştı.':state==='sending'?'Devriye kaydınız gönderiliyor.':'Telefonda bekleyen devriye var.';
+    banner.querySelector('small').textContent=state==='sending'?'Gönderimi görmek için dokunun.':allHistory?'Kalan kayıtları göndermek için dokunun.':'İnternetinizin çektiği yerde bu sayfayı açın.';
     const card=document.getElementById('patrolTransferCard');
-    // Yeşil, devriye raporunun onayıdır. Ek işlemlerin durumu ayrıca ve doğru gösterilir.
+    // Yeşil, devriye raporunun onayıdır; kalan işler arka planda aynı şekilde sürer.
     card.dataset.state=allHistory?'success':state;
     document.getElementById('patrolTransferIcon').textContent=allHistory?'verified':state==='waiting'?'cloud_off':'sync';
     const title=document.getElementById('patrolTransferTitle');
@@ -1502,37 +1508,37 @@ function renderTransferView() {
     const footnote=document.getElementById('patrolTransferFootnote');
     if (state==='success') {
         title.innerHTML='Devriyeniz<br>tamamlandı.';
-        description.textContent='Raporunuz sunucuya başarıyla iletildi. Varsa fotoğraflar kaydedildi. WhatsApp bildirimi, bildirim kuyruğuna iletildi.';
-        chip.textContent='SUNUCU ONAYI ALINDI';
-        footnote.textContent='Aktarım tamamlandı. Bu sayfadan güvenle ayrılabilirsiniz.';
+        description.textContent='Devriye kaydınız merkeze ulaştı.';
+        chip.textContent='TAMAMLANDI';
+        footnote.textContent='';
     } else if (allHistory) {
         title.innerHTML='Devriyeniz<br>tamamlandı.';
-        description.textContent=permissionError
-            ?'Devriye raporunuz sunucuya başarıyla kaydedildi. Ek aktarımda erişim izni hatası var. Hangi işlemin hata verdiği aşağıdaki ayrıntılarda gösterilir.'
-            :state==='sending'
-                ?'Devriye raporunuz sunucuya başarıyla kaydedildi. Fotoğraf ve bildirim aktarımı devam ediyor. Henüz tamamlanmayan işlemler aşağıda gösterilir.'
-                :'Devriye raporunuz sunucuya başarıyla kaydedildi. Ek aktarım henüz tamamlanmadı. Bekleyen veriler telefonda korunuyor; bu sayfayı tekrar açınca yeniden denenecektir.';
-        chip.textContent=state==='sending'?'RAPOR SUNUCUDA':'EK AKTARIM BEKLİYOR';
-        footnote.textContent='Raporunuz kayıtlıdır. Bekleyen veriler için uygulama verilerini temizlemeyin. Bu sayfayı tekrar açtığınızda kalan aktarım devam eder.';
+        description.textContent='Devriye kaydınız merkeze ulaştı.';
+        chip.textContent='KAYIT ULAŞTI';
+        footnote.textContent=state==='sending'
+            ?'Gönderim sürüyor. Lütfen bu ekranı kapatmayın.'
+            :'Kalan kayıtlar bu sayfayı tekrar açtığınızda gönderilecek.';
     } else if (state==='waiting') {
         title.innerHTML='Devriyeniz telefona<br>kaydedildi.';
         description.textContent=permissionError
-                ?'Sunucudan erişim izni alınamadığı için devriyeniz henüz iletilemedi. Kayıt telefonunuzda saklanıyor. Yöneticinize haber verin; izin düzeltildiğinde bu sayfaya tekrar girmeniz yeterlidir.'
+                ?'Kaydınız henüz gönderilemedi. Lütfen yöneticinize haber verin.'
                 :transferView.fault
-                    ?'Telefon yedeği şu anda okunamıyor. Sayfayı yeniden açmayı deneyin; uygulama verilerini silmeyin. Tamamlanmamış kayıtlar silinmedi.'
-                    :'İnternet bağlantınızdan dolayı devriyeniz telefona kaydedildi. İnternetinizin çektiği yerde bu sayfayı tekrar açtığınızda sunucuya otomatik yüklenecektir.';
-        chip.textContent='TELEFON YEDEĞİ HAZIR';
-        footnote.textContent='Uygulama verilerini ve tarayıcı geçmişini temizlemeyin. Aktarılmayı bekleyen kayıtlar bu telefonda tutuluyor.';
+                    ?'Lütfen sayfayı yeniden açın. Sorun sürerse yöneticinize haber verin.'
+                    :'İnternetinizin çektiği yerde bu sayfayı tekrar açın. Devriyeniz otomatik gönderilecek.';
+        chip.textContent='TELEFONDA KAYITLI';
+        footnote.textContent='';
     } else {
-        title.innerHTML=transferView.origin==='finish'?'Devriyeniz<br>sunucuya yükleniyor.':'Bekleyen devriyeler<br>sunucuya yükleniyor.';
-        description.textContent='Telefonunuzdaki kayıtlar aktarılıyor. İlerleme, sunucu onayları ve fotoğraf aktarımına göre güncellenir.';
-        chip.textContent='TELEFON YEDEĞİ HAZIR';
-        footnote.textContent='Aktarım tamamlanana kadar bu ekrandan ayrılmayın. Bağlantı kesilirse kayıtlarınız telefonda korunur.';
+        title.innerHTML='Devriyeniz<br>gönderiliyor.';
+        description.textContent='Lütfen bu ekranı kapatmayın.';
+        chip.textContent='GÖNDERİLİYOR';
+        footnote.textContent='';
     }
+    footnote.hidden=!footnote.textContent;
+    document.getElementById('patrolTransferMeter').hidden=state!=='sending';
     document.getElementById('patrolTransferPercent').textContent='%'+percent;
     document.getElementById('patrolTransferFill').style.width=percent+'%';
     document.getElementById('patrolTransferProgress').setAttribute('aria-valuenow',String(percent));
-    document.getElementById('patrolTransferCount').textContent=`${rows.filter(log=>log._historyConfirmed || log._outboxCleared).length} / ${rows.length} rapor sunucuda`;
+    document.getElementById('patrolTransferCount').textContent='Gönderiliyor';
     const waiting=[];
     if(pending.some(log=>!log._historyConfirmed))waiting.push('rapor');
     if(pending.some(log=>!log._notificationSent))waiting.push('bildirim');
@@ -1553,7 +1559,8 @@ function renderTransferView() {
     document.getElementById('patrolTransferErrors').textContent=[...connectionLines,...lines].join('\n\n');
     document.getElementById('patrolTransferActions').style.display=state==='sending' && !allHistory?'none':'flex';
     document.getElementById('patrolTransferRetry').style.display=state==='waiting'?'block':'none';
-    document.getElementById('patrolTransferDismiss').textContent=allHistory?(transferView.origin==='finish'?'ANASAYFAYA DÖN':'DEVAM ET'):'ANLADIM';
+    document.getElementById('patrolTransferDismiss').textContent=allHistory?(transferView.origin==='finish'?'ANASAYFAYA DÖN':'DEVAM ET'):'TAMAM';
+    document.getElementById('patrolTransferDismiss').dataset.primary=String(state!=='waiting');
 }
 async function settleTransferView() {
     if (!transferView.initialized) return;
