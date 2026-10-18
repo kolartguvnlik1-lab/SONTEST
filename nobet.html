@@ -534,6 +534,18 @@ const securitySelect = document.getElementById('securitySelect'), deliverSelect 
 const timerEl = document.getElementById('timer'), qrModal = document.getElementById('qrScannerModal');
 const successModal = document.getElementById('successModal'), successText = document.getElementById('successText');
 const supportModal = document.getElementById('supportModal'), supportNameInput = document.getElementById('supportName'), supportPhoneInput = document.getElementById('supportPhone'), saveSupportBtn = document.getElementById('saveSupportBtn');
+// Telefon numarasını rakamlara çevir ve 10 haneli cep numarasına baştaki 0'ı ekle.
+supportPhoneInput.addEventListener('input', () => {
+    let phone = supportPhoneInput.value.replace(/\D/g, '');
+
+    if (phone.startsWith('90') && phone.length === 12) {
+        phone = '0' + phone.slice(2);
+    } else if (phone.length === 10 && phone.startsWith('5')) {
+        phone = '0' + phone;
+    }
+
+    supportPhoneInput.value = phone.slice(0, 11);
+});
 const manualBtn = document.getElementById('manualBtn');
 const startBtn = document.getElementById('startBtn');
 const deliverBtn = document.getElementById('deliverBtn');
@@ -1059,27 +1071,81 @@ document.getElementById('cancelManualBtn').addEventListener('click', () => {
     document.getElementById('manualBlockModal').style.display = 'none'; resetUIState();
 });
 
+// Destek personeli: bilgileri ancak doğrulama başarılı olunca kaydet.
+async function startSupportAfterVerification(fullName, phone, pointName, capturedBase64) {
+    try {
+        // Bu fonksiyon yalnızca QR geçerliyse veya manuel nokta onaylandıysa çağrılır.
+        await renameSupportUser(fullName, phone);
+
+        // Kullanıcı adı güncellendikten sonra nöbet kaydını başlat.
+        await handleStartFlow(pointName, capturedBase64);
+    } catch (e) {
+        showAppError("Destek personel bilgileri kaydedilemedi: " + e.message);
+        resetUIState();
+    }
+}
+
 saveSupportBtn.addEventListener('click', async () => {
     const fullName = supportNameInput.value.trim().replace(/\s+/g, ' ');
-    if(fullName.split(' ').length < 2) return showAppError("Lütfen adınızı ve soyadınızı giriniz!");
-    const phone = supportPhoneInput.value.trim();
-    if(phone.length < 10) return showAppError("Lütfen geçerli bir telefon numarası giriniz!");
+    if (fullName.split(' ').length < 2) {
+        return showAppError("Lütfen adınızı ve soyadınızı giriniz!");
+    }
+
+    let phone = supportPhoneInput.value.replace(/\D/g, '');
+
+    // Başında 0 olmayan 10 haneli cep numarasını düzelt.
+    if (phone.length === 10 && phone.startsWith('5')) {
+        phone = '0' + phone;
+    }
+
+    if (!/^05\d{9}$/.test(phone)) {
+        return showAppError("Lütfen 05XXXXXXXXX formatında geçerli bir telefon numarası giriniz!");
+    }
+
+    supportPhoneInput.value = phone;
     saveSupportBtn.disabled = true;
-    
+
     try {
-        await renameSupportUser(fullName, phone);
-        supportModal.style.display = 'none';
         const isPhoneBroken = manualBtn.style.display === 'block';
 
+        // Bu noktada Firebase'e ad veya telefon kaydetme!
+        supportModal.style.display = 'none';
+
         if (isPhoneBroken) {
-            handleStartFlow(window.selectedManualBlock || "MANUEL ONAY", null);
+            const selectedBlock = window.selectedManualBlock;
+
+            if (!selectedBlock) {
+                supportModal.style.display = 'flex';
+                showAppError("Önce manuel doğrulama için bir nokta seçip onaylamalısınız.");
+                return;
+            }
+
+            // Manuel doğrulama, nokta seçilip ONAYLA'ya basıldıktan sonra yapılır.
+            window.selectedManualBlock = null;
+            await startSupportAfterVerification(
+                fullName,
+                phone,
+                selectedBlock,
+                null
+            );
         } else {
-            openScanner((qrData, qrId, capturedBase64) => {
-                handleStartFlow(qrData.name || qrId, capturedBase64);
+            // QR doğrulanana kadar isim ve telefon sadece geçici değişkenlerde kalır.
+            openScanner(async (qrData, qrId, capturedBase64) => {
+                await startSupportAfterVerification(
+                    fullName,
+                    phone,
+                    qrData.name || qrId,
+                    capturedBase64
+                );
             });
         }
-    } catch(e) { showAppError("Bağlantı hatası: " + e.message); } 
-    finally { saveSupportBtn.disabled = false; resetUIState(); }
+    } catch (e) {
+        supportModal.style.display = 'flex';
+        showAppError("İşlem başlatılamadı: " + e.message);
+    } finally {
+        saveSupportBtn.disabled = false;
+        resetUIState();
+    }
 });
 
 document.getElementById('closeScanner').addEventListener('click', async () => { 
