@@ -945,7 +945,6 @@ let initPromise = null;
 let isStarting = false;
 let journalReady = false;
 const closedSessionIds = new Set();
-const historyConfirmedPatrolIds = new Set();
 const unverifiedLegacyReports = new Set();
 const deepCopy = value => JSON.parse(JSON.stringify(value));
 const journalKey = (kind, id) => JOURNAL_SCOPE + kind + ':' + id;
@@ -1073,8 +1072,8 @@ async function readJournal() {
             if (!previous || item._revision > previous._revision) result.set(id, item);
         } catch (error) { console.error('Bozuk yedek silinmedi:', key, error); }
     }
-    // Alternatif depodaki birkaç kayıt, erişilemeyen ana depoda bekleyen rapor olmadığını kanıtlamaz.
-    if (dbError && window.indexedDB && localStorage.getItem(JOURNAL_BACKEND_KEY) === 'idb') throw dbError;
+    // Erişilemeyen veritabanını boş sanıp yeni devriye başlatma.
+    if (dbError && window.indexedDB && result.size === 0 && localStorage.getItem(JOURNAL_BACKEND_KEY) === 'idb') throw dbError;
     return [...result.values()];
 }
 async function removeJournal(kind, id) {
@@ -1260,7 +1259,6 @@ async function writeConfirmedHistory(log) {
     const result = await runTransaction(ref(db,`devriyeHistory/${log.dateKey}/${log.user}/${outboxId(log)}`),
         current=>mergeHistory(current,incoming),{applyLocally:false});
     if (!result.committed) throw new Error('Geçmiş kaydının sunucu onayı alınamadı.');
-    historyConfirmedPatrolIds.add(outboxId(log));
     return result.snapshot.val();
 }
 async function closeMatchingCloudPatrol(log) {
@@ -1549,8 +1547,7 @@ async function finalizePatrol(note='',eksikListesi=[]) {
     catch(error){console.warn('Gönderim bekliyor; yedek saklı:',error);}
     finally{clearInterval(timer);clearTimeout(timeoutId);document.querySelector('#appModal .custom-alert-btn').style.display='';}
     let pending=true;try{pending=(await readPatrolOutbox()).some(item=>outboxId(item)===log.patrolId);}catch(_){}
-    const delivered=!pending && historyConfirmedPatrolIds.has(log.patrolId);
-    showAppModal(delivered?'BAŞARILI':'TAMAMLANDI',delivered?'Rapor merkeze başarıyla iletildi.':'Devriyeniz tamamlandı.','check_circle');
+    showAppModal(pending?'TAMAMLANDI':'BAŞARILI',pending?'Devriyeniz tamamlandı.':'Rapor merkeze başarıyla iletildi.','check_circle');
     setTimeout(()=>{window.location.href='guvenlik.html';},2500);
 }
 function retryPatrolTransfers() {
