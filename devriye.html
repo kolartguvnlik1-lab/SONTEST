@@ -161,6 +161,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); }
 /* Telefon yedeği ve sunucu aktarımı: yalnızca onaylanan işlemler ilerler. */
 .transfer-banner { display:none; margin:14px 16px 8px; width:calc(100% - 32px); padding:15px; border:1px solid #a32a3e; border-radius:18px; background:linear-gradient(135deg,#32131d,#1d1015); color:#ffe2e7; text-align:left; cursor:pointer; align-items:center; gap:12px; }
 .transfer-banner[data-state="sending"] { background:linear-gradient(135deg,#10293c,#101c28); border-color:#285776; color:#d0eeff; }
+.transfer-banner[data-state="supplement"] { background:linear-gradient(135deg,#302513,#1d1910); border-color:#806330; color:#ffe0a3; }
 .transfer-banner > .material-symbols-outlined { font-size:25px; flex-shrink:0; }
 .transfer-banner strong { display:block; font-size:12px; line-height:1.5; }
 .transfer-banner small { display:block; margin-top:3px; font-size:11px; opacity:.8; line-height:1.5; }
@@ -178,7 +179,8 @@ body { background-color: var(--bg-dark); color: var(--text-main); }
 .transfer-card[data-state="waiting"] .transfer-title { color:#ffb5c3; }
 .transfer-card[data-state="success"] .transfer-title { color:#a2f3d1; }
 .transfer-description { font-size:12px; color:#c1ccdc; line-height:1.8; }
-.transfer-meter-head { display:flex; justify-content:space-between; align-items:flex-end; gap:10px; margin:23px 0 9px; }
+.transfer-meter-label { margin-top:22px; font-size:8px; letter-spacing:1px; font-weight:900; color:#9facbe; }
+.transfer-meter-head { display:flex; justify-content:space-between; align-items:flex-end; gap:10px; margin:10px 0 9px; }
 .transfer-meter-head strong { font-size:31px; letter-spacing:-1px; color:var(--transfer-accent); line-height:1; }
 .transfer-meter-head span { font-size:10px; color:#a8b4c7; line-height:1.5; text-align:right; }
 .transfer-track { height:9px; background:#ffffff0c; border-radius:20px; overflow:hidden; }
@@ -194,6 +196,9 @@ body { background-color: var(--bg-dark); color: var(--text-main); }
 .transfer-step[data-error="true"] .material-symbols-outlined,.transfer-step[data-error="true"] b { color:#ff8298; }
 .transfer-footnote { border-radius:13px; padding:11px 12px; background:#ffffff06; color:#a8b4c6; font-size:10px; line-height:1.7; }
 .transfer-card[data-state="waiting"] .transfer-footnote { background:#ff506d12; color:#ffb5c3; border:1px solid #ff506d24; }
+.transfer-diagnostics { margin:0 0 14px; padding:11px 12px; border:1px solid #ad7e383f; border-radius:13px; color:#efc788; background:#d3a5480a; }
+.transfer-diagnostics summary { font-size:10px; font-weight:700; cursor:pointer; }
+.transfer-diagnostics pre { white-space:pre-wrap; overflow-wrap:anywhere; font:10px/1.65 monospace; color:#eedbc0; margin-top:10px; user-select:text; -webkit-user-select:text; }
 .transfer-actions { display:none; gap:9px; flex-direction:column; margin-top:17px; }
 .transfer-actions button { width:100%; min-height:47px; border:0; border-radius:14px; padding:12px; color:#0c121c; background:var(--transfer-accent); font-weight:900; font-size:11px; letter-spacing:.4px; cursor:pointer; }
 .transfer-actions .transfer-secondary { color:#d0d9e7; background:#ffffff08; border:1px solid #ffffff12; }
@@ -283,6 +288,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); }
         <div class="transfer-emblem"><span id="patrolTransferIcon" class="material-symbols-outlined" aria-hidden="true">sync</span></div>
         <h2 id="patrolTransferTitle" class="transfer-title">Devriyeniz<br>sunucuya yükleniyor.</h2>
         <p id="patrolTransferDescription" class="transfer-description" role="status" aria-live="polite"></p>
+        <p class="transfer-meter-label">RAPOR, FOTOĞRAF VE BİLDİRİM AKTARIMI</p>
         <div class="transfer-meter-head"><strong id="patrolTransferPercent">%0</strong><span id="patrolTransferCount">Sunucu onayı bekleniyor</span></div>
         <div id="patrolTransferProgress" class="transfer-track" role="progressbar" aria-label="Devriye aktarımı" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="patrolTransferFill" class="transfer-fill"></div></div>
         <p id="patrolTransferDetail" class="transfer-detail"></p>
@@ -292,6 +298,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); }
             <div id="transferStepPhotos" class="transfer-step"><span class="material-symbols-outlined">schedule</span><span>Fotoğraflar</span><b>Bekliyor</b></div>
             <div id="transferStepCleanup" class="transfer-step"><span class="material-symbols-outlined">schedule</span><span>Saat ve aktif kayıt</span><b>Bekliyor</b></div>
         </div>
+        <details id="patrolTransferDiagnostics" class="transfer-diagnostics" hidden><summary>Aktarım hata ayrıntıları</summary><pre id="patrolTransferErrors"></pre></details>
         <p id="patrolTransferFootnote" class="transfer-footnote"></p>
         <div id="patrolTransferActions" class="transfer-actions">
             <button id="patrolTransferRetry" type="button">TEKRAR DENE</button>
@@ -1431,11 +1438,13 @@ function registerTransferBatch(rows) {
     if (!transferView.initialized) openTransferView(rows,'resume');
     else { for (const log of rows) transferView.rows.set(outboxId(log),log); renderTransferView(); }
 }
-function transferError(log,stage,error) {
+async function transferError(log,stage,error) {
     log._transferErrors ||= {};
     log._transferErrors[stage]={code:String(error?.code || ''),message:String(error?.message || error || 'Aktarım bekliyor').slice(0,240)};
     console.error('Devriye aktarımı bekliyor:',stage,outboxId(log),error);
     trackTransferReport(log);
+    // Hata kodu sayfa kapansa da sonraki girişte görülebilir.
+    try{await saveOutboxProgress(log);}catch(saveError){console.warn('Aktarım hatası diske yazılamadı; ana yedek korunuyor:',saveError);}
 }
 function clearTransferError(log,stage) {
     if (log._transferErrors) delete log._transferErrors[stage];
@@ -1470,16 +1479,22 @@ function renderTransferView() {
     else if (!navigator.onLine) transferView.mode='waiting';
     const state=transferView.mode;
     const allHistory=rows.length>0 && rows.every(log=>log._historyConfirmed || log._outboxCleared);
-    const errors=pending.flatMap(log=>Object.values(log._transferErrors || {}));
+    const stageFlags={history:'_historyConfirmed',notification:'_notificationSent',photos:'_photosConfirmed',cleanup:'_activeCleanupConfirmed',local:'_outboxCleared'};
+    // Daha sonra onaylanmış bir işlemin eski hatası, yeni bir yetki hatası sayılmaz.
+    const errorEntries=pending.flatMap(log=>Object.entries(log._transferErrors || {})
+        .filter(([stage])=>!log[stageFlags[stage]])
+        .map(([stage,error])=>({stage,...error})));
+    const errors=errorEntries;
     const permissionError=errors.some(error=>/permission|unauthorized|unauthenticated/i.test(error.code+' '+error.message));
     const banner=document.getElementById('patrolTransferBanner');
     banner.style.display=pending.length?'flex':'none';
-    banner.dataset.state=state;
-    banner.querySelector('strong').textContent=state==='sending'?`${pending.length} devriye aktarılıyor · %${percent}`:allHistory?'Rapor sunucuda · Ek aktarım bekliyor':`${pending.length} devriye telefonda bekliyor`;
+    banner.dataset.state=allHistory?'supplement':state;
+    banner.querySelector('strong').textContent=allHistory?'Raporlar sunucuda · Ek aktarım bekliyor':state==='sending'?`${pending.length} devriye aktarılıyor · %${percent}`:`${pending.length} devriye telefonda bekliyor`;
     banner.querySelector('small').textContent=state==='sending'?'Aktarımın durumunu görmek için dokunun.':'İnternetinizin çektiği yerde bu sayfayı açın. Ayrıntılar için dokunun.';
     const card=document.getElementById('patrolTransferCard');
-    card.dataset.state=state;
-    document.getElementById('patrolTransferIcon').textContent=state==='success'?'verified':state==='waiting'?'cloud_off':'sync';
+    // Yeşil, devriye raporunun onayıdır. Ek işlemlerin durumu ayrıca ve doğru gösterilir.
+    card.dataset.state=allHistory?'success':state;
+    document.getElementById('patrolTransferIcon').textContent=allHistory?'verified':state==='waiting'?'cloud_off':'sync';
     const title=document.getElementById('patrolTransferTitle');
     const description=document.getElementById('patrolTransferDescription');
     const chip=document.getElementById('patrolTransferChip');
@@ -1489,18 +1504,23 @@ function renderTransferView() {
         description.textContent='Raporunuz sunucuya başarıyla iletildi. Varsa fotoğraflar kaydedildi. WhatsApp bildirimi, bildirim kuyruğuna iletildi.';
         chip.textContent='SUNUCU ONAYI ALINDI';
         footnote.textContent='Aktarım tamamlandı. Bu sayfadan güvenle ayrılabilirsiniz.';
+    } else if (allHistory) {
+        title.innerHTML='Devriyeniz<br>tamamlandı.';
+        description.textContent=permissionError
+            ?'Devriye raporunuz sunucuya başarıyla kaydedildi. Ek aktarımda erişim izni hatası var. Hangi işlemin hata verdiği aşağıdaki ayrıntılarda gösterilir.'
+            :state==='sending'
+                ?'Devriye raporunuz sunucuya başarıyla kaydedildi. Fotoğraf ve bildirim aktarımı devam ediyor. Henüz tamamlanmayan işlemler aşağıda gösterilir.'
+                :'Devriye raporunuz sunucuya başarıyla kaydedildi. Ek aktarım henüz tamamlanmadı. Bekleyen veriler telefonda korunuyor; bu sayfayı tekrar açınca yeniden denenecektir.';
+        chip.textContent=state==='sending'?'RAPOR SUNUCUDA':'EK AKTARIM BEKLİYOR';
+        footnote.textContent='Raporunuz kayıtlıdır. Bekleyen veriler için uygulama verilerini temizlemeyin. Bu sayfayı tekrar açtığınızda kalan aktarım devam eder.';
     } else if (state==='waiting') {
-        title.innerHTML=allHistory?'Rapor sunucuda.<br>Ek aktarım bekliyor.':'Devriyeniz telefona<br>kaydedildi.';
-        description.textContent=allHistory
-            ?permissionError
-                ?'Devriye raporunuz sunucuda. Bildirim veya ek aktarım için erişim izni alınamadı. Yöneticinize haber verin; izin düzeltildiğinde bu sayfayı tekrar açmanız yeterlidir.'
-                :'Devriye raporunuz sunucuda. Fotoğraf, bildirim veya kapanış işlemi bekliyor. İnternetinizin çektiği yerde bu sayfayı tekrar açınca kalan aktarım otomatik devam edecektir.'
-            :permissionError
+        title.innerHTML='Devriyeniz telefona<br>kaydedildi.';
+        description.textContent=permissionError
                 ?'Sunucudan erişim izni alınamadığı için devriyeniz henüz iletilemedi. Kayıt telefonunuzda saklanıyor. Yöneticinize haber verin; izin düzeltildiğinde bu sayfaya tekrar girmeniz yeterlidir.'
                 :transferView.fault
                     ?'Telefon yedeği şu anda okunamıyor. Sayfayı yeniden açmayı deneyin; uygulama verilerini silmeyin. Tamamlanmamış kayıtlar silinmedi.'
                     :'İnternet bağlantınızdan dolayı devriyeniz telefona kaydedildi. İnternetinizin çektiği yerde bu sayfayı tekrar açtığınızda sunucuya otomatik yüklenecektir.';
-        chip.textContent=allHistory?'KALAN İŞLEMLER SAKLI':'TELEFON YEDEĞİ HAZIR';
+        chip.textContent='TELEFON YEDEĞİ HAZIR';
         footnote.textContent='Uygulama verilerini ve tarayıcı geçmişini temizlemeyin. Aktarılmayı bekleyen kayıtlar bu telefonda tutuluyor.';
     } else {
         title.innerHTML=transferView.origin==='finish'?'Devriyeniz<br>sunucuya yükleniyor.':'Bekleyen devriyeler<br>sunucuya yükleniyor.';
@@ -1511,7 +1531,7 @@ function renderTransferView() {
     document.getElementById('patrolTransferPercent').textContent='%'+percent;
     document.getElementById('patrolTransferFill').style.width=percent+'%';
     document.getElementById('patrolTransferProgress').setAttribute('aria-valuenow',String(percent));
-    document.getElementById('patrolTransferCount').textContent=`${rows.filter(log=>log._outboxCleared).length} / ${rows.length} devriye aktarıldı`;
+    document.getElementById('patrolTransferCount').textContent=`${rows.filter(log=>log._historyConfirmed || log._outboxCleared).length} / ${rows.length} rapor sunucuda`;
     const waiting=[];
     if(pending.some(log=>!log._historyConfirmed))waiting.push('rapor');
     if(pending.some(log=>!log._notificationSent))waiting.push('bildirim');
@@ -1522,9 +1542,14 @@ function renderTransferView() {
     renderTransferStep('transferStepNotification',rows,'_notificationSent','notification');
     renderTransferStep('transferStepPhotos',rows,'_photosConfirmed','photos');
     renderTransferStep('transferStepCleanup',rows,'_activeCleanupConfirmed','cleanup');
-    document.getElementById('patrolTransferActions').style.display=state==='sending'?'none':'flex';
+    const diagnostics=document.getElementById('patrolTransferDiagnostics');
+    diagnostics.hidden=!errorEntries.length;
+    const stageNames={history:'Devriye raporu',notification:'WhatsApp bildirimi',photos:'Fotoğraf aktarımı',cleanup:'Saat / aktif kayıt',local:'Telefon kuyruğu'};
+    const lines=[...new Set(errorEntries.map(error=>`${stageNames[error.stage] || error.stage}: ${error.code || 'Hata'} — ${error.message}`))];
+    document.getElementById('patrolTransferErrors').textContent=lines.join('\n\n');
+    document.getElementById('patrolTransferActions').style.display=state==='sending' && !allHistory?'none':'flex';
     document.getElementById('patrolTransferRetry').style.display=state==='waiting'?'block':'none';
-    document.getElementById('patrolTransferDismiss').textContent=state==='success'?(transferView.origin==='finish'?'ANASAYFAYA DÖN':'DEVAM ET'):'ANLADIM';
+    document.getElementById('patrolTransferDismiss').textContent=allHistory?(transferView.origin==='finish'?'ANASAYFAYA DÖN':'DEVAM ET'):'ANLADIM';
 }
 async function settleTransferView() {
     if (!transferView.initialized) return;
@@ -1568,12 +1593,14 @@ document.getElementById('patrolTransferRetry').onclick=async()=>{
     if(navigator.onLine)syncOutbox().catch(error=>console.error('Gönderim kuyruğu korundu:',error));
 };
 document.getElementById('patrolTransferDismiss').onclick=()=>{
-    if (transferView.mode==='sending') return;
-    if (transferView.mode==='success' && transferView.origin==='finish') {window.location.href='guvenlik.html';return;}
+    const reportSaved=[...transferView.rows.values()].every(log=>log._historyConfirmed || log._outboxCleared);
+    if (transferView.mode==='sending' && !reportSaved) return;
+    if (reportSaved && transferView.origin==='finish') {window.location.href='guvenlik.html';return;}
     transferView.visible=false;document.getElementById('patrolTransferOverlay').dataset.open='false';
 };
 window.addEventListener('beforeunload',event=>{
-    if(isSyncOutboxRunning && transferView.visible && transferView.mode==='sending') {event.preventDefault();event.returnValue='';}
+    const unconfirmed=[...transferView.rows.values()].some(log=>!log._historyConfirmed && !log._outboxCleared);
+    if(isSyncOutboxRunning && unconfirmed && transferView.visible && transferView.mode==='sending') {event.preventDefault();event.returnValue='';}
 });
 
 async function uploadOutboxPhoto(log,point) {
@@ -1622,7 +1649,7 @@ function syncOutbox() {
                     log._photosConfirmed=!(log.points || []).some(point=>point.offlineBase64 && !point.photoUrl);
                     await saveOutboxProgress(log);
                     ready.push(log);trackTransferReport(log);
-                }catch(error){transferError(log,'history',error);}
+                }catch(error){await transferError(log,'history',error);}
             }
             // Üç bağımsız iş: fotoğraf veya vardiya hatası WhatsApp çağrısını durdurmaz.
             // Bildirimler tek proje yoluna yazıldığı için kendi içinde sırayla gönderilir.
@@ -1636,7 +1663,7 @@ function syncOutbox() {
                         log._notificationSent=true;
                         await saveOutboxProgress(log);
                         trackTransferReport(log);
-                    }catch(error){transferError(log,'notification',error);}
+                    }catch(error){await transferError(log,'notification',error);}
                 }
             };
             const cleanups=async()=>{
@@ -1648,7 +1675,7 @@ function syncOutbox() {
                         await applyExistingHourRule(log);
                         log._activeCleanupConfirmed=true;
                         await saveOutboxProgress(log);trackTransferReport(log);
-                    }catch(error){transferError(log,'cleanup',error);}
+                    }catch(error){await transferError(log,'cleanup',error);}
                 }
             };
             const photos=async()=>{
@@ -1663,7 +1690,7 @@ function syncOutbox() {
                         if(!log._photosConfirmed){await writeConfirmedHistory(log);log._photosConfirmed=true;}
                         for(const point of log.points || [])if(point.photoUrl)point.offlineBase64=null;
                         await saveOutboxProgress(log);trackTransferReport(log);
-                    }catch(error){transferError(log,'photos',error);}
+                    }catch(error){await transferError(log,'photos',error);}
                 }
             };
             const results=await Promise.allSettled([notifications(),cleanups(),photos()]);
@@ -1675,7 +1702,7 @@ function syncOutbox() {
                     if(await removeConfirmedFromOutbox(log)){
                         log._outboxCleared=true;trackTransferReport(log);
                     }
-                }catch(error){transferError(log,'local',error);}
+                }catch(error){await transferError(log,'local',error);}
             }
         }
     };
