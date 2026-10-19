@@ -158,57 +158,6 @@ body { background-color: var(--bg-dark); color: var(--text-main); }
   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;
 }
-/* Telefon yedeği ve sunucu aktarımı: yalnızca onaylanan işlemler ilerler. */
-.transfer-banner { display:none; margin:14px 16px 8px; width:calc(100% - 32px); padding:15px; border:1px solid #a32a3e; border-radius:18px; background:linear-gradient(135deg,#32131d,#1d1015); color:#ffe2e7; text-align:left; cursor:pointer; align-items:center; gap:12px; }
-.transfer-banner[data-state="sending"] { background:linear-gradient(135deg,#10293c,#101c28); border-color:#285776; color:#d0eeff; }
-.transfer-banner[data-state="supplement"] { background:linear-gradient(135deg,#302513,#1d1910); border-color:#806330; color:#ffe0a3; }
-.transfer-banner > .material-symbols-outlined { font-size:25px; flex-shrink:0; }
-.transfer-banner strong { display:block; font-size:15px; line-height:1.5; }
-.transfer-banner small { display:block; margin-top:4px; font-size:13px; color:inherit; line-height:1.5; }
-.transfer-overlay { display:none; position:fixed; inset:0; z-index:30000; padding:20px 16px; overflow-y:auto; background:rgba(3,7,12,.92); backdrop-filter:blur(14px); align-items:center; justify-content:center; }
-.transfer-overlay[data-open="true"] { display:flex; }
-.transfer-card { --transfer-accent:#63c7ff; --transfer-line:#285471; --transfer-tint:#122c40; position:relative; width:100%; max-width:410px; max-height:calc(100vh - 40px); max-height:calc(100dvh - 40px); overflow-y:auto; border:1px solid var(--transfer-line); border-radius:28px; padding:28px 24px; background:radial-gradient(ellipse at 50% 0%,var(--transfer-tint),transparent 65%),#0c121c; box-shadow:0 24px 90px #0009; text-align:center; }
-.transfer-card[data-state="waiting"] { --transfer-accent:#ff8298; --transfer-line:#a1374b; --transfer-tint:#3d1622; }
-.transfer-card[data-state="success"] { --transfer-accent:#60e7b0; --transfer-line:#276c54; --transfer-tint:#12382e; }
-.transfer-eyebrow { color:#b4bfd0; font-size:11px; font-weight:800; letter-spacing:.5px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; }
-.transfer-chip { border:1px solid var(--transfer-line); background:#0003; padding:7px 10px; border-radius:30px; color:var(--transfer-accent); font-size:10px; letter-spacing:.2px; white-space:nowrap; }
-.transfer-emblem { width:80px; height:80px; margin:30px auto 22px; display:flex; align-items:center; justify-content:center; border:1px solid var(--transfer-line); background:var(--transfer-tint); border-radius:26px; box-shadow:0 0 35px #0003; color:var(--transfer-accent); }
-.transfer-emblem .material-symbols-outlined { font-size:44px; }
-.transfer-card[data-state="sending"] .transfer-emblem .material-symbols-outlined { animation:spin 2.5s linear infinite; }
-.transfer-title { font-size:31px; line-height:1.2; font-weight:900; letter-spacing:-.6px; color:#fff; margin-bottom:16px; overflow-wrap:break-word; }
-.transfer-card[data-state="waiting"] .transfer-title { color:#ffb5c3; }
-.transfer-card[data-state="success"] .transfer-title { color:#a2f3d1; }
-.transfer-description { font-size:17px; color:#e1e8f2; line-height:1.65; }
-.transfer-meter { margin-top:27px; padding:18px; border:1px solid #ffffff0d; border-radius:18px; background:#060b124d; }
-.transfer-meter[hidden],.transfer-footnote[hidden],.transfer-internal { display:none !important; }
-.transfer-meter-head { display:flex; justify-content:space-between; align-items:flex-end; gap:10px; margin:10px 0 9px; }
-.transfer-meter-head strong { font-size:31px; letter-spacing:-1px; color:var(--transfer-accent); line-height:1; }
-.transfer-meter-head span { font-size:14px; color:#c6d2e2; line-height:1.5; text-align:right; }
-.transfer-track { height:11px; background:#ffffff12; border-radius:20px; overflow:hidden; }
-.transfer-fill { width:0; height:100%; border-radius:inherit; background:var(--transfer-accent); transition:width .35s ease; box-shadow:0 0 14px var(--transfer-accent); }
-.transfer-detail { margin-top:10px; font-size:10px; line-height:1.6; color:#9fadc1; min-height:16px; }
-.transfer-steps { display:flex; flex-direction:column; gap:0; margin:18px 0; border:1px solid #ffffff0b; border-radius:17px; background:#060b124d; padding:0 14px; }
-.transfer-step { display:flex; align-items:center; gap:11px; padding:12px 0; font-size:11px; color:#a3b1c4; }
-.transfer-step + .transfer-step { border-top:1px solid #ffffff08; }
-.transfer-step .material-symbols-outlined { font-size:18px; color:#64748b; }
-.transfer-step b { margin-left:auto; font-size:10px; color:#93a5ba; white-space:nowrap; font-weight:700; }
-.transfer-step[data-done="true"] { color:#e0efe8; }
-.transfer-step[data-done="true"] .material-symbols-outlined,.transfer-step[data-done="true"] b { color:#60e7b0; }
-.transfer-step[data-error="true"] .material-symbols-outlined,.transfer-step[data-error="true"] b { color:#ff8298; }
-.transfer-footnote { margin-top:18px; border-radius:13px; padding:12px 14px; background:#ffffff06; color:#c6d2e2; font-size:15px; line-height:1.6; }
-.transfer-card[data-state="waiting"] .transfer-footnote { background:#ff506d12; color:#ffb5c3; border:1px solid #ff506d24; }
-.transfer-diagnostics { margin:0 0 14px; padding:11px 12px; border:1px solid #ad7e383f; border-radius:13px; color:#efc788; background:#d3a5480a; }
-.transfer-diagnostics summary { font-size:10px; font-weight:700; cursor:pointer; }
-.transfer-diagnostics pre { white-space:pre-wrap; overflow-wrap:anywhere; font:10px/1.65 monospace; color:#eedbc0; margin-top:10px; user-select:text; -webkit-user-select:text; }
-.transfer-actions { display:none; gap:12px; flex-direction:column; margin-top:26px; }
-.transfer-actions button { width:100%; min-height:56px; border:0; border-radius:15px; padding:15px; color:#0c121c; background:var(--transfer-accent); font-weight:900; font-size:16px; letter-spacing:.2px; cursor:pointer; touch-action:manipulation; }
-.transfer-actions .transfer-secondary { color:#d0d9e7; background:#ffffff08; border:1px solid #ffffff12; }
-.transfer-actions .transfer-secondary[data-primary="true"] { color:#0c121c; background:var(--transfer-accent); border-color:transparent; }
-.transfer-actions button:focus-visible { outline:3px solid #fff; outline-offset:4px; }
-@media (max-width:360px) { .transfer-card { padding:24px 20px; border-radius:23px; } .transfer-title { font-size:28px; } .transfer-eyebrow { justify-content:center; column-gap:14px; } }
-@media (max-height:640px) { .transfer-card { padding:22px 20px; } .transfer-emblem { width:64px; height:64px; border-radius:21px; margin:20px auto 17px; } .transfer-emblem .material-symbols-outlined { font-size:37px; } .transfer-meter { margin-top:20px; } .transfer-actions { margin-top:20px; } }
-@media (prefers-reduced-motion:reduce) { .transfer-card * { animation:none !important; transition:none !important; } }
-
     </style>
 </head>
 <body>
@@ -232,7 +181,6 @@ body { background-color: var(--bg-dark); color: var(--text-main); }
             <div class="brand-sub"><span class="neon">KOLART</span> ONLINE DENETİM</div>
         </div>
     </header>
-    <button id="patrolTransferBanner" class="transfer-banner" type="button"><span class="material-symbols-outlined" aria-hidden="true">cloud_upload</span><span><strong></strong><small></small></span></button>
 
 <div class="info-card">
     <div id="eliteSelectBadge" onclick="openBlockModal()">SEÇ</div>
@@ -285,34 +233,6 @@ body { background-color: var(--bg-dark); color: var(--text-main); }
     </div>
 </div>
 
-<div id="patrolTransferOverlay" class="transfer-overlay" role="dialog" aria-modal="true" aria-labelledby="patrolTransferTitle" data-open="false">
-    <section id="patrolTransferCard" class="transfer-card" data-state="sending">
-        <div class="transfer-eyebrow"><span>KOLART / DEVRİYE</span><span id="patrolTransferChip" class="transfer-chip">GÖNDERİLİYOR</span></div>
-        <div class="transfer-emblem"><span id="patrolTransferIcon" class="material-symbols-outlined" aria-hidden="true">sync</span></div>
-        <h2 id="patrolTransferTitle" class="transfer-title">Devriyeniz<br>gönderiliyor.</h2>
-        <p id="patrolTransferDescription" class="transfer-description" role="status" aria-live="polite"></p>
-        <div id="patrolTransferMeter" class="transfer-meter">
-            <div class="transfer-meter-head"><strong id="patrolTransferPercent">%0</strong><span id="patrolTransferCount">Gönderiliyor</span></div>
-            <div id="patrolTransferProgress" class="transfer-track" role="progressbar" aria-label="Devriye gönderimi" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="patrolTransferFill" class="transfer-fill"></div></div>
-        </div>
-        <div class="transfer-internal" hidden aria-hidden="true">
-        <p id="patrolTransferDetail" class="transfer-detail"></p>
-        <div class="transfer-steps">
-            <div id="transferStepHistory" class="transfer-step"><span class="material-symbols-outlined">schedule</span><span>Devriye raporu</span><b>Bekliyor</b></div>
-            <div id="transferStepNotification" class="transfer-step"><span class="material-symbols-outlined">schedule</span><span>WhatsApp bildirim kuyruğu</span><b>Bekliyor</b></div>
-            <div id="transferStepPhotos" class="transfer-step"><span class="material-symbols-outlined">schedule</span><span>Fotoğraflar</span><b>Bekliyor</b></div>
-            <div id="transferStepCleanup" class="transfer-step"><span class="material-symbols-outlined">schedule</span><span>Saat ve aktif kayıt</span><b>Bekliyor</b></div>
-        </div>
-        <details id="patrolTransferDiagnostics" class="transfer-diagnostics" hidden><summary>Aktarım hata ayrıntıları</summary><pre id="patrolTransferErrors"></pre></details>
-        </div>
-        <p id="patrolTransferFootnote" class="transfer-footnote"></p>
-        <div id="patrolTransferActions" class="transfer-actions">
-            <button id="patrolTransferRetry" type="button">TEKRAR DENE</button>
-            <button id="patrolTransferDismiss" type="button" class="transfer-secondary">TAMAM</button>
-        </div>
-    </section>
-</div>
-
 <div id="appModal" class="modal">
     <div class="custom-alert-box">
         <span id="appModalIcon" class="material-symbols-outlined" style="font-size: 50px; color: var(--primary); margin-bottom: 15px;">info</span>
@@ -329,7 +249,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); }
         <p style="font-size:13px; color:#fff; opacity:0.9; margin-top:15px; line-height:1.5;">
             Rotadaki tüm noktaları okutmadığınız için devriyeyi normal şekilde bitiremezsiniz. 
             <br><br>
-            <b>Neden okutmadığınızı şirkete bildirmeniz gerekmektedir.</b>
+            <b>Neden okutmadığınızı şirkete bildirmeniz gerekmektediRRr.</b>
         </p>
         <div id="incidentArea" style="margin-top:20px; text-align:left;">
             <p style="font-size:10px; color:var(--primary); font-weight:900; text-transform:uppercase;">Eksik Nokta Sebebi (Zorunlu)</p>
@@ -417,7 +337,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); }
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 import { getDatabase, ref, get, set, update, onValue, push, runTransaction } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-import { getStorage, ref as sRef, uploadString, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
+import { getStorage, ref as sRef, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
 const merkezConfig = {
     apiKey: "AIzaSyDCJWz80wWlzNhaM2Qnw_e5UkQoc8DoJaU",
     authDomain: "merkez-14bf8.firebaseapp.com",
@@ -470,7 +390,7 @@ onAuthStateChanged(auth, (user) => {
         window.location.href = "index.html";
     } else {
         console.log("Yetkili Giriş:", user.uid);
-        init().catch(error => console.error('Başlatma bekliyor:', error)); 
+        init(); 
     }
 });
 const OFFLINE_STORAGE_KEY = `patrol_data_${currentUser.username}`;
@@ -480,7 +400,12 @@ const nobetRef = ref(db, 'nobetRecords');
 let devriyeStarted = false;
 let secilenHedefSaat = null;
 let isFinalizing = false;       // ARKA PLAN RESİM/SENKRONİZASYON KİLİDİ
-let isSyncOutboxRunning = false; // ÇİFT RAPOR GÖNDERİM KİLİDİ
+let syncOutboxPromise = null; // Bütün çağıranlar aynı gerçek gönderim sonucunu bekler.
+let activePatrolId = null;
+let activeHourPath = null;
+let pendingReportId = null;
+let reportWaitVersion = 0;
+let reportCountdownTimer = null;
 let eqStatus = { gps: null, fener: null, yelek: null };
 let startTime = null;
 let readPoints = [];
@@ -500,32 +425,87 @@ window.showAppModal = (title, text, icon = "info") => {
 };
 window.closeAppModal = () => { document.getElementById('appModal').style.display = 'none'; };
 async function sendWhatsappNotification(logData) {
-    const started=new Date(logData.startedAt || logData._startTime || logData.startTime).getTime();
-    let ended=Number(logData.timestamp);
-    if(!Number.isFinite(ended))ended=Date.now();
-    let durationMin=Number.isFinite(started)?Math.max(0,Math.round((ended-started)/60000)):0;
-    if(!Number.isFinite(started)){
-        const clock=value=>{const parts=String(value || '').split(':').map(Number);return parts.length>=2 && parts.every(Number.isFinite)?parts[0]*3600+parts[1]*60+(parts[2] || 0):NaN;};
-        const a=clock(logData.start),b=clock(logData.end);
-        if(Number.isFinite(a)&&Number.isFinite(b))durationMin=Math.round(((b-a+86400)%86400)/60);
+    try {
+        const logStart = getLogStartTimestamp(logData);
+        const durationMin = Number.isFinite(logStart)
+            ? Math.max(0, Math.round((logData.timestamp - logStart) / 60000)) : 0;
+        const notificationPayload = {
+            BİLDİRİM: true,
+            TUR: logData.status === "Eksik Devriye" ? "EKSİK_DEVRİYE" : "TAM_DEVRİYE",
+            HEDEF_SAAT: logData.hedefSaat || "Belirtilmedi", // <--- İŞTE BURASI!
+            GÜVENLİK: logData.name,
+            BÖLGE: logData.bolge,
+            BAŞLANGIÇ: logData.start,
+            BİTİŞ: logData.end,
+            SÜRE: durationMin + " Dakika",
+            OKUNAN_SAYI: logData.okunanSayi,
+            TOPLAM_NOKTA: logData.toplamNokta,
+            EKSİK_NOKTALAR: logData.missedPoints.length > 0 ? logData.missedPoints.join(", ") : "Yok",
+            NOT: logData.eksikNotu || "Açıklama yok.",
+            ZAMAN: Date.now()
+        };
+        await set(ref(bildirimDb, `bildirimler/${siteID}`), notificationPayload);
+    } catch (err) {
+        console.error("Bildirim hatası:", err);
+        throw err; // Bildirim de onaylanmadan raporu gönderim kuyruğundan çıkarma.
     }
-    const missed=Array.isArray(logData.missedPoints)?logData.missedPoints:[];
-    const notificationPayload={
-        BİLDİRİM:true,
-        TUR:logData.status==='Eksik Devriye'?'EKSİK_DEVRİYE':'TAM_DEVRİYE',
-        HEDEF_SAAT:logData.hedefSaat || 'Belirtilmedi',
-        GÜVENLİK:logData.name || logData.user || 'Bilinmiyor',
-        BÖLGE:logData.bolge || 'BÖLGE',
-        BAŞLANGIÇ:logData.start || '',BİTİŞ:logData.end || '',
-        SÜRE:durationMin+' Dakika',
-        OKUNAN_SAYI:logData.okunanSayi ?? (logData.points || []).length,
-        TOPLAM_NOKTA:logData.toplamNokta ?? (logData.points || []).length,
-        EKSİK_NOKTALAR:missed.length?missed.join(', '):'Yok',
-        NOT:logData.eksikNotu || 'Açıklama yok.',ZAMAN:Date.now()
-    };
-    // set() tamamlanması bildirim veritabanının onayıdır; WhatsApp teslim bilgisi değildir.
-    // Hata gizlenmez: başarısız bildirim tekrar denemek için telefonda kalır.
-    await set(ref(bildirimDb,`bildirimler/${siteID}`),notificationPayload);
+}
+function saveToLocal() {
+    // KESİN KİLİT: Devriye bitmişse veya final aşamasındaysa ASLA hafızayı canlandırma!
+    if (!devriyeStarted || isFinalizing) return;
+
+    localStorage.setItem(OFFLINE_STORAGE_KEY, JSON.stringify({
+        startTime: startTime ? startTime.toISOString() : null,
+        readPoints: readPoints,
+        hedefSaat: secilenHedefSaat,
+        patrolId: activePatrolId,
+        hourPath: activeHourPath,
+        equipment: { ...eqStatus },
+        block: currentBlock
+    }));
+}
+async function syncActivePatrolToCloud() {
+    // Döngü öncesi ilk çelik bariyer
+    if (!navigator.onLine || !devriyeStarted || isFinalizing) return;
+
+    let resimYüklendiMi = false;
+
+    for (let pt of readPoints) {
+        // Döngü sırasında devriye bittiyse anında işlemi kes
+        if (!devriyeStarted || isFinalizing) return;
+
+        if (pt.offlineBase64 && !pt.photoUrl && storage) {
+            try {
+                const url = await uploadPhotoToStorage(pt.name, pt.offlineBase64);
+                if (url) {
+                    pt.photoUrl = url;
+                    pt.offlineBase64 = null; 
+                    resimYüklendiMi = true;
+                }
+            } catch (e) { console.warn("Resim yükleme hatası:", e); }
+        }
+    }
+    if (!devriyeStarted || isFinalizing) return;
+
+    if (resimYüklendiMi) {
+        saveToLocal();
+    }
+
+    const cleanPoints = readPoints.map(p => {
+        const { offlineBase64, ...temizNokta } = p;
+        return temizNokta;
+    });
+
+    try {
+        await update(activeDevriyeRef, {
+            startTime: startTime ? startTime.toISOString() : new Date().toISOString(),
+            readPoints: cleanPoints,
+            patrolId: activePatrolId,
+            hedefSaat: secilenHedefSaat,
+            hourPath: activeHourPath,
+            equipment: { ...eqStatus }
+        });
+    } catch (e) { console.log("Anlık eşitleme hatası:", e); }
 }
 function startEndBtnCountdown() {
     const eBtn = document.getElementById('endBtn');
@@ -559,7 +539,7 @@ function checkConnectivity() {
     if (navigator.onLine) { 
         if (bar) bar.style.display = 'none'; 
         syncActivePatrolToCloud(); 
-        if (journalReady) syncOutbox().catch(error => console.error('Gönderim kuyruğu korundu:', error)); 
+        syncOutbox().catch(err => console.error("Bekleyen rapor aktarımı:", err));
     } else { 
         if (bar) bar.style.display = 'block'; 
         if (btnCountdownInterval) {
@@ -578,7 +558,7 @@ window.addEventListener('online', () => {
     checkConnectivity();
     startEndBtnCountdown(); 
 });
-window.addEventListener('offline', ()=>{checkConnectivity();if(transferView.initialized)renderTransferView();});
+window.addEventListener('offline', checkConnectivity);
 window.checkEq = (tip, cevap) => {
     eqStatus[tip] = cevap;
     const evetBtn = document.getElementById(tip + 'Evet');
@@ -598,7 +578,67 @@ window.checkEq = (tip, cevap) => {
         btn.style.opacity = "1";
         btn.style.pointerEvents = "auto";
     }
-};
+};async function init() {
+    let pendingOutbox;
+    try {
+        pendingOutbox = readOutbox();
+    } catch (err) {
+        showAppModal("KAYIT KONTROLÜ", "Bekleyen raporlar okunamadı. Telefon verilerini silmeden yöneticiye haber verin.", "warning");
+        console.error("Rapor kuyruğu okunamadı:", err);
+        return;
+    }
+    let savedData = localStorage.getItem(OFFLINE_STORAGE_KEY);
+    if (savedData) {
+        const data = JSON.parse(savedData);
+        // Yalnızca aynı devriyenin tamamlanmış raporu güvenle kuyruktaysa aktif yedeği kaldır.
+        if (pendingOutbox.some(log => belongsToThisSite(log) && isSamePatrol(data, log))) {
+            localStorage.removeItem(OFFLINE_STORAGE_KEY);
+            savedData = null;
+        }
+    }
+
+    const restorePatrol = (data) => {
+        startTime = new Date(data.startTime);
+        readPoints = data.readPoints || [];
+        secilenHedefSaat = data.hedefSaat || null;
+        activePatrolId = data.patrolId || `P_${startTime.getTime()}`;
+        activeHourPath = data.hourPath || null;
+        eqStatus = data.equipment || eqStatus;
+        currentBlock = data.block || currentBlock;
+        devriyeStarted = true;
+        isFinalizing = false;
+        saveToLocal();
+        uiStartMode();
+        startTimerLoop();
+    };
+
+    if (savedData) {
+        // Bulutta aktif kayıt bulunmaması, cihazdaki okunmuş noktaları silmek için yeterli değildir.
+        restorePatrol(JSON.parse(savedData));
+    } else {
+        try {
+            const snap = await get(activeDevriyeRef);
+            const cloudData = snap.exists() ? snap.val() : null;
+            const alreadyQueued = cloudData && pendingOutbox.some(log =>
+                belongsToThisSite(log) && isSamePatrol(cloudData, log));
+            if (cloudData && !alreadyQueued) {
+                restorePatrol(cloudData);
+            } else {
+                devriyeStarted = false;
+                isFinalizing = false;
+                uiReadyMode();
+            }
+        } catch (err) {
+            devriyeStarted = false;
+            isFinalizing = false;
+            uiReadyMode();
+        }
+    }
+    loadQRInterface();
+    checkConnectivity();
+    const pending = readOutbox().find(belongsToThisSite);
+    if (pending && !devriyeStarted) waitForQueuedReport(getPatrolId(pending));
+}
 document.getElementById('backHomeBtn').onclick = () => {
     window.location.href = "guvenlik.html";
 };
@@ -741,44 +781,45 @@ function updateUIVisually(pointName) {
     refreshStats(); 
 }
 document.getElementById('startBtn').onclick = () => {
+    if (isFinalizing && pendingReportId) { waitForQueuedReport(pendingReportId); return; }
     if(!navigator.onLine) { showAppModal("BAĞLANTI HATASI", "Devriyeyi başlatmak için internet şart!", "signal_wifi_off"); return; }
     openHourSelectModal(); // Önce saati seçecek!
 };
 document.getElementById('finalStartBtn').onclick = async () => {
-    if (isStarting || devriyeStarted || !journalReady) return;
+    if (devriyeStarted || isFinalizing) return;
     if(eqStatus.gps === true && eqStatus.fener === true && eqStatus.yelek === true) {
-        isStarting = true;
         document.getElementById('equipmentModal').style.display = 'none';
+        
         startTime = new Date();
-        patrolSessionId = 'P_V3_' + Date.now() + '_' + (globalThis.crypto?.randomUUID?.() || Math.random().toString(36).slice(2)).replace(/-/g, '');
-        activeCloudConfirmed = false;
+        activePatrolId = `P_${startTime.getTime()}_${Math.random().toString(36).slice(2, 11)}`;
+        activeHourPath = null;
+        const startedPatrolId = activePatrolId;
         devriyeStarted = true;
         isFinalizing = false;
         readPoints = [];
-        try {
-            await saveToLocal();
-        } catch (error) {
-            devriyeStarted = false;
-            isStarting = false;
-            showAppModal('KAYIT ALANI HATASI', 'Telefon yedeği oluşturulamadı. Boş alanı kontrol edip yeniden başlatın.', 'error');
-            return;
-        }
-        isStarting = false;
+        saveToLocal();
         uiStartMode();
         startTimerLoop();
         loadQRInterface();
-        syncActivePatrolToCloud();
+        set(activeDevriyeRef, { 
+            startTime: startTime.toISOString(), 
+            readPoints: [],
+            equipment: eqStatus,
+            hedefSaat: secilenHedefSaat,
+            patrolId: activePatrolId,
+            hourPath: activeHourPath
+        }).catch(err => console.error("Aktif devriye aktarımı; cihaz yedeği korunuyor:", err));
 
         // Seçilen devriye saatini başlatıldığı an güvenlik adıyla kapatır
         if (secilenHedefSaat) {
             try {
-                let sD = new Date();
+                let sD = new Date(startTime);
                 if (sD.getHours() < 8) sD.setDate(sD.getDate() - 1);
                 const vTarihi = `${sD.getFullYear()}-${String(sD.getMonth() + 1).padStart(2, '0')}-${String(sD.getDate()).padStart(2, '0')}`;
                 
                 const ayarSnap = await get(ref(db, 'sistemAyarlari/saatModu'));
                 const saatModu = ayarSnap.exists() ? ayarSnap.val() : 'tekli';
-                
+                if (!devriyeStarted || isFinalizing || activePatrolId !== startedPatrolId) return;
                 let targetPath = `tamamlananDevriyeSaatleri/${vTarihi}`;
                 if (saatModu === 'blok') {
                     targetPath += `/${currentBlock}`;
@@ -787,8 +828,13 @@ document.getElementById('finalStartBtn').onclick = async () => {
                 // Aktif güvenlik adını sistemdeki currentUser nesnesinden çekiyoruz
                 const personelAdi = currentUser?.name || currentUser?.username || localStorage.getItem('guvenlikAdi') || "Bilinmeyen Personel";
 
-                // true yerine güvenlik adını yazıyoruz
-                await set(ref(db, `${targetPath}/${secilenHedefSaat}`), personelAdi);
+                const hourPath = `${targetPath}/${secilenHedefSaat}`;
+                activeHourPath = hourPath;
+                saveToLocal();
+                await update(activeDevriyeRef, { hourPath });
+                if (!devriyeStarted || isFinalizing || activePatrolId !== startedPatrolId) return;
+                // Saat, mevcut mantıktaki gibi başlangıçta kapanır.
+                await set(ref(db, hourPath), personelAdi);
 
             } catch(e) {
                 console.error("Devriye saati işaretleme hatası:", e);
@@ -821,10 +867,10 @@ function captureCameraFrame() {
         return canvas.toDataURL("image/jpeg", 0.4);
     } catch (e) { return null; }
 }
-async function uploadPhotoToStorage(pointName, base64Data) {
+async function uploadPhotoToStorage(pointName, base64Data, log = null) {
     if (!base64Data || !storage) return null;
     try {
-        const d = startTime || new Date();
+        const d = log ? new Date(getLogStartTimestamp(log)) : (startTime || new Date());
         const dinamikDateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         const cleanName = pointName.trim().replace(/\s+/g, '_');
         const fileName = `devriye_fotolari/${dinamikDateKey}/${siteID}/${currentUser.username}_${cleanName}_${Date.now()}.jpg`;
@@ -917,6 +963,24 @@ function saveFinalAttempt(name, photo = null) {
         { enableHighAccuracy: true, timeout: 3000 }
     );
 }
+function pushPoint(name, lat, lng, acc, base64Photo = null) {
+    if (isFinalizing || !devriyeStarted) return;
+    if (readPoints.some(p => p.name === name)) return;      
+    const yeniNokta = { 
+        block: currentBlock, 
+        name: name, 
+        time: new Date().toLocaleTimeString('tr-TR'), 
+        lat, lng, acc,
+        photoUrl: null,
+        offlineBase64: base64Photo || null 
+    };   
+    readPoints.push(yeniNokta);  
+    updateUIVisually(name); 
+    saveToLocal();            
+    if (navigator.onLine && !isFinalizing) {
+        syncActivePatrolToCloud();
+    }
+}
 function startTimerLoop() {
     if (mainTimerInterval) clearInterval(mainTimerInterval);
     mainTimerInterval = setInterval(() => {
@@ -930,6 +994,7 @@ function startTimerLoop() {
 }
 document.getElementById('endBtn').onclick = () => {
     if (isFinalizing || !devriyeStarted) return; 
+    if (!navigator.onLine) { showAppModal("İŞLEM ENGELLENDİ", "İnternet yokken devriye bitirilemez!", "cloud_off"); return; }   
     
     const allCards = document.querySelectorAll('.qr-card');
 
@@ -1012,978 +1077,279 @@ submitBtn.onclick = async () => {
         finalizePatrol("Eksiksiz tamamlandı.", []); 
     }
 };
-// Kayıt güvenliği: görünüm, saat seçimi ve vardiya hesabından bağımsızdır.
-const JOURNAL_SCOPE = `${encodeURIComponent(siteID)}:${encodeURIComponent(currentUser.username)}:`;
-const JOURNAL_PREFIX = 'kolart_patrol_v3:';
-const JOURNAL_BACKEND_KEY = JOURNAL_PREFIX + JOURNAL_SCOPE + 'backend';
-let journalDbPromise = null;
-let journalRevision = 0;
-let patrolSessionId = null;
-let activeCloudConfirmed = false;
-let activeSaveTail = Promise.resolve();
-let pointSaveTail = Promise.resolve();
-let activeSyncPromise = null;
-let syncOutboxPromise = null;
-let initPromise = null;
-let isStarting = false;
-let journalReady = false;
-const closedSessionIds = new Set();
-const historyConfirmedPatrolIds = new Set();
-const unverifiedLegacyReports = new Set();
-const deepCopy = value => JSON.parse(JSON.stringify(value));
-const journalKey = (kind, id) => JOURNAL_SCOPE + kind + ':' + id;
-const outboxId = log => log.patrolId || `P_${log.timestamp}`;
-const activeId = data => data.patrolId || `P_L_${new Date(data.startTime || data.startedAt).getTime()}`;
-
-function journalDb() {
-    if (!journalDbPromise) journalDbPromise = new Promise((resolve, reject) => {
-        if (!window.indexedDB) { reject(new Error('IndexedDB kullanılamıyor.')); return; }
-        const request = indexedDB.open('kolart-patrol-journal-v3', 1);
-        request.onupgradeneeded = () => request.result.createObjectStore('records');
-        request.onerror = () => reject(request.error || new Error('Telefon yedeği açılamadı.'));
-        request.onblocked = () => reject(new Error('Telefon yedeği başka bir sayfada kilitli.'));
-        request.onsuccess = () => {
-            const database = request.result;
-            database.onversionchange = () => { database.close(); journalDbPromise = null; };
-            resolve(database);
-        };
-    }).catch(error => { journalDbPromise = null; throw error; });
-    return journalDbPromise;
+// Kuyruk değişiklikleri en güncel veriye uygulanır; eski bir diziyle yeni raporlar ezilmez.
+function getPatrolId(log) {
+    return log.patrolId || `P_${log.timestamp}`;
 }
-async function journalTransaction(mode, work) {
-    const database = await journalDb();
-    return new Promise((resolve, reject) => {
-        let tx, result;
-        try { tx = database.transaction('records', mode, { durability: 'strict' }); }
-        catch (_) { tx = database.transaction('records', mode); }
-        tx.oncomplete = () => resolve(typeof result === 'function' ? result() : result?.result);
-        tx.onabort = tx.onerror = () => reject(tx.error || new Error('Telefon kaydı tamamlanamadı.'));
-        try { result = work(tx.objectStore('records')); }
-        catch (error) { try { tx.abort(); } catch (_) {} reject(error); }
-    });
+function belongsToThisSite(log) {
+    return !log._siteId || log._siteId === siteID;
 }
-function readLocalRecord(kind, id) {
-    const raw = localStorage.getItem(JOURNAL_PREFIX + journalKey(kind, id));
-    return raw ? JSON.parse(raw) : null;
+function readOutbox() {
+    const logs = JSON.parse(localStorage.getItem(OUTBOX_STORAGE_KEY) || "[]");
+    if (!Array.isArray(logs)) throw new Error("INVALID_OUTBOX");
+    return logs;
 }
-function writeLocalRecord(row) {
-    const key = JOURNAL_PREFIX + journalKey(row._kind, row._id);
-    const raw = JSON.stringify(row);
-    localStorage.setItem(key, raw);
-    if (localStorage.getItem(key) !== raw) throw new Error('Telefon kaydı doğrulanamadı.');
-}
-function mergePoints(first = [], second = []) {
-    const result = new Map();
-    for (const point of [...first, ...second]) {
-        if (!point || typeof point.name !== 'string') continue;
-        const previous = result.get(point.name);
-        if (!previous) result.set(point.name, deepCopy(point));
-        else {
-            // Eski bir tekrar gönderim, alınmış fotoğraf adresini veya özgün fotoğrafı silmez.
-            result.set(point.name, { ...point, ...previous,
-                photoUrl: previous.photoUrl || point.photoUrl || null,
-                offlineBase64: previous.offlineBase64 || point.offlineBase64 || null });
-        }
-    }
-    return [...result.values()];
-}
-function storeJournal(kind,id,value) {
-    if ((kind==='active' || kind==='point') && navigator.locks) {
-        return navigator.locks.request('kolart-patrol-store:'+JOURNAL_SCOPE,()=>storeJournalUnlocked(kind,id,value));
-    }
-    return storeJournalUnlocked(kind,id,value);
-}
-async function storeJournalUnlocked(kind, id, value) {
-    const row = deepCopy({ ...value, _kind: kind, _id: id, _siteId: siteID,
-        _user: currentUser.username, _revision: ++journalRevision + Date.now() });
-    let stored = false, rejectedClosed = false;
-    try {
-        await journalTransaction('readwrite', store => {
-            const write = () => {
-                const previous = store.get(journalKey(kind, id));
-                previous.onsuccess = () => {
-                    if (kind === 'active' && previous.result) row.readPoints = mergePoints(previous.result.readPoints, row.readPoints);
-                    if (kind === 'report' && previous.result) row.points = mergePoints(previous.result.points, row.points);
-                    store.put(row, journalKey(kind, id));
-                };
-            };
-            if (kind === 'active' || kind === 'point') {
-                const receipt = store.get(journalKey('closed', value.patrolId || id));
-                receipt.onsuccess = () => {
-                    if (receipt.result || closedSessionIds.has(value.patrolId || id)) rejectedClosed = true;
-                    else write();
-                };
-            } else write();
-        });
-        if (rejectedClosed) throw new Error('Bitirilmiş devriye yeniden aktif kaydedilemez.');
-        stored = true;
-    } catch (error) {
-        if (rejectedClosed || closedSessionIds.has(value.patrolId || id) && (kind === 'active' || kind === 'point')) throw error;
-    }
-    if (!stored) {
-        if ((kind === 'active' || kind === 'point') && (closedSessionIds.has(value.patrolId || id) || readLocalRecord('closed', value.patrolId || id))) {
-            throw new Error('Bitirilmiş devriye tekrar açılamaz.');
-        }
-        const previous = readLocalRecord(kind, id);
-        if (kind === 'active' && previous) row.readPoints = mergePoints(previous.readPoints, row.readPoints);
-        if (kind === 'report' && previous) row.points = mergePoints(previous.points, row.points);
-        writeLocalRecord(row);
-    } else {
-        try { localStorage.setItem(JOURNAL_BACKEND_KEY, 'idb'); } catch (_) {}
-        // Yalnızca bu kaydın eski alternatif kopyası temizlenir; diğer kayıtlar korunur.
-        try {
-            const previous = readLocalRecord(kind, id);
-            if (previous && (previous._revision || 0) <= row._revision) localStorage.removeItem(JOURNAL_PREFIX + journalKey(kind, id));
-        } catch (_) {}
-    }
-    return row;
-}
-async function readJournal() {
-    let rows = [], dbError = null;
-    try { rows = await journalTransaction('readonly', store => store.getAll(IDBKeyRange.bound(JOURNAL_SCOPE, JOURNAL_SCOPE + '\uffff'))); }
-    catch (error) { dbError = error; }
-    const result = new Map(rows.map(row => [journalKey(row._kind, row._id), row]));
-    const keys = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key !== JOURNAL_BACKEND_KEY && key.startsWith(JOURNAL_PREFIX + JOURNAL_SCOPE)) keys.push(key);
-    }
-    for (const key of keys) {
-        try {
-            const item = JSON.parse(localStorage.getItem(key));
-            if (!item || item._siteId !== siteID || item._user !== currentUser.username) continue;
-            const id = journalKey(item._kind, item._id), previous = result.get(id);
-            if (!previous || item._revision > previous._revision) result.set(id, item);
-        } catch (error) { console.error('Bozuk yedek silinmedi:', key, error); }
-    }
-    // Alternatif depodaki birkaç kayıt, erişilemeyen ana depoda bekleyen rapor olmadığını kanıtlamaz.
-    if (dbError && window.indexedDB && localStorage.getItem(JOURNAL_BACKEND_KEY) === 'idb') throw dbError;
-    return [...result.values()];
-}
-async function removeJournal(kind, id) {
-    await journalTransaction('readwrite', store => store.delete(journalKey(kind, id))).catch(error => {
-        if (window.indexedDB) throw error;
-    });
-    localStorage.removeItem(JOURNAL_PREFIX + journalKey(kind, id));
-}
-function readLegacyOutbox() {
-    const raw = localStorage.getItem(OUTBOX_STORAGE_KEY);
-    if (!raw) return [];
-    const list = JSON.parse(raw);
-    if (!Array.isArray(list)) throw new Error('Eski gönderim kuyruğu okunamıyor.');
-    return list;
-}
-async function readOldIndexedReports() {
-    if (!window.indexedDB) return [];
-    // Daha önce verilen sürümlerin IndexedDB raporları da taşınır.
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open('kolart-completed-patrols-v1', 1);
-        request.onupgradeneeded = () => request.result.createObjectStore('reports');
-        request.onerror = request.onblocked = () => reject(request.error || new Error('Önceki yedek açılamadı.'));
-        request.onsuccess = () => {
-            const database = request.result;
-            const tx = database.transaction('reports', 'readonly');
-            const read = tx.objectStore('reports').getAll(IDBKeyRange.bound(JOURNAL_SCOPE, JOURNAL_SCOPE + '\uffff'));
-            tx.oncomplete = () => { database.close(); resolve(read.result); };
-            tx.onabort = tx.onerror = () => { database.close(); reject(tx.error); };
-        };
-    });
-}
-async function readPatrolOutbox() {
-    const rows = await readJournal();
-    const result = new Map(rows.filter(row => row._kind === 'report').map(row => [outboxId(row), row]));
-    let legacy = [];
-    try { legacy = readLegacyOutbox(); } catch (error) { console.error('Eski ham kuyruk korunuyor:', error); }
-    let oldRows = [];
-    try { oldRows = await readOldIndexedReports(); }
-    catch (error) { if (legacy.some(row => row._storedInDb)) throw error; }
-    const scopedOld = oldRows.map(item=>({...item,_siteId:siteID}));
-    for (const item of [...scopedOld, ...legacy]) {
-        if (item._siteId && item._siteId !== siteID) continue;
-        if (item._storedInDb || !Array.isArray(item.points)) continue;
-        const id = outboxId(item);
-        if (item.user !== currentUser.username || !item._siteId && !legacyPhotoProvesProject(item)) {
-            // Önceki sürüm yalnızca kullanıcı adını saklıyordu. Proje tahminiyle rapor üretilmez.
-            unverifiedLegacyReports.add(id);
-            continue;
-        }
-        unverifiedLegacyReports.delete(id);
-        if (!result.has(id)) {
-            const migrated = await storeJournal('report', id, { ...item, patrolId: id });
-            result.set(id, migrated);
-        }
-    }
-    return [...result.values()];
-}
-function legacyPhotoProvesProject(log) {
-    if (!siteConfig.storageBucket) return false;
-    return (log.points || []).some(point=>{
-        try {
-            const url=new URL(point.photoUrl);
-            const bucket=url.pathname.match(/^\/v0\/b\/([^/]+)\//)?.[1];
-            return url.protocol==='https:' && url.hostname==='firebasestorage.googleapis.com' &&
-                bucket && decodeURIComponent(bucket)===siteConfig.storageBucket;
-        }catch(_){return false;}
-    });
-}
-function matchesPatrol(active, log) {
-    if (!active) return false;
-    const aId = active.patrolId;
-    if (aId && log.patrolId && !aId.startsWith('P_L_') && !log.patrolId.startsWith('P_L_')) return aId === log.patrolId;
-    const expected = new Date(log.startedAt || log._startTime || log.startTime).getTime();
-    const actual = new Date(active.startTime || active.startedAt).getTime();
-    if (Number.isFinite(expected)) return Number.isFinite(actual) && actual === expected;
-    if (!Number.isFinite(actual)) return false;
-    const started = new Date(actual);
-    const day = `${started.getFullYear()}-${String(started.getMonth()+1).padStart(2,'0')}-${String(started.getDate()).padStart(2,'0')}`;
-    return day === log.dateKey && started.toLocaleTimeString('tr-TR') === log.start &&
-        String(active.hedefSaat || 'Belirtilmedi') === String(log.hedefSaat || 'Belirtilmedi');
-}
-function activeSnapshot() {
-    if (!startTime || !Number.isFinite(startTime.getTime())) throw new Error('Devriye başlangıcı okunamıyor.');
-    patrolSessionId ||= activeId({startTime:startTime.toISOString()});
-    return deepCopy({patrolId:patrolSessionId, startTime:startTime.toISOString(), readPoints,
-        hedefSaat:secilenHedefSaat, equipment:eqStatus, block:currentBlock,
-        historyDateKey:`${startTime.getFullYear()}-${String(startTime.getMonth()+1).padStart(2,'0')}-${String(startTime.getDate()).padStart(2,'0')}`,
-        _cloudConfirmed:activeCloudConfirmed});
-}
-function saveToLocal() {
-    if (!devriyeStarted || isFinalizing) return activeSaveTail;
-    const snapshot = activeSnapshot();
-    const saving = activeSaveTail.catch(() => {}).then(() => storeJournal('active', snapshot.patrolId, snapshot));
-    activeSaveTail = saving;
-    return saving;
-}
-async function markClosed(log) {
-    const id = outboxId(log);
-    const receipt = {patrolId:id, startedAt:log.startedAt || log._startTime || log.startTime,
-        start:log.start, dateKey:log.dateKey, hedefSaat:log.hedefSaat,
-        _historyConfirmed:!!log._historyConfirmed,_notificationSent:!!log._notificationSent,
-        _photosConfirmed:!!log._photosConfirmed,_activeCleanupConfirmed:!!log._activeCleanupConfirmed};
-    const result = await storeJournal('closed', id, receipt);
-    closedSessionIds.add(id);
-    return result;
-}
-function saveOutboxProgress(log) {
-    const id=outboxId(log);
-    // Paralel fotoğraf, bildirim ve kapanış onayları birbirinin disk kaydını ezmez.
-    const saving=(reportSaveTails.get(id) || Promise.resolve()).catch(()=>{}).then(async()=>{
-        const row=await storeJournal('report',id,log);
-        try{await markClosed(log);}catch(error){console.warn('Tam rapor saklı; kapanış işareti yeniden denenecek:',error);}
-        return row;
-    });
-    reportSaveTails.set(id,saving);
-    return saving;
-}
-function includeDurablePoints(log,rows) {
-    const id=outboxId(log);
-    let points=log.points || [];
-    for(const row of rows){
-        if(row._kind==='point' && row.patrolId===id)points=mergePoints(points,[row.point]);
-        if(row._kind==='active' && matchesPatrol(row,log))points=mergePoints(points,row.readPoints);
-        if(row._kind==='report' && outboxId(row)===id)points=mergePoints(points,row.points);
-    }
-    const names=new Set(points.map(point=>point.name.trim().toLocaleLowerCase('tr-TR')));
-    const missed=(log.missedPoints || []).filter(name=>!names.has(name.trim().toLocaleLowerCase('tr-TR')));
-    return {...log,points,okunanSayi:points.length,missedPoints:missed,
-        status:missed.length===0 && points.length>=log.toplamNokta?'TAM DEVRİYE':log.status};
-}
-async function commitFinishedReport(log) {
-    const commit=async()=>{
-        let saved;
-        const id=outboxId(log);
-        try {
-            await journalTransaction('readwrite',store=>{
-                const request=store.getAll(IDBKeyRange.bound(JOURNAL_SCOPE,JOURNAL_SCOPE+'\uffff'));
-                request.onsuccess=()=>{
-                    saved=deepCopy({...includeDurablePoints(log,request.result),_kind:'report',_id:id,
-                        _siteId:siteID,_user:currentUser.username,_revision:++journalRevision+Date.now()});
-                    store.put(saved,journalKey('report',id));
-                    // Noktaları dondurma ve bitiş kanıtı aynı disk işleminde tamamlanır.
-                    store.put({patrolId:id,startedAt:log.startedAt,start:log.start,dateKey:log.dateKey,hedefSaat:log.hedefSaat,
-                        _kind:'closed',_id:id,_siteId:siteID,_user:currentUser.username,_revision:saved._revision},journalKey('closed',id));
-                };
-            });
-            try{localStorage.setItem(JOURNAL_BACKEND_KEY,'idb');}catch(_){}
-        }catch(error){
-            // LS alternatifinde de önce tam rapor yazılır. Ham veri hiçbir zaman önce silinmez.
-            const rows=await readJournal().catch(()=>[]);
-            saved=await saveOutboxProgress(includeDurablePoints(log,rows));
-        }
-        closedSessionIds.add(id);
-        return saved;
+function mutateOutbox(change) {
+    const apply = () => {
+        const logs = readOutbox();
+        const result = change(logs);
+        localStorage.setItem(OUTBOX_STORAGE_KEY, JSON.stringify(logs));
+        return result;
     };
-    return navigator.locks?navigator.locks.request('kolart-patrol-store:'+JOURNAL_SCOPE,commit):commit();
+    // Aynı telefondaki iki sekmenin kuyruk yazılarını da sıraya al.
+    return navigator.locks && navigator.locks.request
+        ? navigator.locks.request(`kolart-queue-${OUTBOX_STORAGE_KEY}`, apply)
+        : Promise.resolve().then(apply);
 }
-async function removeActiveLocal(snapshot) {
-    if (!snapshot) return;
-    const id = activeId(snapshot);
-    await removeJournal('active', id).catch(error => console.warn('Eski aktif yedek korunuyor:',error));
-    try {
-        const legacy = JSON.parse(localStorage.getItem(OFFLINE_STORAGE_KEY) || 'null');
-        if (legacy && (!legacy._siteId || legacy._siteId === siteID) && matchesPatrol(legacy, snapshot)) localStorage.removeItem(OFFLINE_STORAGE_KEY);
-    } catch (_) {}
+function saveQueuedLog(log) {
+    return mutateOutbox(logs => {
+        const index = logs.findIndex(item => getPatrolId(item) === getPatrolId(log));
+        if (index >= 0) logs[index] = log;
+    });
 }
-function historyPayload(log) {
-    const clean = {};
-    for (const [key,value] of Object.entries(log)) if (!key.startsWith('_')) clean[key] = value;
-    clean.points = (log.points || []).map(({offlineBase64,...point})=>point);
-    return clean;
+function isQueued(patrolId) {
+    return readOutbox().some(log => belongsToThisSite(log) && getPatrolId(log) === patrolId);
 }
-function mergeHistory(current, incoming) {
-    if (!current) return incoming;
-    if (current.patrolId && current.patrolId !== incoming.patrolId) return undefined;
-    const result = {...incoming,...current};
-    if (current.startedAt || incoming.startedAt) result.startedAt = current.startedAt || incoming.startedAt;
-    else delete result.startedAt;
-    result.patrolId = incoming.patrolId;
-    result.points = mergePoints(current.points,incoming.points).map(({offlineBase64,...point})=>point);
-    result.okunanSayi = Math.max(current.okunanSayi || 0,incoming.okunanSayi || 0,result.points.length);
-    // Aynı devriyenin ikinci cihazdan gelen ek noktası varsa eksik listesini yalnızca azalt.
-    const scanned = new Set(result.points.map(point=>point.name.trim().toLocaleLowerCase('tr-TR')));
-    result.missedPoints = (current.missedPoints || incoming.missedPoints || []).filter(name=>!scanned.has(name.trim().toLocaleLowerCase('tr-TR')));
-    if (result.missedPoints.length === 0 && result.okunanSayi >= result.toplamNokta) result.status='TAM DEVRİYE';
-    return result;
+function getLogStartTimestamp(log) {
+    if (Number.isFinite(log.startTimestamp)) return log.startTimestamp;
+    return new Date(`${log.dateKey}T${log.start}`).getTime();
 }
-async function writeConfirmedHistory(log) {
-    const incoming = historyPayload(log);
-    const result = await runTransaction(ref(db,`devriyeHistory/${log.dateKey}/${log.user}/${outboxId(log)}`),
-        current=>mergeHistory(current,incoming),{applyLocally:false});
-    if (!result.committed) throw new Error('Geçmiş kaydının sunucu onayı alınamadı.');
-    historyConfirmedPatrolIds.add(outboxId(log));
-    return result.snapshot.val();
+function isSamePatrol(active, log) {
+    if (active.patrolId && log.patrolId) return active.patrolId === log.patrolId;
+    const activeStart = new Date(active.startTime).getTime();
+    const logStart = getLogStartTimestamp(log);
+    return Number.isFinite(activeStart) && Number.isFinite(logStart)
+        && Math.floor(activeStart / 1000) === Math.floor(logStart / 1000);
 }
-async function closeMatchingCloudPatrol(log) {
-    const result = await runTransaction(activeDevriyeRef, active => active === null || matchesPatrol(active,log) ? null : undefined,{applyLocally:false});
-    if (result.committed || result.snapshot.val() && !matchesPatrol(result.snapshot.val(),log)) return;
-    throw new Error('Aktif devriyenin kapanışı henüz onaylanmadı.');
+function cleanLogForHistory(log) {
+    const { _sync, _siteId, startTimestamp, ...historyLog } = log;
+    historyLog.patrolId = getPatrolId(log);
+    historyLog.points = (log.points || []).map(point => {
+        const { offlineBase64, ...cleanPoint } = point;
+        return cleanPoint;
+    });
+    return historyLog;
 }
-async function applyExistingHourRule(log) {
-    if (!log.hedefSaat || log.hedefSaat === 'Belirtilmedi') return;
-    // ORİJİNAL HESAP: bitiş gününün 08:00 öncesi önceki vardiyaya aittir.
-    let sD = new Date(log.timestamp);
-    if (sD.getHours() < 8) sD.setDate(sD.getDate() - 1);
-    const vTarihi = log.patrolSync?.slotDateKey || `${sD.getFullYear()}-${String(sD.getMonth()+1).padStart(2,'0')}-${String(sD.getDate()).padStart(2,'0')}`;
-    const ayarSnap = await get(ref(db,'sistemAyarlari/saatModu'));
-    const saatModu = ayarSnap.exists() ? ayarSnap.val() : 'tekli';
-    const hedefPath = saatModu === 'blok'
-        ? `tamamlananDevriyeSaatleri/${vTarihi}/${log.bolge}/${log.hedefSaat}`
-        : `tamamlananDevriyeSaatleri/${vTarihi}/${log.hedefSaat}`;
-    const name = log.name || log.user || 'Bilinmiyor';
-    await set(ref(db,hedefPath),log.okunanSayi === 0 ? null : name + (log.status === 'Eksik Devriye' ? ' - Eksik Devriye' : ''));
-}
-async function removeConfirmedFromOutbox(log) {
-    // Kapanış kanıtı saklanmadan tam rapor veya fotoğraf yedeği kaldırılmaz.
-    await markClosed({...log,_historyConfirmed:true});
-    const records=await readJournal();
-    const extra=records.filter(row=>row._kind==='point' && row.patrolId===outboxId(log) &&
-        !(log.points || []).some(point=>point.name===row.point.name && (!row.point.offlineBase64 || point.photoUrl)));
-    if(extra.length){await saveOutboxProgress({...includeDurablePoints(log,extra),_photosConfirmed:false,_historyNeedsUpdate:true});return false;}
-    try {
-        const legacy = readLegacyOutbox();
-        const next = legacy.filter(item=>outboxId(item)!==outboxId(log) || item._siteId && item._siteId!==siteID);
-        if (next.length!==legacy.length) localStorage.setItem(OUTBOX_STORAGE_KEY,JSON.stringify(next));
-    } catch (error) { console.warn('Eski kuyruk yerinde korundu:',error); }
-    if (window.indexedDB) {
-        await new Promise((resolve,reject)=>{
-            const request=indexedDB.open('kolart-completed-patrols-v1',1);
-            request.onupgradeneeded=()=>request.result.createObjectStore('reports');
-            request.onerror=request.onblocked=()=>reject(request.error || new Error('Önceki kuyruk temizlenemedi.'));
-            request.onsuccess=()=>{const database=request.result;const tx=database.transaction('reports','readwrite');
-                tx.objectStore('reports').delete(JOURNAL_SCOPE+outboxId(log));
-                tx.oncomplete=()=>{database.close();resolve();};tx.onerror=tx.onabort=()=>{database.close();reject(tx.error);};};
-        });
+async function finishPatrolHour(log) {
+    if (!log.hedefSaat || log.hedefSaat === "Belirtilmedi" || log._sync.hourSaved) return;
+    let hedefPath = log._sync.hourPath;
+    if (!hedefPath) {
+        const startStamp = getLogStartTimestamp(log);
+        const sD = new Date(Number.isFinite(startStamp) ? startStamp : log.timestamp);
+        if (sD.getHours() < 8) sD.setDate(sD.getDate() - 1);
+        const vTarihi = `${sD.getFullYear()}-${String(sD.getMonth() + 1).padStart(2, '0')}-${String(sD.getDate()).padStart(2, '0')}`;
+        const ayarSnap = await get(ref(db, 'sistemAyarlari/saatModu'));
+        const saatModu = ayarSnap.exists() ? ayarSnap.val() : 'tekli';
+        hedefPath = saatModu === 'blok'
+            ? `tamamlananDevriyeSaatleri/${vTarihi}/${log.bolge}/${log.hedefSaat}`
+            : `tamamlananDevriyeSaatleri/${vTarihi}/${log.hedefSaat}`;
+        log._sync.hourPath = hedefPath;
     }
-    const related=records.filter(row=>(row._kind==='point' && row.patrolId===outboxId(log)) || row._kind==='active' && matchesPatrol(row,log));
-    const keys=[['report',outboxId(log)],...related.map(row=>[row._kind,row._id])];
-    // Tam rapor ile ilişkili nokta yedekleri tek disk işleminde temizlenir.
-    await journalTransaction('readwrite',store=>{for(const [kind,id] of keys)store.delete(journalKey(kind,id));})
-        .catch(error=>{if(window.indexedDB)throw error;});
-    for(const [kind,id] of keys)localStorage.removeItem(JOURNAL_PREFIX+journalKey(kind,id));
-    return true;
+    const guvenlikAdi = log.name || log.user || "Bilinmiyor";
+    // Mevcut üç durum korunur: sıfır nokta, eksik devriye, tam devriye.
+    const value = log.okunanSayi === 0 ? null
+        : log.status === "Eksik Devriye" ? guvenlikAdi + " - Eksik Devriye" : guvenlikAdi;
+    await set(ref(db, hedefPath), value);
+    log._sync.hourSaved = true;
+    await saveQueuedLog(log);
 }
-// Bu ekran yalnızca telefona kalıcı yazılmış raporları gösterir.
-const TRANSFER_UI_WAIT_MS = 25000;
-const transferView = { rows:new Map(), photoFractions:new Map(), initialized:false,
-    visible:false, mode:'sending', origin:'resume', startedAt:0, timer:null, timedOut:false, fault:null };
-const reportSaveTails = new Map();
-const photoUploadJobs = new Map();
-const transferConnections={reports:null,notifications:null};
-function trackTransferReport(log) {
-    transferView.rows.set(outboxId(log), log);
-    renderTransferView();
-}
-function openTransferView(rows, origin='resume') {
-    if (!rows.length) return;
-    transferView.rows = new Map(rows.map(log=>[outboxId(log),log]));
-    transferView.initialized = true;
-    transferView.visible = true;
-    transferView.origin = origin;
-    transferView.startedAt = Date.now();
-    transferView.timedOut = false;
-    transferView.fault = null;
-    transferView.mode = navigator.onLine ? 'sending' : 'waiting';
-    document.getElementById('appModal').style.display='none';
-    document.getElementById('patrolTransferOverlay').dataset.open='true';
-    if (!transferView.timer) transferView.timer=setInterval(()=>{
-        if (transferView.mode==='sending' && Date.now()-transferView.startedAt>=TRANSFER_UI_WAIT_MS) expireTransferView();
-        else if (transferView.visible) renderTransferView();
-    },1000);
-    renderTransferView();
-    document.getElementById('patrolTransferTitle').setAttribute('tabindex','-1');
-    document.getElementById('patrolTransferTitle').focus({preventScroll:true});
-}
-function expireTransferView() {
-    if ([...transferView.rows.values()].some(log=>!log._outboxCleared)) {
-        // Bu yalnızca ekranın bekleme sınırıdır. Devam eden istek iptal edilmiş sayılmaz.
-        transferView.timedOut=true;
-        transferView.mode='waiting';
-        renderTransferView();
-    }
-}
-function registerTransferBatch(rows) {
-    if (!transferView.initialized) openTransferView(rows,'resume');
-    else { for (const log of rows) transferView.rows.set(outboxId(log),log); renderTransferView(); }
-}
-async function transferError(log,stage,error) {
-    log._transferErrors ||= {};
-    log._transferErrors[stage]={code:String(error?.code || ''),message:String(error?.message || error || 'Aktarım bekliyor').slice(0,240)};
-    console.error('Devriye aktarımı bekliyor:',stage,outboxId(log),error);
-    trackTransferReport(log);
-    // Hata kodu sayfa kapansa da sonraki girişte görülebilir.
-    try{await saveOutboxProgress(log);}catch(saveError){console.warn('Aktarım hatası diske yazılamadı; ana yedek korunuyor:',saveError);}
-}
-function clearTransferError(log,stage) {
-    if (log._transferErrors) delete log._transferErrors[stage];
-}
-function transferProgress() {
-    const rows=[...transferView.rows.values()];
-    let done=0,total=0;
-    for (const log of rows) {
-        const photos=(log.points || []).filter(point=>point.offlineBase64 || point.photoUrl);
-        total+=5+photos.length;
-        done+=Number(!!log._historyConfirmed)+Number(!!log._notificationSent)+Number(!!log._photosConfirmed)+Number(!!log._activeCleanupConfirmed)+Number(!!log._outboxCleared);
-        for (const point of photos) done+=point.photoUrl ? 1 : (transferView.photoFractions.get(outboxId(log)+':'+point.name) || 0);
-    }
-    // %100, kuyruk temizliği dahil tüm gerekli işlemlerin onayıyla mümkündür.
-    return {rows,percent:total ? Math.min(rows.every(log=>log._outboxCleared)?100:99,Math.floor(100*done/total)) : 0};
-}
-function renderTransferStep(id,rows,flag,stage) {
-    const row=document.getElementById(id);
-    if (!row) return;
-    const count=rows.filter(log=>log[flag] || log._outboxCleared).length;
-    const done=rows.length>0 && count===rows.length;
-    const failed=rows.some(log=>!log[flag] && log._transferErrors?.[stage]);
-    row.dataset.done=String(done);row.dataset.error=String(!done && failed);
-    row.querySelector('.material-symbols-outlined').textContent=done?'check_circle':failed?'error_outline':'schedule';
-    row.querySelector('b').textContent=done?'Onaylandı':failed?'Bekliyor':count>0?`${count}/${rows.length}`:'Bekliyor';
-}
-function renderTransferView() {
-    if (!transferView.initialized) return;
-    const {rows,percent}=transferProgress();
-    const pending=rows.filter(log=>!log._outboxCleared);
-    if (!pending.length && rows.length) transferView.mode='success';
-    else if (!navigator.onLine) transferView.mode='waiting';
-    const state=transferView.mode;
-    const allHistory=rows.length>0 && rows.every(log=>log._historyConfirmed || log._outboxCleared);
-    const stageFlags={history:'_historyConfirmed',notification:'_notificationSent',photos:'_photosConfirmed',cleanup:'_activeCleanupConfirmed',local:'_outboxCleared'};
-    // Daha sonra onaylanmış bir işlemin eski hatası, yeni bir yetki hatası sayılmaz.
-    const errorEntries=pending.flatMap(log=>Object.entries(log._transferErrors || {})
-        .filter(([stage])=>stage==='history' && log._historyNeedsUpdate || !log[stageFlags[stage]])
-        .map(([stage,error])=>({stage,...error})));
-    const errors=errorEntries;
-    const permissionError=errors.some(error=>/permission|unauthorized|unauthenticated/i.test(error.code+' '+error.message));
-    const banner=document.getElementById('patrolTransferBanner');
-    banner.style.display=pending.length?'flex':'none';
-    banner.dataset.state=allHistory?'supplement':state;
-    banner.querySelector('strong').textContent=allHistory?'Devriye kaydınız merkeze ulaştı.':state==='sending'?'Devriye kaydınız gönderiliyor.':'Telefonda bekleyen devriye var.';
-    banner.querySelector('small').textContent=state==='sending'?'Gönderimi görmek için dokunun.':allHistory?'Kalan kayıtları göndermek için dokunun.':'İnternetinizin çektiği yerde bu sayfayı açın.';
-    const card=document.getElementById('patrolTransferCard');
-    // Yeşil, devriye raporunun onayıdır; kalan işler arka planda aynı şekilde sürer.
-    card.dataset.state=allHistory?'success':state;
-    document.getElementById('patrolTransferIcon').textContent=allHistory?'verified':state==='waiting'?'cloud_off':'sync';
-    const title=document.getElementById('patrolTransferTitle');
-    const description=document.getElementById('patrolTransferDescription');
-    const chip=document.getElementById('patrolTransferChip');
-    const footnote=document.getElementById('patrolTransferFootnote');
-    if (state==='success') {
-        title.innerHTML='Devriyeniz<br>tamamlandı.';
-        description.textContent='Devriye kaydınız merkeze ulaştı.';
-        chip.textContent='TAMAMLANDI';
-        footnote.textContent='';
-    } else if (allHistory) {
-        title.innerHTML='Devriyeniz<br>tamamlandı.';
-        description.textContent='Devriye kaydınız merkeze ulaştı.';
-        chip.textContent='KAYIT ULAŞTI';
-        footnote.textContent=state==='sending'
-            ?'Gönderim sürüyor. Lütfen bu ekranı kapatmayın.'
-            :'Kalan kayıtlar bu sayfayı tekrar açtığınızda gönderilecek.';
-    } else if (state==='waiting') {
-        title.innerHTML='Devriyeniz telefona<br>kaydedildi.';
-        description.textContent=permissionError
-                ?'Kaydınız henüz gönderilemedi. Lütfen yöneticinize haber verin.'
-                :transferView.fault
-                    ?'Lütfen sayfayı yeniden açın. Sorun sürerse yöneticinize haber verin.'
-                    :'İnternetinizin çektiği yerde bu sayfayı tekrar açın. Devriyeniz otomatik gönderilecek.';
-        chip.textContent='TELEFONDA KAYITLI';
-        footnote.textContent='';
-    } else {
-        title.innerHTML='Devriyeniz<br>gönderiliyor.';
-        description.textContent='Lütfen bu ekranı kapatmayın.';
-        chip.textContent='GÖNDERİLİYOR';
-        footnote.textContent='';
-    }
-    footnote.hidden=!footnote.textContent;
-    document.getElementById('patrolTransferMeter').hidden=state!=='sending';
-    document.getElementById('patrolTransferPercent').textContent='%'+percent;
-    document.getElementById('patrolTransferFill').style.width=percent+'%';
-    document.getElementById('patrolTransferProgress').setAttribute('aria-valuenow',String(percent));
-    document.getElementById('patrolTransferCount').textContent='Gönderiliyor';
-    const waiting=[];
-    if(pending.some(log=>!log._historyConfirmed))waiting.push('rapor');
-    if(pending.some(log=>!log._notificationSent))waiting.push('bildirim');
-    if(pending.some(log=>!log._photosConfirmed))waiting.push('fotoğraf');
-    if(pending.some(log=>!log._activeCleanupConfirmed))waiting.push('kapanış');
-    document.getElementById('patrolTransferDetail').textContent=state==='success'?'Tüm gerekli işlemler sunucu tarafından onaylandı.':`Bekleyen: ${waiting.join(', ') || 'telefon kuyruğunun güncellenmesi'} · ${Math.max(0,Math.floor((Date.now()-transferView.startedAt)/1000))} sn`;
-    renderTransferStep('transferStepHistory',rows,'_historyConfirmed','history');
-    renderTransferStep('transferStepNotification',rows,'_notificationSent','notification');
-    renderTransferStep('transferStepPhotos',rows,'_photosConfirmed','photos');
-    renderTransferStep('transferStepCleanup',rows,'_activeCleanupConfirmed','cleanup');
-    const diagnostics=document.getElementById('patrolTransferDiagnostics');
-    diagnostics.hidden=!errorEntries.length && state!=='waiting';
-    const stageNames={history:'Devriye raporu',notification:'WhatsApp bildirimi',photos:'Fotoğraf aktarımı',cleanup:'Saat / aktif kayıt',local:'Telefon kuyruğu'};
-    const lines=[...new Set(errorEntries.map(error=>`${stageNames[error.stage] || error.stage}: ${error.code || 'Hata'} — ${error.message}`))];
-    const connectionText=value=>value===true?'Bağlı':value===false?'Bağlantı yok':'Bağlantı bilgisi bekleniyor';
-    const connectionLines=[`Devriye sunucusu: ${connectionText(transferConnections.reports)}`,`WhatsApp bildirim sunucusu: ${connectionText(transferConnections.notifications)}`];
-    if(!lines.length && state==='waiting')lines.push('Henüz bir hata kodu dönmedi. Bekleyen işlemlerin sunucu yanıtı bekleniyor.');
-    document.getElementById('patrolTransferErrors').textContent=[...connectionLines,...lines].join('\n\n');
-    document.getElementById('patrolTransferActions').style.display=state==='sending' && !allHistory?'none':'flex';
-    document.getElementById('patrolTransferRetry').style.display=state==='waiting'?'block':'none';
-    document.getElementById('patrolTransferDismiss').textContent=allHistory?(transferView.origin==='finish'?'ANASAYFAYA DÖN':'DEVAM ET'):'TAMAM';
-    document.getElementById('patrolTransferDismiss').dataset.primary=String(state!=='waiting');
-}
-async function settleTransferView() {
-    if (!transferView.initialized) return;
-    try {
-        const pending=await readPatrolOutbox();
-        for (const log of pending) {
-            const previous=transferView.rows.get(outboxId(log));
-            if(previous?._transferErrors)log._transferErrors=previous._transferErrors;
-            transferView.rows.set(outboxId(log),log);
-        }
-        // Başka bir sekme aynı kilit altında aktarımı tamamlamış olabilir.
-        const pendingIds=new Set(pending.map(outboxId));
-        const receipts=(await readJournal()).filter(row=>row._kind==='closed');
-        for (const [id,log] of transferView.rows) if (!pendingIds.has(id) && !log._outboxCleared) {
-            const receipt=receipts.find(row=>row.patrolId===id);
-            if (receipt?._historyConfirmed && receipt._notificationSent && receipt._photosConfirmed && receipt._activeCleanupConfirmed) {
-                Object.assign(log,{_historyConfirmed:true,_notificationSent:true,_photosConfirmed:true,_activeCleanupConfirmed:true,_outboxCleared:true});
-            }
-        }
-        transferView.mode=!pending.length && [...transferView.rows.values()].every(log=>log._outboxCleared)?'success':'waiting';
-    } catch (error) {
-        transferView.fault=error;transferView.mode='waiting';
-        console.error('Kuyruk durumu okunamadı; başarı gösterilmedi:',error);
-    }
-    renderTransferView();
-}
-async function showPendingTransfers() {
-    try {
-        const pending=await readPatrolOutbox();
-        if (!pending.length) {await settleTransferView();return;}
-        openTransferView(pending,'resume');
-        if (navigator.onLine) syncOutbox().catch(error=>console.error('Kayıtlar telefonda korundu:',error));
-    } catch (error) {
-        showAppModal('KAYITLARA ERİŞİLEMİYOR','Telefon yedekleri şu anda açılamıyor. Uygulama verilerini silmeden bu sayfayı tekrar açın.','error');
-    }
-}
-document.getElementById('patrolTransferBanner').onclick=showPendingTransfers;
-document.getElementById('patrolTransferRetry').onclick=async()=>{
-    transferView.startedAt=Date.now();transferView.timedOut=false;
-    transferView.mode=navigator.onLine?'sending':'waiting';renderTransferView();
-    if(navigator.onLine)syncOutbox().catch(error=>console.error('Gönderim kuyruğu korundu:',error));
-};
-document.getElementById('patrolTransferDismiss').onclick=()=>{
-    const reportSaved=[...transferView.rows.values()].every(log=>log._historyConfirmed || log._outboxCleared);
-    if (transferView.mode==='sending' && !reportSaved) return;
-    if (reportSaved && transferView.origin==='finish') {window.location.href='guvenlik.html';return;}
-    transferView.visible=false;document.getElementById('patrolTransferOverlay').dataset.open='false';
-};
-window.addEventListener('beforeunload',event=>{
-    const unconfirmed=[...transferView.rows.values()].some(log=>!log._historyConfirmed && !log._outboxCleared);
-    if(isSyncOutboxRunning && unconfirmed && transferView.visible && transferView.mode==='sending') {event.preventDefault();event.returnValue='';}
-});
-
-async function writeConfirmedPhotoUrls(log) {
-    // Ana rapor değişmez; yalnızca mevcut doğru noktanın photoUrl alanı yazılır.
-    const photos=(log.points || []).filter(point=>typeof point.photoUrl==='string' && point.photoUrl.length>0);
-    if(!photos.length)return;
-    const pointsPath=`devriyeHistory/${log.dateKey}/${log.user}/${outboxId(log)}/points`;
-    let snapshot;
-    try{snapshot=await get(ref(db,pointsPath));}
-    catch(error){
-        const failure=new Error('Fotoğraf adresi için devriye geçmişi okunamadı: '+(error?.message || error));
-        failure.code=error?.code || 'photo/history-read-failed';throw failure;
-    }
-    const cloudPoints=Object.entries(snapshot.val() || {});
-    for(const point of photos){
-        const matches=cloudPoints.filter(([,saved])=>saved && saved.name===point.name &&
-            (!saved.block || !point.block || saved.block===point.block));
-        if(matches.length!==1){
-            const failure=new Error('Fotoğrafın ait olduğu nokta devriye geçmişinde tek olarak bulunamadı. Telefon yedeği korundu.');
-            failure.code='photo/history-point-mismatch';throw failure;
-        }
-        const photoRef=ref(db,`${pointsPath}/${matches[0][0]}/photoUrl`);
-        let result;
-        try{
-            result=await runTransaction(photoRef,current=>{
-                // Diğer cihazın onaylanmış fotoğraf adresi üzerine yazılmaz.
-                if(typeof current==='string' && current.length>0)return current;
-                if(current!==null && current!=='')return undefined;
-                return point.photoUrl;
-            },{applyLocally:false});
-        }catch(error){
-            const failure=new Error('Fotoğraf adresi devriye geçmişine eklenemedi: '+(error?.message || error));
-            failure.code=error?.code || 'photo/history-write-failed';throw failure;
-        }
-        const confirmed=result.snapshot.val();
-        if(!result.committed || typeof confirmed!=='string' || !confirmed){
-            const failure=new Error('Fotoğraf adresinin sunucu onayı alınamadı. Telefon yedeği korundu.');
-            failure.code='photo/history-ack-missing';throw failure;
-        }
-        point.photoUrl=confirmed;
-        await saveOutboxProgress(log);
-    }
-}
-
-async function uploadOutboxPhoto(log,point) {
-    if(!storage) throw new Error('Fotoğraf servisine erişilemiyor.');
-    const key=outboxId(log)+':'+point.name;
-    if(photoUploadJobs.has(key))return photoUploadJobs.get(key);
-    const sending=(async()=>{
-        const match=String(point.offlineBase64 || '').match(/^data:([^;,]+)?;base64,([\s\S]+)$/);
-        if(!match)throw new Error('Telefon yedeğindeki fotoğraf okunamadı.');
-        const binary=atob(match[2]),bytes=new Uint8Array(binary.length);
-        for(let index=0;index<binary.length;index++)bytes[index]=binary.charCodeAt(index);
-        const path=`devriye_fotolari/${log.dateKey}/${siteID}/${log.user}_${outboxId(log)}_${encodeURIComponent(point.name)}.jpg`;
-        const task=uploadBytesResumable(sRef(storage,path),bytes,{contentType:match[1] || 'image/jpeg'});
-        const snapshot=await new Promise((resolve,reject)=>{
-            task.on('state_changed',snapshot=>{
-                if(snapshot.totalBytes)transferView.photoFractions.set(key,Math.min(.99,snapshot.bytesTransferred/snapshot.totalBytes));
-                renderTransferView();
-            },reject,()=>resolve(task.snapshot));
-        });
-        return await getDownloadURL(snapshot.ref);
-    })().finally(()=>photoUploadJobs.delete(key));
-    photoUploadJobs.set(key,sending);
-    return sending;
+async function clearFinishedActivePatrol(log) {
+    if (log._sync.activeCleared) return;
+    // Eski raporun aktarılması, sonradan başlayan başka bir devriyeyi silemez.
+    await runTransaction(activeDevriyeRef, active => {
+        if (active === null || isSamePatrol(active, log)) return null;
+        return undefined;
+    }, { applyLocally: false });
+    log._sync.activeCleared = true;
+    await saveQueuedLog(log);
 }
 function syncOutbox() {
-    if(syncOutboxPromise)return syncOutboxPromise;
-    if(!navigator.onLine || !journalReady)return Promise.resolve();
-    const sending=async()=>{
-        const attempted=new Set();
-        while(true){
-            const batch=(await readPatrolOutbox()).filter(log=>!attempted.has(outboxId(log)));
-            if(!batch.length)break;
-            registerTransferBatch(batch);
-            const ready=[];
-            // Yeni rapor önce geçmişe yazılır. Daha önce ACK alınmış rapor tekrar yazıma zorlanmaz.
-            for(const log of batch){
-                attempted.add(outboxId(log));
-                delete log._attemptFailed;
-                try{
-                    clearTransferError(log,'history');
-                    if(!log._historyConfirmed || log._historyNeedsUpdate){
-                        const canonical=await writeConfirmedHistory(log);
-                        log._historyConfirmed=true;
-                        log._historyNeedsUpdate=false;
-                        log.points=mergePoints(log.points,canonical.points);
-                        log.missedPoints=canonical.missedPoints || [];
-                        log.status=canonical.status;log.okunanSayi=canonical.okunanSayi;
-                        log._photosConfirmed=!(log.points || []).some(point=>point.offlineBase64 && !point.photoUrl);
-                        try{await saveOutboxProgress(log);}
-                        catch(error){await transferError(log,'local',error);}
-                    }else if(!(log.points || []).some(point=>point.offlineBase64 || point.photoUrl)){
-                        log._photosConfirmed=true;
+    if (syncOutboxPromise) return syncOutboxPromise;
+    if (!navigator.onLine || !auth.currentUser) return Promise.resolve();
+    const drain = async () => {
+        const attempted = new Set();
+        while (navigator.onLine) {
+            const log = readOutbox().find(item => belongsToThisSite(item) && !attempted.has(getPatrolId(item)));
+            if (!log) break;
+            const patrolId = getPatrolId(log);
+            attempted.add(patrolId);
+            log.patrolId = patrolId;
+            log._sync = log._sync || {};
+            try {
+                const historyRef = ref(db, `devriyeHistory/${log.dateKey}/${log.user}/${patrolId}`);
+                // Önce temel rapor: fotoğraf yüklenmesi History kaydını geciktiremez.
+                // Her deneme aynı devriyeye yazar; gün/personel dalını değiştirmez.
+                await update(historyRef, cleanLogForHistory(log));
+                await finishPatrolHour(log);
+                await clearFinishedActivePatrol(log);
+                for (const point of log.points || []) {
+                    if (!point.offlineBase64 || point.photoUrl) continue;
+                    const url = await uploadPhotoToStorage(point.name, point.offlineBase64, log);
+                    if (!url) throw new Error("REPORT_UPLOAD_PENDING");
+                    point.photoUrl = url;
+                    point.offlineBase64 = null;
+                    // URL cihazda da saklanır; bağlantı koparsa yeniden kullanılır.
+                    await saveQueuedLog(log);
+                    await update(historyRef, { points: cleanLogForHistory(log).points });
+                }
+                if (!log._sync.notified) {
+                    await sendWhatsappNotification(log);
+                    log._sync.notified = true;
+                    await saveQueuedLog(log);
+                }
+                // Sadece onaylanan raporu güncel kuyruktan çıkar; diğer kayıtlara dokunma.
+                await mutateOutbox(logs => {
+                    for (let i = logs.length - 1; i >= 0; i--) {
+                        if (getPatrolId(logs[i]) === patrolId && belongsToThisSite(logs[i])) logs.splice(i, 1);
                     }
-                    ready.push(log);trackTransferReport(log);
-                }catch(error){await transferError(log,'history',error);}
-            }
-            // Üç bağımsız iş: fotoğraf veya vardiya hatası WhatsApp çağrısını durdurmaz.
-            // Bildirimler tek proje yoluna yazıldığı için kendi içinde sırayla gönderilir.
-            const notifications=async()=>{
-                for(const log of ready){
-                    if(log._notificationSent)continue;
-                    try{
-                        clearTransferError(log,'notification');
-                        // İlk dosyayla aynı bildirimler/{siteID} yolu ve aynı alanlar.
-                        await sendWhatsappNotification(log);
-                        log._notificationSent=true;
-                        await saveOutboxProgress(log);
-                        trackTransferReport(log);
-                    }catch(error){await transferError(log,'notification',error);}
-                }
-            };
-            const cleanups=async()=>{
-                for(const log of ready){
-                    if(log._activeCleanupConfirmed)continue;
-                    try{
-                        clearTransferError(log,'cleanup');
-                        await closeMatchingCloudPatrol(log);
-                        await applyExistingHourRule(log);
-                        log._activeCleanupConfirmed=true;
-                        await saveOutboxProgress(log);trackTransferReport(log);
-                    }catch(error){await transferError(log,'cleanup',error);}
-                }
-            };
-            const photos=async()=>{
-                for(const log of ready){
-                    try{
-                        clearTransferError(log,'photos');
-                        for(const point of log.points || [])if(point.offlineBase64 && !point.photoUrl){
-                            point.photoUrl=await uploadOutboxPhoto(log,point);
-                            await saveOutboxProgress(log);trackTransferReport(log);
-                        }
-                        // Fotoğrafın hem Storage hem geçmiş adresi onaylanmadan özgün veri temizlenmez.
-                        if(!log._photosConfirmed){await writeConfirmedPhotoUrls(log);log._photosConfirmed=true;}
-                        for(const point of log.points || [])if(point.photoUrl)point.offlineBase64=null;
-                        await saveOutboxProgress(log);trackTransferReport(log);
-                    }catch(error){await transferError(log,'photos',error);}
-                }
-            };
-            const results=await Promise.allSettled([notifications(),cleanups(),photos()]);
-            for(const result of results)if(result.status==='rejected')console.error('Aktarım yedeği korundu:',result.reason);
-            for(const log of ready){
-                if(!log._historyConfirmed || !log._notificationSent || !log._photosConfirmed || !log._activeCleanupConfirmed)continue;
-                try{
-                    await (reportSaveTails.get(outboxId(log)) || Promise.resolve());
-                    if(await removeConfirmedFromOutbox(log)){
-                        log._outboxCleared=true;trackTransferReport(log);
-                    }
-                }catch(error){await transferError(log,'local',error);}
+                });
+                showReportSuccess(patrolId);
+            } catch (err) {
+                console.error("Devriye raporu kuyrukta korunuyor:", patrolId, err);
+                // Bir raporun hatası diğer bekleyen raporları engellemez.
             }
         }
     };
-    isSyncOutboxRunning=true;
-    syncOutboxPromise=Promise.resolve()
-        .then(()=>navigator.locks?navigator.locks.request('kolart-patrol-send:'+JOURNAL_SCOPE,sending):sending())
-        .finally(async()=>{
-            isSyncOutboxRunning=false;
-            try{await settleTransferView();}finally{syncOutboxPromise=null;}
-        });
+    const run = navigator.locks && navigator.locks.request
+        ? navigator.locks.request(`kolart-send-${OUTBOX_STORAGE_KEY}`, drain) : drain();
+    syncOutboxPromise = run.finally(() => { syncOutboxPromise = null; });
     return syncOutboxPromise;
 }
-
-async function findCompletedCloudRecord(active) {
-    const started = new Date(active.startTime);
-    if (!Number.isFinite(started.getTime()) || !navigator.onLine) return null;
-    const day = active.historyDateKey || `${started.getFullYear()}-${String(started.getMonth()+1).padStart(2,'0')}-${String(started.getDate()).padStart(2,'0')}`;
-    const completed = record => record && record.end &&
-        (record.status === 'TAM DEVRİYE' || record.status === 'Eksik Devriye') && matchesPatrol(active,record);
-    if (active.patrolId && !active.patrolId.startsWith('P_L_')) {
-        const snapshot = await get(ref(db,`devriyeHistory/${day}/${currentUser.username}/${active.patrolId}`));
-        return completed(snapshot.val()) ? snapshot.val() : null;
+function setReportButtons(sending, retryId = null) {
+    const modal = document.getElementById('appModal');
+    const closeBtn = modal.querySelector('.custom-alert-btn');
+    if (closeBtn) closeBtn.style.display = sending ? 'none' : '';
+    let retryBtn = document.getElementById('patrolRetryBtn');
+    if (!retryBtn && retryId) {
+        retryBtn = document.createElement('button');
+        retryBtn.id = 'patrolRetryBtn';
+        retryBtn.className = 'custom-alert-btn';
+        retryBtn.innerText = 'TEKRAR DENE';
+        modal.querySelector('.custom-alert-box').appendChild(retryBtn);
     }
-    // Eski kayıtlarda kimlik yoktu: yalnızca o kullanıcı ve başlangıç günü okunur.
-    const snapshot = await get(ref(db,`devriyeHistory/${day}/${currentUser.username}`));
-    const entry = Object.entries(snapshot.val() || {}).find(([,record])=>completed(record));
-    return entry ? {...entry[1],patrolId:entry[1].patrolId || entry[0]} : null;
+    if (retryBtn) {
+        retryBtn.style.display = !sending && retryId ? '' : 'none';
+        retryBtn.onclick = () => waitForQueuedReport(retryId);
+    }
 }
-function init() {
-    if (initPromise) return initPromise;
-    initPromise = (async()=>{
-        const rows = await readJournal();
-        const pending = await readPatrolOutbox();
-        const receipts = rows.filter(row=>row._kind==='closed');
-        for (const row of receipts) closedSessionIds.add(row.patrolId);
-        const candidates = rows.filter(row=>row._kind==='active');
-        try {
-            const legacy = JSON.parse(localStorage.getItem(OFFLINE_STORAGE_KEY) || 'null');
-            if (legacy && (!legacy._siteId || legacy._siteId===siteID) && Number.isFinite(new Date(legacy.startTime).getTime())) {
-                const id = activeId(legacy);
-                if (!candidates.some(row=>row.patrolId===id)) candidates.push({...legacy,patrolId:id,_unscopedLegacy:!legacy._siteId});
-            }
-        } catch (error) { console.warn('Eski aktif yedek silinmedi:',error); }
-        // Tek noktalar da ayrı saklanır; aynı hesabın iki sekmesi listeyi ezemez.
-        for (const row of rows.filter(row=>row._kind==='point')) {
-            let active=candidates.find(item=>activeId(item)===row.patrolId);
-            if (!active) {active={...row.activeMeta,patrolId:row.patrolId,readPoints:[]};candidates.push(active);}
-            active.readPoints=mergePoints(active.readPoints,[row.point]);
-        }
-        journalReady=true;
-        if(pending.length){
-            openTransferView(pending,'resume');
-            if(navigator.onLine)syncOutbox().catch(error=>console.error('Bekleyen rapor telefonda korundu:',error));
-        }
-        let cloud=null;
-        if (navigator.onLine) {
-            try { const snapshot=await get(activeDevriyeRef);cloud=snapshot.val(); }
-            catch (error) { console.warn('Bulut doğrulanamadı; telefon yedeği korunuyor:',error); }
-        }
-        if (cloud && Number.isFinite(new Date(cloud.startTime).getTime())) {
-            const matching=candidates.find(row=>matchesPatrol(row,cloud));
-            if (matching) matching.readPoints=mergePoints(matching.readPoints,cloud.readPoints);
-            else candidates.push({...cloud,patrolId:activeId(cloud),_cloudConfirmed:true});
-        }
-        const open=[];
-        for(const active of candidates){
-            if(active._unscopedLegacy && !(cloud && matchesPatrol(cloud,active)) && !legacyPhotoProvesProject({points:active.readPoints || []})){
-                unverifiedLegacyReports.add('active:'+activeId(active));
-                continue;
-            }
-            const proof=pending.find(log=>matchesPatrol(active,log)) || receipts.find(log=>matchesPatrol(active,log));
-            if(proof){await removeActiveLocal(active);continue;}
-            let completed=null;
-            try{completed=await findCompletedCloudRecord(active);}catch(error){console.warn('Tamamlandığı doğrulanamayan aktif veri korundu:',error);}
-            if(completed){
-                await saveOutboxProgress({...completed,points:mergePoints(completed.points,active.readPoints),
-                    startedAt:completed.startedAt || active.startTime,_historyConfirmed:true,_notificationSent:false});
-                await removeActiveLocal(active);
-                continue;
-            }
-            open.push(active);
-        }
-        journalReady=true;
-        if(open.length){
-            open.sort((a,b)=>new Date(b.startTime)-new Date(a.startTime));
-            const saved=open[0];
-            patrolSessionId=activeId(saved);startTime=new Date(saved.startTime);
-            readPoints=saved.readPoints || [];secilenHedefSaat=saved.hedefSaat || null;
-            eqStatus=saved.equipment || eqStatus;currentBlock=saved.block || currentBlock;
-            activeCloudConfirmed=!!saved._cloudConfirmed || !!cloud && matchesPatrol(cloud,saved);
-            devriyeStarted=true;isFinalizing=false;
-            await saveToLocal();uiStartMode();startTimerLoop();
-        }else{devriyeStarted=false;isFinalizing=false;uiReadyMode();}
-        checkConnectivity();
-        await loadQRInterface();
-        if(unverifiedLegacyReports.size){
-            showAppModal('ESKİ KAYIT KORUNUYOR','Önceki sürümden kalan bazı kayıtların hangi projeye ait olduğu doğrulanamadı. Kayıtlar silinmedi. Yöneticinize haber verin; uygulama verilerini silmeyin.','info');
-        }
-    })().catch(error=>{
-        console.error('Telefon yedeği okunamadı; eldeki kayıtlar silinmedi:',error);
-        showAppModal('KAYITLARA ERİŞİLEMİYOR','Telefon yedekleri şu anda açılamıyor. Sayfayı yeniden açmayı deneyin; uygulama verilerini silmeyin.','error');
-        initPromise=null;
-    });
-    return initPromise;
+function showReportSuccess(patrolId) {
+    if (pendingReportId !== patrolId || isQueued(patrolId)) return;
+    pendingReportId = null;
+    reportWaitVersion++;
+    clearInterval(reportCountdownTimer);
+    showAppModal("BAŞARILI", "Rapor merkeze başarıyla iletildi.", "check_circle");
+    setReportButtons(false);
+    setTimeout(() => { window.location.href = "guvenlik.html"; }, 2500);
 }
-function syncActivePatrolToCloud() {
-    if(activeSyncPromise) return activeSyncPromise;
-    if(!journalReady || !navigator.onLine || !devriyeStarted || isFinalizing) return Promise.resolve();
-    const snapshot=activeSnapshot(), id=snapshot.patrolId;
-    const stillActive=()=>devriyeStarted && !isFinalizing && patrolSessionId===id && !closedSessionIds.has(id);
-    activeSyncPromise=(async()=>{
-        for(const point of snapshot.readPoints){
-            if(!stillActive()) return;
-            if(point.offlineBase64 && !point.photoUrl && storage){
-                try{
-                    const url=await uploadOutboxPhoto({dateKey:snapshot.historyDateKey,user:currentUser.username,patrolId:id},point);
-                    if(!stillActive()) return;
-                    point.photoUrl=url;
-                    // Fotoğrafın adresi telefona yazılmadan özgün veri kaldırılmaz.
-                    await storeJournal('point',id+':'+encodeURIComponent(point.name),{patrolId:id,point,
-                        activeMeta:{...snapshot,readPoints:[]}});
-                    const live=readPoints.find(item=>item.name===point.name);
-                    if(live){live.photoUrl=url; /* özgün fotoğraf rapor onayına kadar tutulur */}
-                }catch(error){console.warn('Aktif fotoğraf yedeği korunuyor:',error);}
-            }
-        }
-        if(!stillActive()) return;
-        await saveToLocal();
-        const payload={patrolId:id,startTime:snapshot.startTime,hedefSaat:snapshot.hedefSaat,
-            historyDateKey:snapshot.historyDateKey,equipment:snapshot.equipment,
-            readPoints:snapshot.readPoints.map(({offlineBase64,...point})=>point)};
-        const canCreate=!activeCloudConfirmed;
-        const result=await runTransaction(activeDevriyeRef,active=>{
-            if(!stillActive()) return undefined;
-            if(active===null) return canCreate?payload:null;
-            if(!matchesPatrol(active,snapshot)) return undefined;
-            return {...active,...payload,readPoints:mergePoints(active.readPoints,payload.readPoints).map(({offlineBase64,...point})=>point)};
-        },{applyLocally:false});
-        if(result.committed && stillActive()){activeCloudConfirmed=true;await saveToLocal();}
-    })().catch(error=>console.warn('Aktif aktarım bekliyor; telefon yedeği korunuyor:',error))
-        .finally(()=>{activeSyncPromise=null;});
-    return activeSyncPromise;
+async function waitForQueuedReport(patrolId) {
+    pendingReportId = patrolId;
+    const version = ++reportWaitVersion;
+    clearInterval(reportCountdownTimer);
+    let secondsLeft = 20;
+    const draw = () => {
+        showAppModal("GÖNDERİLİYOR",
+            `Rapor merkeze iletiliyor...<br><br><b style="font-size:26px; color:#3b82f6;">${secondsLeft} Saniye</b>` +
+            `<div style="margin-top:14px; font-size:12px;">Lütfen işlem tamamlanana kadar ekrandan ayrılmayın.</div>`, "cloud_upload");
+        setReportButtons(true);
+    };
+    draw();
+    reportCountdownTimer = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft > 0) draw();
+        else clearInterval(reportCountdownTimer);
+    }, 1000);
+    let timeoutId;
+    try {
+        await Promise.race([
+            (async () => {
+                await syncOutbox();
+                if (isQueued(patrolId)) throw new Error("REPORT_UPLOAD_PENDING");
+            })(),
+            new Promise((_, reject) => { timeoutId = setTimeout(() => reject(new Error("TIMEOUT")), 20000); })
+        ]);
+        showReportSuccess(patrolId);
+    } catch (err) {
+        if (version !== reportWaitVersion) return;
+        showAppModal("CİHAZA KAYDEDİLDİ",
+            "Rapor telefonda kayıtlı. Merkeze henüz iletilemedi. Bağlantınızı kontrol edip Tekrar Dene'ye basın.", "cloud_sync");
+        setReportButtons(false, patrolId);
+    } finally {
+        clearTimeout(timeoutId);
+        if (version === reportWaitVersion) clearInterval(reportCountdownTimer);
+    }
 }
-function pushPoint(name,lat,lng,acc,base64Photo=null) {
-    if(isFinalizing || !devriyeStarted || readPoints.some(point=>point.name===name)) return Promise.resolve();
-    const point={block:currentBlock,name,time:new Date().toLocaleTimeString('tr-TR'),lat,lng,acc,
-        photoUrl:null,offlineBase64:base64Photo || null};
-    readPoints.push(point);
-    const snapshot=activeSnapshot(), id=snapshot.patrolId;
-    const saving=pointSaveTail.catch(()=>{}).then(async()=>{
-        await storeJournal('point',id+':'+encodeURIComponent(name),{patrolId:id,point,
-            activeMeta:{...snapshot,readPoints:[]}});
-        // Nokta ayrı olarak kalıcı yazıldı. Toplu görünüm kotaya takılsa da geri alınabilir.
-        try{await storeJournal('active',id,snapshot);}catch(error){console.warn('Tekil nokta yedeği saklı:',error);}
-        if(devriyeStarted && patrolSessionId===id){updateUIVisually(name);if(!isFinalizing)syncActivePatrolToCloud();}
-    });
-    pointSaveTail=saving;
-    saving.catch(error=>{
-        console.error('Nokta henüz kalıcı saklanamadı:',error);
-        showAppModal('NOKTA KAYDEDİLEMEDİ','Telefon kayıt alanına yazılamadı. Sayfayı kapatmayın; boş alanı kontrol edip devriyeyi bitirmeyi tekrar deneyin.','error');
-    });
-    return saving;
-}
-async function finalizePatrol(note='',eksikListesi=[]) {
-    if(isFinalizing || !devriyeStarted) return;
-    isFinalizing=true;
-    await pointSaveTail.catch(()=>{});
-    await activeSaveTail.catch(()=>{});
-    const referenceDate=startTime || new Date(), endedAt=new Date();
-    patrolSessionId ||= activeId({startTime:referenceDate.toISOString()});
-    const snapshot=activeSnapshot();
-    let sD=new Date(endedAt);if(sD.getHours()<8)sD.setDate(sD.getDate()-1);
-    const log=deepCopy({patrolId:patrolSessionId,user:currentUser.username,name:currentUser.name || currentUser.username,
-        bolge:currentBlock,hedefSaat:secilenHedefSaat || 'Belirtilmedi',
-        start:referenceDate.toLocaleTimeString('tr-TR'),end:endedAt.toLocaleTimeString('tr-TR'),
-        startedAt:referenceDate.toISOString(),points:readPoints,missedPoints:eksikListesi,ekipmanlar:eqStatus,
-        status:eksikListesi.length>0?'Eksik Devriye':'TAM DEVRİYE',eksikNotu:note,okunanSayi:readPoints.length,
-        toplamNokta:document.querySelectorAll('.qr-card').length,timestamp:endedAt.getTime(),
-        dateKey:snapshot.historyDateKey,patrolSync:{version:3,slotDateKey:`${sD.getFullYear()}-${String(sD.getMonth()+1).padStart(2,'0')}-${String(sD.getDate()).padStart(2,'0')}`},
-        _startTime:referenceDate.toISOString(),_siteId:siteID});
-    try{Object.assign(log,await commitFinishedReport(log));}
-    catch(error){
-        isFinalizing=false;
-        const button=document.getElementById('endBtn');button.style.pointerEvents='auto';button.style.opacity='1';button.innerText='DEVRİYEYİ BİTİR';
-        const submit=document.getElementById('forceFinishBtn');submit.disabled=false;submit.style.pointerEvents='auto';submit.style.opacity='1';
-        document.getElementById('finishIcon').style.animation='';document.getElementById('finishIcon').innerText='send_and_archive';
-        document.getElementById('finishText').style.animation='';document.getElementById('finishText').innerText='Devriyeyi Bitir / Raporu Gönder';
-        showAppModal('KAYIT SAKLANAMADI','Devriye kapatılmadı. Telefon yedeği yazılamadı. Sayfayı kapatmadan boş alanı kontrol edip tekrar deneyin.','error');
+async function finalizePatrol(note = "", eksikListesi = []) {
+    if (isFinalizing || !devriyeStarted) return;
+    isFinalizing = true;
+    const referenceDate = startTime || new Date();
+    const dateKey = `${referenceDate.getFullYear()}-${String(referenceDate.getMonth() + 1).padStart(2, '0')}-${String(referenceDate.getDate()).padStart(2, '0')}`;
+    const log = {
+        patrolId: activePatrolId || `P_${referenceDate.getTime()}`,
+        user: currentUser.username,
+        name: currentUser.name || currentUser.username,
+        bolge: currentBlock,
+        hedefSaat: secilenHedefSaat || "Belirtilmedi",
+        start: referenceDate.toLocaleTimeString('tr-TR'),
+        end: new Date().toLocaleTimeString('tr-TR'),
+        points: readPoints.map(point => ({ ...point })),
+        missedPoints: eksikListesi,
+        ekipmanlar: { ...eqStatus },
+        status: eksikListesi.length > 0 ? "Eksik Devriye" : "TAM DEVRİYE",
+        eksikNotu: note,
+        okunanSayi: readPoints.length,
+        toplamNokta: document.querySelectorAll('.qr-card').length,
+        timestamp: Date.now(),
+        startTimestamp: referenceDate.getTime(),
+        dateKey,
+        _siteId: siteID,
+        _sync: { hourPath: activeHourPath }
+    };
+    try {
+        // Kalıcı kuyruk yazısı tamamlanmadan aktif noktaları veya cihaz yedeğini silme.
+        await mutateOutbox(logs => {
+            if (!logs.some(item => getPatrolId(item) === log.patrolId)) logs.push(log);
+        });
+    } catch (err) {
+        isFinalizing = false;
+        const endBtn = document.getElementById('endBtn');
+        endBtn.style.pointerEvents = 'auto';
+        endBtn.style.opacity = '1';
+        endBtn.innerText = 'DEVRİYEYİ BİTİR';
+        const forceBtn = document.getElementById('forceFinishBtn');
+        forceBtn.disabled = false;
+        forceBtn.style.pointerEvents = 'auto';
+        forceBtn.style.opacity = '1';
+        showAppModal("KAYIT TAMAMLANAMADI", "Rapor telefona kaydedilemedi. Devriyeniz açık tutuldu. Lütfen tekrar deneyin veya yöneticiye haber verin.", "warning");
+        console.error("Cihaz kaydı başarısız; aktif devriye korunuyor:", err);
         return;
     }
-    closedSessionIds.add(log.patrolId);
-    devriyeStarted=false;
-    for(const timer of[mainTimerInterval,btnCountdownInterval,countdownInterval])if(timer)clearInterval(timer);
-    if(watchId){navigator.geolocation.clearWatch(watchId);watchId=null;}
-    await removeActiveLocal(snapshot);
-    readPoints=[];startTime=null;secilenHedefSaat=null;
-    // Rapor artık kalıcı telefonda. Aktarım sonucu ayrı ve açık gösterilir.
+    devriyeStarted = false;
+    if (mainTimerInterval) clearInterval(mainTimerInterval);
+    if (btnCountdownInterval) clearInterval(btnCountdownInterval);
+    if (countdownInterval) clearInterval(countdownInterval);
+    if (watchId) navigator.geolocation.clearWatch(watchId);
+    readPoints = [];
+    startTime = null;
+    secilenHedefSaat = null;
+    activePatrolId = null;
+    activeHourPath = null;
+    localStorage.removeItem(OFFLINE_STORAGE_KEY);
     uiReadyMode();
-    isFinalizing=false;
-    const endButton=document.getElementById('endBtn');
-    endButton.style.pointerEvents='auto';endButton.style.opacity='1';endButton.innerText='DEVRİYEYİ BİTİR';
-    const submit=document.getElementById('forceFinishBtn');
-    submit.disabled=true;submit.style.pointerEvents='auto';submit.style.opacity='1';
-    document.getElementById('incidentNote').value='';
-    document.getElementById('finishIcon').style.animation='';document.getElementById('finishIcon').innerText='send_and_archive';
-    document.getElementById('finishText').style.animation='';document.getElementById('finishText').innerText='Devriyeyi Bitir / Raporu Gönder';
-    let pending;
-    try{pending=await readPatrolOutbox();}catch(_){pending=[log];}
-    openTransferView(pending.length?pending:[log],'finish');
-    if(navigator.onLine)syncOutbox().catch(error=>console.error('Gönderim bekliyor; telefon yedeği saklı:',error));
+    await waitForQueuedReport(log.patrolId);
 }
-
-function retryPatrolTransfers() {
-    if(!journalReady)return;
-    syncActivePatrolToCloud();
-    syncOutbox().catch(error=>console.error('Gönderim kuyruğu korundu:',error));
-}
-onValue(ref(db,'.info/connected'),snapshot=>{transferConnections.reports=snapshot.val()===true;renderTransferView();if(snapshot.val()===true)retryPatrolTransfers();});
-onValue(ref(bildirimDb,'.info/connected'),snapshot=>{transferConnections.notifications=snapshot.val()===true;renderTransferView();if(snapshot.val()===true)retryPatrolTransfers();});
-setInterval(()=>{if(navigator.onLine && document.visibilityState!=='hidden')retryPatrolTransfers();},30000);
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible' && navigator.onLine)retryPatrolTransfers();});
-
+// Bağlantı tekrar kurulduğunda ve uygulama öne geldiğinde kalan raporları devam ettir.
+onValue(ref(db, '.info/connected'), snap => {
+    if (snap.val() === true) syncOutbox().catch(err => console.error("Rapor aktarımı:", err));
+});
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') checkConnectivity();
+});
+window.addEventListener('beforeunload', event => {
+    if (isFinalizing && pendingReportId) {
+        event.preventDefault();
+        event.returnValue = '';
+    }
+});
 onValue(ref(db, 'settings/allowPointChange'), (snap) => {
     const badge = document.getElementById('eliteSelectBadge');
     if (badge) {
