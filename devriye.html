@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#080808">
   <title>KOLART — Devriye</title>
-  <!-- ofdev:20261020-1 · Saatler online, devriye kaydı mevcut offline altyapıyla. -->
+  <!-- ofdev:20261020-2 · Canlı tolerans kontrolü ve aktif devriye olay butonu. -->
   <!-- Bu dosyayı offline-paket.js, offline-sync.js ve vendor klasörüyle aynı dizine koyun. -->
   <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('kolart-theme-tone') || 'elite-neon');}catch(_){}</script>
   <script defer src="./offline-sync.js?v=20261009-elit-1"></script>
@@ -172,7 +172,7 @@ header{padding-top:calc(20px + env(safe-area-inset-top))}.header-left .material-
 .qr-icon-side svg{width:25px;height:25px;display:block}.qr-icon-side .material-symbols-outlined svg{width:25px;height:25px}
 .patrol-footer{left:50%;transform:translateX(-50%);padding-bottom:calc(24px + env(safe-area-inset-bottom))}
 .patrol-footer .action-btn{width:auto;letter-spacing:.2px;overflow-wrap:anywhere}.patrol-footer .material-symbols-outlined{font-size:22px;margin-right:7px}
-#incidentBtn{display:none!important}#ofdevQueueArea{margin:8px 16px 10px}#offlineUserLabel{font-size:10px;color:var(--text-dim);line-height:1.5;margin:0 0 8px}
+#ofdevQueueArea{margin:8px 16px 10px}#offlineUserLabel{font-size:10px;color:var(--text-dim);line-height:1.5;margin:0 0 8px}
 #offlineUploadBtn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 9px;border:1px solid var(--border);border-radius:14px;background:var(--card);color:var(--primary);font-size:10px;font-weight:900;letter-spacing:.3px}
 #offlineUploadCount{min-width:22px;padding:4px 6px;border:1px solid var(--primary);border-radius:6px}
 .modal,#hourSelectModal,#confirmPatrolModal{display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.96);align-items:center;justify-content:center;padding:24px;overflow:auto}
@@ -254,7 +254,7 @@ header{padding-top:calc(20px + env(safe-area-inset-top))}.header-left .material-
             <span style="font-size: 13px; font-weight: 900; text-transform: uppercase;">BİTİR</span>
         </button>
 
-        <button id="incidentBtn" class="action-btn" style="background: #1a1a1a; color: #ff3b30; border: 1px solid #ff3b30; flex: 1; min-height: 56px; display: none; align-items: center; justify-content: center; padding: 0 15px; border-radius: 20px;">
+        <button id="incidentBtn" class="action-btn" style="background: #ff3b30; color: #fff; border: 1px solid #ff3b30; flex: 1; min-height: 56px; display: none; align-items: center; justify-content: center; padding: 0 15px; border-radius: 20px;">
             <span class="material-symbols-outlined">report</span>
             <span style="font-size: 13px; font-weight: 900; text-transform: uppercase;">OLAY BİLDİR</span>
         </button>
@@ -381,10 +381,11 @@ window.checkEq = (tip, cevap) => {
     }
 };
 function uiStartMode() {
-    document.getElementById('backHomeBtn').style.display = "flex";
+    document.getElementById('backHomeBtn').style.display = "none";
     document.getElementById('startBtn').style.display = "none";
     document.getElementById('endBtn').style.display = "flex";
-    document.getElementById('incidentBtn').style.display = "none"; 
+    renderEndButton();
+    document.getElementById('incidentBtn').style.display = "flex"; 
     document.getElementById('statusLabel').innerText = "AKTİF DEVRİYE";
     document.getElementById('selectedHourStatus').textContent=(secilenHedefSaat || '')+' devriyesi';
 }
@@ -641,6 +642,9 @@ function startTimerLoop() {
     }, 1000);
 }
 /* SAAT İŞLEMLERİ: yalnız canlı Firebase; paket saatleri bu akışta kullanılmaz. */
+function renderEndButton() {
+  document.getElementById('endBtn').innerHTML='<span class="material-symbols-outlined" aria-hidden="true">stop_circle</span><span style="font-size:13px;font-weight:900;text-transform:uppercase">BİTİR</span>';
+}
 function startupProblem(title,message) {
   unlocked=false;
   document.querySelector('.app-container').inert=true;
@@ -818,6 +822,7 @@ window.openHourSelectModal=async()=>{
   modal.style.display='flex';area.innerHTML='<div class="hour-empty">DEVRİYE SAATLERİ MERKEZDEN ALINIYOR…</div>';
   document.getElementById('hourDateLabel').textContent='';
   const block=currentBlock;
+  let selecting=false;
   try {
     const live=await liveSchedule();
     const completed=(await freshHourRead(live.context,hourPath(live.shift.key,live.mode,block))).val() || {};
@@ -828,22 +833,35 @@ window.openHourSelectModal=async()=>{
     for(const hour of selectable) {
       const button=document.createElement('button');button.type='button';button.className='hour-choice';
       const title=document.createElement('strong');title.textContent=hour;button.appendChild(title);
-      button.onclick=()=>{
-        if(devriyeStarted || isFinalizing || currentBlock!==block)return;
-        // Online sayfayla aynı başlangıç + 59 dakika + tolerans penceresi.
-        const date=new Date(live.date.getTime()+Math.max(0,Date.now()-live.loadedAt));
-        const candidate={...live,date,shift:shiftDetails(date)};
-        try{requireValidHour(hour,candidate,live.shift.key);}catch(error){showAppModal('GEÇERSİZ ZAMAN!',escapeHTML(error.message),'timer_off');return;}
-        const confirm=document.getElementById('confirmPatrolModal');
-        document.getElementById('confirmPatrolText').innerHTML=`<span class="confirm-hour">${hour}</span>Devriyesini başlatacaksınız.<br>Onaylıyor musunuz?`;
-        confirm.style.display='flex';
-        document.getElementById('btnConfirmCancel').onclick=()=>{confirm.style.display='none';};
-        document.getElementById('btnConfirmOk').onclick=()=>{
-          if(currentBlock!==block || devriyeStarted)return;
-          confirm.style.display='none';modal.style.display='none';secilenHedefSaat=hour;
-          selectedSchedule={shiftDate:live.shift.key,block,hour};
-          document.getElementById('equipmentModal').style.display='flex';
-        };
+      button.onclick=async()=>{
+        if(selecting || devriyeStarted || isFinalizing || currentBlock!==block)return;
+        selecting=true;area.setAttribute('aria-busy','true');
+        area.querySelectorAll('button').forEach(item=>item.disabled=true);
+        try {
+          // Liste açıkken tolerans değişmiş olabilir: her saat seçiminde merkezden yeniden oku.
+          const selected=await liveSchedule();
+          if(epoch!==hourListEpoch || !unlocked || currentBlock!==block || modal.style.display!=='flex')return;
+          try{requireValidHour(hour,selected,live.shift.key);}catch(error){error.invalidHour=true;throw error;}
+          const closed=(await freshHourRead(selected.context,hourPath(selected.shift.key,selected.mode,block,hour))).val();
+          if(epoch!==hourListEpoch || !unlocked || currentBlock!==block || modal.style.display!=='flex')return;
+          if(closed!=null)throw hourConflict();
+          const confirm=document.getElementById('confirmPatrolModal');
+          document.getElementById('confirmPatrolText').innerHTML=`<span class="confirm-hour">${hour}</span>Devriyesini başlatacaksınız.<br>Onaylıyor musunuz?`;
+          confirm.style.display='flex';
+          document.getElementById('btnConfirmCancel').onclick=()=>{confirm.style.display='none';};
+          document.getElementById('btnConfirmOk').onclick=()=>{
+            if(currentBlock!==block || devriyeStarted || !unlocked)return;
+            confirm.style.display='none';modal.style.display='none';secilenHedefSaat=hour;
+            selectedSchedule={shiftDate:selected.shift.key,block,hour};
+            document.getElementById('equipmentModal').style.display='flex';
+          };
+        } catch(error) {
+          if(epoch===hourListEpoch && unlocked && modal.style.display==='flex')
+            showAppModal(error.invalidHour?'GEÇERSİZ ZAMAN!':error.hourConflict?'SAAT KAPATILMIŞ':'SAAT SEÇİLEMEDİ',escapeHTML(error.message),error.invalidHour?'timer_off':'warning');
+        } finally {
+          selecting=false;area.setAttribute('aria-busy','false');
+          area.querySelectorAll('button').forEach(item=>item.disabled=false);
+        }
       };
       area.appendChild(button);
     }
@@ -1007,7 +1025,7 @@ async function finalizeOffline(note,missed) {
   } catch(error) {
     isFinalizing=false;startTimerLoop();
     showAppModal('KAYIT TAMAMLANAMADI','Aktif devriyeniz korunuyor. Tekrar bitirmeyi deneyin: '+escapeHTML(error.message),'error');
-  } finally {button.disabled=false;button.textContent='DEVRİYEYİ BİTİR';}
+  } finally {button.disabled=false;renderEndButton();}
 }
 window.openBlockModal=async()=>{
   if(!unlocked)return;
@@ -1139,6 +1157,14 @@ document.getElementById('startupHome').onclick=()=>{
   location.href=new URL('index.html',window.KolartOffline?.base || location.href).href;
 };
 document.getElementById('incidentBtn').style.display='none';
+document.getElementById('incidentBtn').onclick=()=>{
+  if(!unlocked || !devriyeStarted)return;
+  if(pointSaving || isFinalizing || isSyncOutboxRunning || countdownInterval || qrScanner) {
+    showAppModal('İşlem sürüyor','Nokta kaydı tamamlandıktan sonra olay bildirebilirsiniz.','hourglass_empty');return;
+  }
+  // Aktif devriye cihazda korunur; olay ekranından dönüşte aynı devriye devam eder.
+  location.href=new URL('olay.html',window.KolartOffline.base).href;
+};
 window.addEventListener('online',()=>{onlineSessionPromise=null;void refreshQueueLabel().catch(()=>{});});
 window.addEventListener('offline',()=>{onlineSessionPromise=null;void refreshQueueLabel().catch(()=>{});});
 window.addEventListener('kolart-queue-change',()=>void refreshQueueLabel().catch(()=>{}));
