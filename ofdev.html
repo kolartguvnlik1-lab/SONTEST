@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#080808">
   <title>KOLART — Devriye</title>
-  <!-- ofdev:20261020-1 · Saatler online, devriye kaydı mevcut offline altyapıyla. -->
+  <!-- ofdev:20261020-4 · Hızlı saat yükleme, ortalı simge ve 5 saniyelik tamamlanma ekranı. -->
   <!-- Bu dosyayı offline-paket.js, offline-sync.js ve vendor klasörüyle aynı dizine koyun. -->
   <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('kolart-theme-tone') || 'elite-neon');}catch(_){}</script>
   <script defer src="./offline-sync.js?v=20261009-elit-1"></script>
@@ -172,9 +172,14 @@ header{padding-top:calc(20px + env(safe-area-inset-top))}.header-left .material-
 .qr-icon-side svg{width:25px;height:25px;display:block}.qr-icon-side .material-symbols-outlined svg{width:25px;height:25px}
 .patrol-footer{left:50%;transform:translateX(-50%);padding-bottom:calc(24px + env(safe-area-inset-bottom))}
 .patrol-footer .action-btn{width:auto;letter-spacing:.2px;overflow-wrap:anywhere}.patrol-footer .material-symbols-outlined{font-size:22px;margin-right:7px}
-#incidentBtn{display:none!important}#ofdevQueueArea{margin:8px 16px 10px}#offlineUserLabel{font-size:10px;color:var(--text-dim);line-height:1.5;margin:0 0 8px}
+#ofdevQueueArea{margin:8px 16px 10px}#offlineUserLabel{font-size:10px;color:var(--text-dim);line-height:1.5;margin:0 0 8px}
 #offlineUploadBtn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 9px;border:1px solid var(--border);border-radius:14px;background:var(--card);color:var(--primary);font-size:10px;font-weight:900;letter-spacing:.3px}
 #offlineUploadCount{min-width:22px;padding:4px 6px;border:1px solid var(--primary);border-radius:6px}
+#offlineUploadBtn.has-pending-records{border:2px solid #ff3b30;background:#281010;color:#ffd4d0;animation:ofdev-pending-pulse 1.8s ease-in-out infinite}
+#offlineUploadBtn.has-pending-records #offlineUploadCount{border-color:#ff675d;background:#ff3b301a;color:#fff}
+#offlineUploadBtn.has-pending-records:disabled{opacity:.8}#offlineUploadBtn[aria-busy="true"]{animation:none}
+@keyframes ofdev-pending-pulse{0%,100%{border-color:#d7352c;box-shadow:0 0 0 0 #ff3b3040,0 0 5px #ff3b3012;background:#281010}50%{border-color:#ff8279;box-shadow:0 0 0 5px #ff3b3000,0 0 20px #ff3b3060;background:#3b1515}}
+@media(prefers-reduced-motion:reduce){#offlineUploadBtn.has-pending-records{animation:none;box-shadow:0 0 12px #ff3b3038}}
 .modal,#hourSelectModal,#confirmPatrolModal{display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.96);align-items:center;justify-content:center;padding:24px;overflow:auto}
 .modal{flex-direction:row}.dialog-card,.startup-card{width:100%;max-width:350px;max-height:calc(100dvh - 48px);overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:28px;padding:25px;text-align:center}
 #blockSelectModal{z-index:10010}#equipmentModal{z-index:10020}#confirmPatrolModal{z-index:10030}#qrScannerModal{z-index:15000}#appModal{z-index:30000}#uploadAccessModal{z-index:40000}
@@ -189,6 +194,17 @@ header{padding-top:calc(20px + env(safe-area-inset-top))}.header-left .material-
 #securityOverlay h2{font-size:20px;font-weight:900}#securityOverlay p{font-size:12px;line-height:1.7;color:#aaa;max-width:300px}.location-pulse{color:var(--primary);margin-bottom:20px}.location-pulse svg{width:55px;height:55px}.stay-note{border:1px solid var(--error);color:var(--error)!important;padding:14px;border-radius:13px;margin-top:20px}
 #hourSelectModal .dialog-card,#confirmPatrolModal .dialog-card{border:1px solid #00ffcc;border-radius:16px;box-shadow:0 0 15px #00ffcc12;max-width:400px}#hourTitle,#confirmTitle{color:#00ffcc;font-size:18px;letter-spacing:.5px}#hourDateLabel{font-size:10px;color:#aaa;margin-bottom:18px;line-height:1.6}
 #hourListArea{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-height:48dvh;overflow:auto}.hour-choice{background:#222;color:white;border:1px solid #444;padding:16px 8px;border-radius:10px;cursor:pointer}.hour-choice:hover{border-color:#00ffcc}.hour-choice strong{display:block;font-size:19px;font-weight:900}.hour-choice span{display:block;font-size:9px;color:#aaa;margin-top:5px}.hour-empty{grid-column:1/-1;font-size:12px;line-height:1.7;padding:15px;color:#ddd}.confirm-hour{display:block;color:#00ffcc;font-size:28px;margin-bottom:15px}#confirmPatrolText{font-size:14px;line-height:1.7}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.hour-loading{grid-column:1/-1;display:grid;place-items:center;position:relative;min-height:170px;width:100%;color:#00ffcc}
+.hour-loading-ring{position:absolute;width:62px;height:62px;border-radius:50%;border:3px solid #00ffcc17;border-top-color:#00ffcc;border-right-color:#00ffcc60;animation:ofdev-hour-spin .9s linear infinite;box-shadow:0 0 22px #00ffcc0a}
+.hour-loading-clock{display:block;width:25px;height:25px;color:#b7ffed}
+@keyframes ofdev-hour-spin{to{transform:rotate(360deg)}}
+#patrolCompleteModal{z-index:50000;background:#030806eb;backdrop-filter:blur(16px)}
+.completion-card{width:100%;max-width:350px;padding:34px 25px 30px;border:1px solid #2ecc7145;border-radius:28px;background:radial-gradient(ellipse at 50% 0,#2ecc711a,transparent 65%),#111614;box-shadow:0 24px 80px #0008;text-align:center}
+.completion-check{display:grid;place-items:center;width:66px;height:66px;margin:0 auto 23px;border:1px solid #2ecc7155;border-radius:50%;background:#2ecc7112;box-shadow:0 0 0 9px #2ecc7106;color:#76e7a7}.completion-check svg{width:34px;height:34px}
+#completeTitle{font-size:23px;line-height:1.35;font-weight:900;letter-spacing:-.4px;margin:0 0 14px;color:#f0fff6}#completeDescription{font-size:12px;line-height:1.7;color:#adbbb3;margin:0}
+.completion-count{display:flex;flex-direction:column;align-items:center;gap:6px;margin:26px 0 24px}#completeSeconds{font-size:62px;line-height:1;font-weight:900;letter-spacing:-2px;color:#79e9aa;font-variant-numeric:tabular-nums}.completion-unit{font-size:9px;letter-spacing:2px;font-weight:800;color:#7a9a88}
+.completion-track{height:4px;background:#2ecc7115;border-radius:9px;overflow:hidden}#completeProgressFill{height:100%;width:100%;background:linear-gradient(90deg,#2ecc71,#a2f8c6);border-radius:inherit;transition:width .1s linear}
 .equipment-list{display:grid;gap:10px;margin-bottom:18px;text-align:left}.equipment-item{background:#1a1a1a;padding:15px;border-radius:15px}.equipment-item p{font-size:11px;color:var(--primary);font-weight:900;margin:0 0 12px}.equipment-options{display:flex;gap:10px}.equipment-options button{flex:1;padding:11px;border:1px solid #444;border-radius:10px;background:none;color:#fff;font-weight:900;font-size:12px}#finalStartBtn{opacity:.3;pointer-events:none}
 #uploadAccessModal input{width:100%;padding:14px;background:#000;border:1px solid #444;border-radius:12px;color:white;margin-bottom:12px}.access-status{font-size:12px;color:#ccc;line-height:1.6;margin-bottom:15px}
 #startupGate{position:fixed;inset:0;z-index:210000;display:grid;place-items:center;background:var(--bg);padding:24px}.startup-logo{font-size:28px;font-weight:900;color:var(--primary);letter-spacing:2px;margin-bottom:25px}#startupTitle{font-size:15px;font-weight:900;margin:0 0 15px}#startupMessage{font-size:12px;color:#aaa;line-height:1.8;margin:0}#startupActions{margin-top:24px}
@@ -254,7 +270,7 @@ header{padding-top:calc(20px + env(safe-area-inset-top))}.header-left .material-
             <span style="font-size: 13px; font-weight: 900; text-transform: uppercase;">BİTİR</span>
         </button>
 
-        <button id="incidentBtn" class="action-btn" style="background: #1a1a1a; color: #ff3b30; border: 1px solid #ff3b30; flex: 1; min-height: 56px; display: none; align-items: center; justify-content: center; padding: 0 15px; border-radius: 20px;">
+        <button id="incidentBtn" class="action-btn" style="background: #ff3b30; color: #fff; border: 1px solid #ff3b30; flex: 1; min-height: 56px; display: none; align-items: center; justify-content: center; padding: 0 15px; border-radius: 20px;">
             <span class="material-symbols-outlined">report</span>
             <span style="font-size: 13px; font-weight: 900; text-transform: uppercase;">OLAY BİLDİR</span>
         </button>
@@ -281,6 +297,15 @@ header{padding-top:calc(20px + env(safe-area-inset-top))}.header-left .material-
 <div id="startupGate" role="status" aria-live="polite">
   <div class="startup-card"><div class="startup-logo">KOD</div><h2 id="startupTitle">DEVRİYE HAZIRLANIYOR</h2><p id="startupMessage">Telefon paketi açılıyor…</p>
   <div id="startupActions" hidden><button type="button" id="startupRetry" class="primary-button">TEKRAR DENE</button><button type="button" id="startupHome" class="secondary-button">ANA GİRİŞ EKRANI</button></div></div>
+</div>
+<div id="patrolCompleteModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="completeTitle" aria-describedby="completeDescription" tabindex="-1">
+  <div class="completion-card">
+    <div class="completion-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m6 12 4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <h2 id="completeTitle">Devriyeniz tamamlanmıştır.</h2>
+    <p id="completeDescription">Anasayfaya yönlendiriliyorsunuz.</p>
+    <div class="completion-count"><span id="completeSeconds" aria-live="polite" aria-atomic="true">5</span><span class="completion-unit">SANİYE</span></div>
+    <div id="completeProgress" class="completion-track" role="progressbar" aria-label="Anasayfaya yönlendirme" aria-valuemin="0" aria-valuemax="5" aria-valuenow="5"><div id="completeProgressFill"></div></div>
+  </div>
 </div>
 <script>
 document.addEventListener('DOMContentLoaded',function(){
@@ -381,10 +406,11 @@ window.checkEq = (tip, cevap) => {
     }
 };
 function uiStartMode() {
-    document.getElementById('backHomeBtn').style.display = "flex";
+    document.getElementById('backHomeBtn').style.display = "none";
     document.getElementById('startBtn').style.display = "none";
     document.getElementById('endBtn').style.display = "flex";
-    document.getElementById('incidentBtn').style.display = "none"; 
+    renderEndButton();
+    document.getElementById('incidentBtn').style.display = "flex"; 
     document.getElementById('statusLabel').innerText = "AKTİF DEVRİYE";
     document.getElementById('selectedHourStatus').textContent=(secilenHedefSaat || '')+' devriyesi';
 }
@@ -641,6 +667,37 @@ function startTimerLoop() {
     }, 1000);
 }
 /* SAAT İŞLEMLERİ: yalnız canlı Firebase; paket saatleri bu akışta kullanılmaz. */
+let trustedTimeSample=null,timeLookupPromise=null,timeRetryAfter=0;
+let completionInterval=null,completionDeadline=0;
+function showHourLoading(area) {
+  area.setAttribute('aria-busy','true');
+  area.innerHTML='<div class="hour-loading" role="status"><span class="hour-loading-ring" aria-hidden="true"></span><svg class="hour-loading-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="sr-only">Devriye saatleri hazırlanıyor</span></div>';
+}
+function updatePatrolCompletion() {
+  if(!completionDeadline)return;
+  const remaining=Math.max(0,completionDeadline-performance.now());
+  const seconds=Math.ceil(remaining/1000);
+  const number=document.getElementById('completeSeconds');
+  if(number.textContent!==String(seconds))number.textContent=String(seconds);
+  document.getElementById('completeProgressFill').style.width=(remaining/5000*100)+'%';
+  document.getElementById('completeProgress').setAttribute('aria-valuenow',String(seconds));
+  if(remaining<=0) {
+    clearInterval(completionInterval);completionInterval=null;completionDeadline=0;
+    location.href=new URL('guvenlik.html',window.KolartOffline.base).href;
+  }
+}
+function showPatrolCompletion() {
+  if(completionInterval)clearInterval(completionInterval);
+  completionDeadline=performance.now()+5000;
+  document.querySelector('.app-container').inert=true;
+  const modal=document.getElementById('patrolCompleteModal');
+  modal.style.display='flex';modal.focus();
+  updatePatrolCompletion();
+  completionInterval=setInterval(updatePatrolCompletion,100);
+}
+function renderEndButton() {
+  document.getElementById('endBtn').innerHTML='<span class="material-symbols-outlined" aria-hidden="true">stop_circle</span><span style="font-size:13px;font-weight:900;text-transform:uppercase">BİTİR</span>';
+}
 function startupProblem(title,message) {
   unlocked=false;
   document.querySelector('.app-container').inert=true;
@@ -660,8 +717,10 @@ async function refreshQueueLabel() {
   document.getElementById('patrolDateLabel').textContent=new Date().toLocaleDateString('tr-TR',{day:'numeric',month:'long'});
   document.getElementById('ofdevQueueArea').hidden=!pending;
   const upload=document.getElementById('offlineUploadBtn');
-  upload.hidden=!navigator.onLine;
-  upload.disabled=!pending || isSyncOutboxRunning;
+  upload.hidden=!pending;
+  upload.disabled=!pending || !navigator.onLine || isSyncOutboxRunning;
+  upload.classList.toggle('has-pending-records',pending>0);
+  upload.setAttribute('aria-busy',String(isSyncOutboxRunning));
   document.getElementById('offlineUploadCount').textContent=String(pending);
 }
 function stopPosition() {
@@ -670,7 +729,7 @@ function stopPosition() {
   document.getElementById('securityOverlay').style.display='none';
 }
 async function bootPatrol() {
-  if(booting || pointSaving || isFinalizing || isSyncOutboxRunning)return;
+  if(booting || pointSaving || isFinalizing || isSyncOutboxRunning || completionDeadline)return;
   booting=true;const epoch=++bootEpoch;
   const gate=document.getElementById('startupGate');
   gate.style.display='grid';document.getElementById('startupActions').hidden=true;
@@ -697,6 +756,8 @@ async function bootPatrol() {
     await restorePatrol(candidate);
     if(epoch!==bootEpoch)return;
     unlocked=true;document.querySelector('.app-container').inert=false;gate.style.display='none';
+    // Bağlantı ve saat kontrolünü sessizce hazırla; canlı plan/tolerans her listede yeniden okunur.
+    if(navigator.onLine){void hourContext().catch(()=>{});void checkTimeAndGetDate().catch(()=>{});}
     if(navigator.storage?.persist)void navigator.storage.persist().catch(()=>{});
   } catch(error) {
     if(epoch===bootEpoch)startupProblem('DEVRİYE AÇILAMADI',error.message || 'Telefon paketi okunamadı. Tekrar deneyin.');
@@ -747,20 +808,41 @@ async function freshHourRead(context,path) {
   } finally {clearTimeout(timer);}
 }
 async function checkTimeAndGetDate() {
-  const sources=[
-    ['https://worldtimeapi.org/api/timezone/Europe/Istanbul','datetime'],
-    ['https://timeapi.io/api/time/current/zone?timeZone=Europe/Istanbul','dateTime']
-  ];
-  for(const [url,field] of sources) {
-    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),3500);
-    try {
-      const response=await fetch(url,{cache:'no-store',signal:controller.signal});
-      if(!response.ok)continue;
-      const date=new Date((await response.json())[field]);
-      if(Number.isFinite(date.getTime()))return {date,isApi:true};
-    } catch(_){} finally {clearTimeout(timer);}
-  }
-  return {date:new Date(),isApi:false};
+  const now=performance.now();
+  if(trustedTimeSample && now-trustedTimeSample.checkedAt<60000)
+    return {date:new Date(trustedTimeSample.time+now-trustedTimeSample.checkedAt),isApi:true};
+  if(!navigator.onLine || now<timeRetryAfter)return {date:new Date(),isApi:false};
+  if(timeLookupPromise)return timeLookupPromise;
+  timeLookupPromise=new Promise(resolve=>{
+    const controllers=[];let settled=false,failed=0;
+    const finish=result=>{
+      if(settled)return;settled=true;clearTimeout(deadline);
+      controllers.forEach(controller=>controller.abort());
+      if(!result.isApi)timeRetryAfter=performance.now()+5000;
+      resolve(result);
+    };
+    const deadline=setTimeout(()=>finish({date:new Date(),isApi:false}),1500);
+    for(const [url,field] of [
+      ['https://worldtimeapi.org/api/timezone/Europe/Istanbul','datetime'],
+      ['https://timeapi.io/api/time/current/zone?timeZone=Europe/Istanbul','dateTime']
+    ]) {
+      const controller=new AbortController();controllers.push(controller);
+      void (async()=>{
+        try {
+          const response=await fetch(url,{cache:'no-store',signal:controller.signal});
+          if(!response.ok)throw new Error('Saat servisine ulaşılamadı.');
+          const date=new Date((await response.json())[field]);
+          if(!Number.isFinite(date.getTime()))throw new Error('Saat yanıtı geçersiz.');
+          if(settled)return;
+          trustedTimeSample={time:date.getTime(),checkedAt:performance.now()};
+          finish({date,isApi:true});
+        } catch(_) {
+          failed++;if(failed===2)finish({date:new Date(),isApi:false});
+        }
+      })();
+    }
+  }).finally(()=>{timeLookupPromise=null;});
+  return timeLookupPromise;
 }
 function checkedDate(timeResult) {
   const now=new Date(),d=timeResult.date;
@@ -782,19 +864,28 @@ function planFor(settings,shift) {
   return [...new Set(list.filter(saat=>typeof saat==='string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(saat)))].sort((a,b)=>weight(a)-weight(b));
 }
 function toleranceOf(settings) {
-  const value=parseInt(settings.dakikaToleransi,10);
-  return Number.isFinite(value) ? Math.max(0,value) : 0;
+  return settings.dakikaToleransi==null ? 0 : parseInt(settings.dakikaToleransi,10);
 }
 function hourPath(shiftDate,mode,block,hour='') {
   return 'tamamlananDevriyeSaatleri/'+shiftDate+(mode==='blok'?'/'+block:'')+(hour?'/'+hour:'');
 }
 function hourWindow(hour,shift,tolerance,date) {
-  const [h,m]=hour.split(':').map(Number),start=new Date(shift.start);
-  if(h<8)start.setDate(start.getDate()+1);
-  start.setHours(h,m,0,0);
-  const end=new Date(start);end.setMinutes(end.getMinutes()+59+tolerance,59,999);
-  const format=`${String(end.getHours()).padStart(2,'0')}:${String(end.getMinutes()).padStart(2,'0')}`;
-  return {allowed:date>=start && date<=end,start,end,format};
+  // Bekleyen başlangıç onayı da kaynak dosyanın dakika/gece yarısı hesabını kullanır.
+  const suAnkiToplamDakika=date.getHours()*60+date.getMinutes();
+  const hedefParcalar=hour.split(':');
+  const hedefToplamDakika=parseInt(hedefParcalar[0],10)*60+parseInt(hedefParcalar[1],10);
+  const devriyeBitisDakikasi=hedefToplamDakika+59+tolerance;
+  const bitisSaati=Math.floor((devriyeBitisDakikasi%1440)/60);
+  const bitisDk=devriyeBitisDakikasi%60;
+  const format=`${String(bitisSaati).padStart(2,'0')}:${String(bitisDk).padStart(2,'0')}`;
+  let allowed=false;
+  if(devriyeBitisDakikasi<1440) {
+    if(suAnkiToplamDakika>=hedefToplamDakika && suAnkiToplamDakika<=devriyeBitisDakikasi)allowed=true;
+  } else {
+    const kalanDakika=devriyeBitisDakikasi-1440;
+    if(suAnkiToplamDakika>=hedefToplamDakika || suAnkiToplamDakika<=kalanDakika)allowed=true;
+  }
+  return {allowed,format};
 }
 function requireValidHour(hour,live,expectedShift) {
   if(expectedShift && live.shift.key!==expectedShift)throw new Error('Vardiya günü değişti. Devriye saatlerini yeniden açıp saat seçin.');
@@ -811,49 +902,161 @@ async function liveSchedule() {
   if(shift.isSunday)settings.pazarSaatleri=(await freshHourRead(context,'sistemAyarlari/pazarSaatleri')).val();
   return {context,date,loadedAt:Date.now(),shift,settings,mode:settings.saatModu==='blok'?'blok':'tekli',hours:planFor(settings,shift)};
 }
-window.openHourSelectModal=async()=>{
-  if(!unlocked || devriyeStarted || isFinalizing || document.getElementById('finalStartBtn').disabled)return;
-  const modal=document.getElementById('hourSelectModal'),area=document.getElementById('hourListArea');
-  const epoch=++hourListEpoch;selectedSchedule=null;
-  modal.style.display='flex';area.innerHTML='<div class="hour-empty">DEVRİYE SAATLERİ MERKEZDEN ALINIYOR…</div>';
-  document.getElementById('hourDateLabel').textContent='';
-  const block=currentBlock;
-  try {
-    const live=await liveSchedule();
-    const completed=(await freshHourRead(live.context,hourPath(live.shift.key,live.mode,block))).val() || {};
-    if(epoch!==hourListEpoch || currentBlock!==block || !unlocked)return;
-    document.getElementById('hourDateLabel').textContent=live.shift.start.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})+' · '+(live.shift.isSunday?'Pazar planı':'Normal plan');
-    const selectable=live.hours.filter(hour=>!completed[hour]);area.replaceChildren();
-    if(!selectable.length){area.innerHTML='<div class="hour-empty">'+(live.hours.length?'TÜM DEVRİYELER ATILMIŞ!':'Bu güne ait planlı devriye saati bulunmuyor.')+'</div>';return;}
-    for(const hour of selectable) {
-      const button=document.createElement('button');button.type='button';button.className='hour-choice';
-      const title=document.createElement('strong');title.textContent=hour;button.appendChild(title);
-      button.onclick=()=>{
-        if(devriyeStarted || isFinalizing || currentBlock!==block)return;
-        // Online sayfayla aynı başlangıç + 59 dakika + tolerans penceresi.
-        const date=new Date(live.date.getTime()+Math.max(0,Date.now()-live.loadedAt));
-        const candidate={...live,date,shift:shiftDetails(date)};
-        try{requireValidHour(hour,candidate,live.shift.key);}catch(error){showAppModal('GEÇERSİZ ZAMAN!',escapeHTML(error.message),'timer_off');return;}
-        const confirm=document.getElementById('confirmPatrolModal');
-        document.getElementById('confirmPatrolText').innerHTML=`<span class="confirm-hour">${hour}</span>Devriyesini başlatacaksınız.<br>Onaylıyor musunuz?`;
-        confirm.style.display='flex';
-        document.getElementById('btnConfirmCancel').onclick=()=>{confirm.style.display='none';};
-        document.getElementById('btnConfirmOk').onclick=()=>{
-          if(currentBlock!==block || devriyeStarted)return;
-          confirm.style.display='none';modal.style.display='none';secilenHedefSaat=hour;
-          selectedSchedule={shiftDate:live.shift.key,block,hour};
-          document.getElementById('equipmentModal').style.display='flex';
-        };
-      };
-      area.appendChild(button);
+window.openHourSelectModal = async () => {
+    if(!unlocked || devriyeStarted || isFinalizing || document.getElementById('finalStartBtn').disabled)return;
+    const epoch=++hourListEpoch,blockAtOpen=currentBlock;selectedSchedule=null;
+    const modal = document.getElementById('hourSelectModal');
+    const area = document.getElementById('hourListArea');
+    modal.style.display = 'flex';
+    showHourLoading(area);
+
+    // 1. TAM YÜKLENİRKEN ARKA PLANDA SESSİZCE KONTROL EDİLİYOR
+    let timeResult,context;
+    try{[timeResult,context]=await Promise.all([checkTimeAndGetDate(),hourContext()]);}
+    catch(error){const message=document.createElement('div');message.className='hour-empty';message.textContent=error.message;area.replaceChildren(message);area.setAttribute('aria-busy','false');return;}
+    let d = timeResult.date;
+
+    // EĞER API'DEN CEVAP GELDİYSE VE TELEFONUN TARİH/SAATİ YANLIŞSA ANINDA ENGELLE!
+    if (timeResult.isApi) {
+        const cihazTarihi = new Date();
+        const cihazTarihStr = `${cihazTarihi.getFullYear()}-${cihazTarihi.getMonth()}-${cihazTarihi.getDate()}`;
+        const gercekTarihStr = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+
+        // Tarih eşleşmiyorsa veya Saat farkı 10 dakikadan fazlaysa patlat
+        const saatFarkiDk = Math.abs((cihazTarihi.getTime() - d.getTime()) / (1000 * 60));
+
+        if (cihazTarihStr !== gercekTarihStr || saatFarkiDk > 10) {
+            modal.style.display = 'none';
+            showAppModal(
+                "TARİH VE SAAT HATASI!", 
+                "Telefonunuzun Tarih ve Saati Yanlıştır!<br><br>Lütfen telefon ayarlarından <b>'Otomatik Tarih ve Saat'</b> seçeneğini aktif edip tekrar deneyiniz.", 
+                "error"
+            );
+            return;
+        }
     }
-  } catch(error) {
-    if(epoch!==hourListEpoch)return;
-    const empty=document.createElement('div');empty.className='hour-empty';empty.textContent=error.message;area.replaceChildren(empty);
-  }
+
+    // Vardiya Günü Hesaplama (Gece 08:00'a kadar olanı dünkü vardiya say)
+    let shiftDate = new Date(d);
+    if (shiftDate.getHours() < 8) { shiftDate.setDate(shiftDate.getDate() - 1); }
+    const vardiyaTarihi = `${shiftDate.getFullYear()}-${String(shiftDate.getMonth() + 1).padStart(2, '0')}-${String(shiftDate.getDate()).padStart(2, '0')}`;
+
+    document.getElementById('hourDateLabel').textContent=shiftDate.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})+' · '+(shiftDate.getDay()===0?'Pazar planı':'Normal plan');
+    const isSunday = shiftDate.getDay() === 0;
+    let tumSaatler = [];
+
+    try {
+        const db=context.db;
+        const {get,ref}=context.database;
+        // Plan, mod ve tolerans birbirini beklemeden aynı anda merkezden okunur.
+        const planRequest=(async()=>{
+            if(isSunday){
+                const pazarSnap=await get(ref(db,'sistemAyarlari/pazarSaatleri'));
+                if(pazarSnap.exists())return pazarSnap.val();
+            }
+            const planliSnap=await get(ref(db,'sistemAyarlari/planliSaatler'));
+            return planliSnap.exists()?planliSnap.val():[];
+        })();
+        const [plan,ayarSnap,tolSnap]=await Promise.all([planRequest,
+            get(ref(db,'sistemAyarlari/saatModu')),get(ref(db,'sistemAyarlari/dakikaToleransi'))]);
+        tumSaatler=plan;
+        const saatModu = ayarSnap.exists() ? ayarSnap.val() : 'tekli';
+        const tolerans = tolSnap.exists() ? parseInt(tolSnap.val(), 10) : 0;
+
+        let tamamlananPath = `tamamlananDevriyeSaatleri/${vardiyaTarihi}`;
+
+        if (saatModu === 'blok') {
+            tamamlananPath += `/${currentBlock}`;
+        }
+
+        const tamamlananSnap = await get(ref(db, tamamlananPath));
+        area.setAttribute('aria-busy','false');
+        const bitenSaatler = tamamlananSnap.exists() ? tamamlananSnap.val() : {};
+        if(epoch!==hourListEpoch || !unlocked || devriyeStarted || currentBlock!==blockAtOpen)return;
+
+        const secilebilirSaatler = tumSaatler.filter(saat => !bitenSaatler[saat]);
+        secilebilirSaatler.sort((a, b) => {
+            const saatA = parseInt(a.split(':')[0], 10);
+            const saatB = parseInt(b.split(':')[0], 10);
+            const agirlikA = saatA >= 8 ? saatA : saatA + 24;
+            const agirlikB = saatB >= 8 ? saatB : saatB + 24;
+            return agirlikA - agirlikB;
+        });
+
+        if (secilebilirSaatler.length > 0) {
+            area.innerHTML = "";
+            secilebilirSaatler.forEach(saat => {
+                const btn = document.createElement('button');
+                btn.type='button';btn.className='hour-choice';
+                const label=document.createElement('strong');label.textContent=saat;btn.appendChild(label);
+                
+                btn.onmouseover = () => btn.style.borderColor = "#00ffcc";
+                btn.onmouseout = () => btn.style.borderColor = "#444";
+
+                btn.onclick = () => {
+                    if(!unlocked || devriyeStarted || isFinalizing || currentBlock!==blockAtOpen)return;
+                    if (!saat || typeof saat !== 'string' || !saat.includes(':')) {
+                        showAppModal("SİSTEM HATASI", "Devriye saat bilgisi hatalı!", "error");
+                        return;
+                    }
+
+                    // Saat hesaplamaları başlangıçta doğrulanan 'd' (veya cihaz) saati üzerinden yapılır
+                    const simdi = d;
+                    const suAnkiToplamDakika = (simdi.getHours() * 60) + simdi.getMinutes();
+                    
+                    const hedefParcalar = saat.split(':');
+                    const hedefToplamDakika = (parseInt(hedefParcalar[0], 10) * 60) + parseInt(hedefParcalar[1], 10);
+                    
+                    const devriyeBitisDakikasi = hedefToplamDakika + 59 + tolerans; 
+
+                    const bitisSaati = Math.floor((devriyeBitisDakikasi % 1440) / 60);
+                    const bitisDk = devriyeBitisDakikasi % 60;
+                    const formatliBitis = `${String(bitisSaati).padStart(2, '0')}:${String(bitisDk).padStart(2, '0')}`;
+
+                    let zamanDogruMu = false;
+                    if (devriyeBitisDakikasi < 1440) {
+                        if (suAnkiToplamDakika >= hedefToplamDakika && suAnkiToplamDakika <= devriyeBitisDakikasi) zamanDogruMu = true;
+                    } else {
+                        const kalanDakika = devriyeBitisDakikasi - 1440;
+                        if (suAnkiToplamDakika >= hedefToplamDakika || suAnkiToplamDakika <= kalanDakika) zamanDogruMu = true;
+                    }
+
+                    if (!zamanDogruMu) {
+                        showAppModal("GEÇERSİZ ZAMAN!", `${saat} devriyesini sadece ${saat} ile ${formatliBitis} saatleri arasında başlatabilirsiniz!`, "timer_off");
+                        return;
+                    }
+
+                    // Modal Onay İşlemi
+                    const confirmModal = document.getElementById('confirmPatrolModal');
+                    document.getElementById('confirmPatrolText').innerHTML = `<span style="color:#00ffcc; font-size:24px; text-shadow: 0 0 5px #00ffcc;">${saat}</span><br><br>Devriyesini başlatacaksınız.<br>Onaylıyor musunuz?`;
+                    confirmModal.style.display = 'flex';
+
+                    document.getElementById('btnConfirmOk').onclick = () => {
+                        if(!unlocked || devriyeStarted || isFinalizing || currentBlock!==blockAtOpen)return;
+                        confirmModal.style.display = 'none';
+                        secilenHedefSaat = saat;
+                        selectedSchedule={shiftDate:vardiyaTarihi,block:blockAtOpen,hour:saat};
+                        modal.style.display = 'none';
+                        document.getElementById('equipmentModal').style.display = 'flex';
+                    };
+
+                    document.getElementById('btnConfirmCancel').onclick = () => {
+                        confirmModal.style.display = 'none';
+                    };
+                };
+                area.appendChild(btn);
+            });
+        } else {
+            area.innerHTML = `<div style="color:#ff3b30; padding:20px; font-weight:bold;">TÜM DEVRİYELER ATILMIŞ!</div>`;
+        }
+    } catch(e) {
+        area.setAttribute('aria-busy','false');
+        area.innerHTML = `<div style="color:#ff3b30; padding:20px;">BAĞLANTI HATASI!</div>`;
+    }
 };
 document.getElementById('startBtn').onclick=()=>{
   if(!unlocked || devriyeStarted || isFinalizing)return;
+  if(!navigator.onLine){showAppModal('BAĞLANTI HATASI','Devriyeyi başlatmak için internet şart!','signal_wifi_off');return;}
   eqStatus={gps:null,fener:null,yelek:null};
   for(const t of ['gps','fener','yelek'])for(const answer of ['Evet','Hayir']){
     const button=document.getElementById(t+answer);button.style.background='none';button.style.color='#fff';
@@ -895,9 +1098,10 @@ document.getElementById('finalStartBtn').onclick=async()=>{
   const button=document.getElementById('finalStartBtn');button.disabled=true;
   let prepared=false;
   try {
-    const live=await liveSchedule();
+    const context=await hourContext();
+    const mode=await context.database.get(context.database.ref(context.db,'sistemAyarlari/saatModu'));
+    const live={context,mode:mode.exists()?mode.val():'tekli',shift:shiftDetails(new Date())};
     if(selectedSchedule.block!==currentBlock)throw new Error('Bölge değişti. Devriye saatini yeniden seçin.');
-    requireValidHour(secilenHedefSaat,live,selectedSchedule.shiftDate);
     startTime=new Date();readPoints=[];
     patrolId='P_'+Date.now()+'_'+crypto.randomUUID().replace(/-/g,'').slice(0,12);
     patrolMeta={siteID,uid:currentUser.uid,username:currentUser.username,shiftDate:live.shift.key,saatModu:live.mode};
@@ -988,7 +1192,7 @@ document.getElementById('endBtn').onclick=()=>{
 async function finalizeOffline(note,missed) {
   if(isFinalizing || !devriyeStarted)return;
   isFinalizing=true;
-  const button=document.getElementById('endBtn');button.disabled=true;button.textContent='TELEFONA KAYDEDİLİYOR…';
+  const button=document.getElementById('endBtn');button.disabled=true;button.textContent='BİTİRİLİYOR…';
   if(mainTimerInterval)clearInterval(mainTimerInterval);stopPosition();
   const dateKey=`${startTime.getFullYear()}-${String(startTime.getMonth()+1).padStart(2,'0')}-${String(startTime.getDate()).padStart(2,'0')}`;
   const log={patrolId,user:currentUser.username,name:currentUser.name || currentUser.username,
@@ -1002,12 +1206,12 @@ async function finalizeOffline(note,missed) {
     await window.KolartOfflineSync.enqueue(log,patrolMeta);
     // IndexedDB işlemi tamamlanmadan ekran ve aktif devriye temizlenmez.
     devriyeStarted=false;isFinalizing=false;readPoints=[];startTime=null;secilenHedefSaat=null;activeRoute=null;hourReservation=null;selectedSchedule=null;
-    uiReadyMode();await loadQRInterface();await refreshQueueLabel();
-    showAppModal('Devriyen kaydedildi','Kayıt telefonunda saklanıyor. Merkeze aktarmak için internet varken “Verileri merkeze gönder” butonuna bas.','check_circle');
+    // Tamamlanma modalı yalnız cihaz kuyruğu yazımı onaylandıktan sonra açılır.
+    showPatrolCompletion();
   } catch(error) {
     isFinalizing=false;startTimerLoop();
     showAppModal('KAYIT TAMAMLANAMADI','Aktif devriyeniz korunuyor. Tekrar bitirmeyi deneyin: '+escapeHTML(error.message),'error');
-  } finally {button.disabled=false;button.textContent='DEVRİYEYİ BİTİR';}
+  } finally {button.disabled=false;renderEndButton();}
 }
 window.openBlockModal=async()=>{
   if(!unlocked)return;
@@ -1047,9 +1251,9 @@ async function toIndex() {
   if(pointSaving || isFinalizing || isSyncOutboxRunning) {
     showAppModal('İşlem sürüyor','Kaydın tamamlanmasını bekle.','hourglass_empty');return;
   }
-  // Çıkış yalnız index.html'e yönlendirir. Auth/hatırlama/aktif kayıt silinmez.
+  // Anasayfa guvenlik.html'e yönlendirir. Auth/hatırlama/aktif kayıt silinmez.
   stopPosition();await window.closeScanner();
-  location.href=new URL('index.html',window.KolartOffline.base).href;
+  location.href=new URL('guvenlik.html',window.KolartOffline.base).href;
 }
 function within(promise,ms=30000) {
   let timer;return Promise.race([promise,new Promise((_,reject)=>timer=setTimeout(()=>reject(new Error('Merkez bağlantısı zaman aşımına uğradı. Kayıtların telefonda korunuyor.')),ms))]).finally(()=>clearTimeout(timer));
@@ -1139,13 +1343,22 @@ document.getElementById('startupHome').onclick=()=>{
   location.href=new URL('index.html',window.KolartOffline?.base || location.href).href;
 };
 document.getElementById('incidentBtn').style.display='none';
-window.addEventListener('online',()=>{onlineSessionPromise=null;void refreshQueueLabel().catch(()=>{});});
+document.getElementById('incidentBtn').onclick=()=>{
+  if(!unlocked || !devriyeStarted)return;
+  if(pointSaving || isFinalizing || isSyncOutboxRunning || countdownInterval || qrScanner) {
+    showAppModal('İşlem sürüyor','Nokta kaydı tamamlandıktan sonra olay bildirebilirsiniz.','hourglass_empty');return;
+  }
+  // Aktif devriye cihazda korunur; olay ekranından dönüşte aynı devriye devam eder.
+  location.href=new URL('olay.html',window.KolartOffline.base).href;
+};
+window.addEventListener('online',()=>{onlineSessionPromise=null;timeRetryAfter=0;void refreshQueueLabel().catch(()=>{});if(unlocked){void hourContext().catch(()=>{});void checkTimeAndGetDate().catch(()=>{});}});
 window.addEventListener('offline',()=>{onlineSessionPromise=null;void refreshQueueLabel().catch(()=>{});});
 window.addEventListener('kolart-queue-change',()=>void refreshQueueLabel().catch(()=>{}));
-window.addEventListener('pagehide',()=>{unlocked=false;stopPosition();void window.closeScanner();});
-window.addEventListener('pageshow',event=>{if(event.persisted)void bootPatrol();});
+window.addEventListener('pagehide',()=>{unlocked=false;if(completionInterval)clearInterval(completionInterval);completionInterval=null;completionDeadline=0;stopPosition();void window.closeScanner();});
+window.addEventListener('pageshow',event=>{if(event.persisted){document.getElementById('patrolCompleteModal').style.display='none';void bootPatrol();}});
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){stopPosition();void window.closeScanner();}
+  else if(completionDeadline){updatePatrolCompletion();}
   else if(!unlocked && !booting && !isSyncOutboxRunning)void bootPatrol();
   else void refreshQueueLabel().catch(()=>{});
 });
