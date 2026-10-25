@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>KOLART — Güvenlik Denetim Sistemi</title>
+    <script defer src="./offline-sync.js?v=20261008-2050"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
@@ -76,6 +77,131 @@ nav{position:fixed;bottom:0;background:#0c0c0c;display:flex;justify-content:spac
     50% { transform: scale(1.3); opacity: 1; }
     100% { transform: scale(0.95); opacity: 0.5; }
 }
+
+/* Nöbet tesliminde, index ile aynı kayıt kuyruğunu kullanan aktarım penceresi. */
+.guard-transfer[hidden], .guard-transfer [hidden] { display: none !important; }
+.guard-transfer { position: fixed; inset: 0; z-index: 1000000; display: flex; align-items: center; justify-content: center; padding: 16px; padding-top: max(16px, env(safe-area-inset-top)); padding-bottom: max(16px, env(safe-area-inset-bottom)); background: rgba(0,0,0,.88); overscroll-behavior: contain; }
+body.guard-transfer-open { overflow: hidden; }
+body.guard-transfer-open #kolartSyncModal { display: none !important; }
+.gt-card { width: 100%; max-width: 380px; max-height: 90vh; max-height: 90dvh; overflow-y: auto; overscroll-behavior: contain; padding: 24px 22px; border-radius: 28px; background: var(--surface-container); border: 1px solid var(--border); border-top: 3px solid var(--primary); box-shadow: 0 24px 65px rgba(0,0,0,.65); outline: none; }
+.gt-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 22px; }
+.gt-brand { color: var(--primary); font-size: 9px; font-weight: 900; letter-spacing: 1.4px; }
+.gt-private { color: #a0a0a0; font-size: 9px; white-space: nowrap; }
+.gt-symbol { width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; color: var(--primary); background: var(--surface); border: 1px solid var(--border); border-radius: 18px; margin-bottom: 18px; }
+.gt-symbol svg { width: 28px; height: 28px; }
+.gt-card h2 { font-size: 23px; font-weight: 900; line-height: 1.25; letter-spacing: -.6px; margin: 0 0 12px; color: var(--text-main); }
+.gt-copy { color: #b7b7bd; font-size: 13px; line-height: 1.7; margin: 0 0 18px; }
+.gt-summary { display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 18px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 8px; }
+.gt-count { font-size: 36px; font-weight: 900; line-height: 1; color: var(--primary); font-variant-numeric: tabular-nums; }
+.gt-summary-label { font-size: 11px; font-weight: 700; color: var(--text-main); }
+.gt-account { color: #a0a0a8; font-size: 10px; line-height: 1.6; margin-top: 5px; overflow-wrap: anywhere; }
+.gt-dates { max-height: 126px; overflow-y: auto; scrollbar-width: thin; margin-bottom: 16px; }
+.gt-date { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 3px; border-bottom: 1px solid var(--border); font-size: 12px; color: #b7b7bd; }
+.gt-date strong { color: var(--text-main); white-space: nowrap; font-size: 11px; }
+.gt-warning { display: flex; align-items: flex-start; gap: 9px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px; color: #b7b7bd; }
+.gt-warning svg { width: 17px; height: 17px; flex-shrink: 0; color: var(--primary); margin-top: 2px; }
+.gt-warning p { margin: 0; font-size: 11px; line-height: 1.7; }
+.gt-auth { margin-top: 16px; }
+.gt-auth label { display: block; font-size: 12px; font-weight: 700; }
+.gt-auth p { color: #b7b7bd; font-size: 11px; line-height: 1.7; margin: 8px 0; }
+.gt-auth input { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text-main); border-radius: 12px; padding: 14px; font-size: 16px; }
+.gt-progress { margin-top: 18px; }
+.gt-progress-row { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; color: #b7b7bd; font-size: 11px; }
+.gt-progress-row strong { color: var(--primary); font-variant-numeric: tabular-nums; }
+.gt-track { height: 8px; border-radius: 12px; background: var(--surface); overflow: hidden; }
+.gt-bar { width: 0; height: 100%; background: var(--primary); border-radius: 12px; transition: width .2s ease; }
+.gt-step { margin: 10px 0 0; color: #b7b7bd; font-size: 11px; line-height: 1.6; overflow-wrap: anywhere; }
+.gt-actions { display: flex; flex-direction: column; gap: 9px; margin-top: 20px; }
+.gt-actions button { width: 100%; min-height: 50px; border: 0; border-radius: 15px; padding: 14px 12px; font-size: 12px; font-weight: 900; cursor: pointer; }
+.gt-primary { background: var(--primary); color: var(--on-primary); }
+.gt-secondary { color: #c3c3c8; background: var(--surface); border: 1px solid var(--border) !important; }
+.gt-actions button:focus-visible, .gt-auth input:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.gt-actions button:disabled { opacity: .55; cursor: wait; }
+.gt-foot { color: #94949d; text-align: center; font-size: 10px; line-height: 1.7; margin: 14px 0 0; }
+.gt-card[data-state="success"] .gt-symbol { color: var(--success); border-color: var(--success); }
+.gt-card[data-state="error"] .gt-symbol { color: var(--error); }
+@media (max-width: 350px) { .guard-transfer { padding: 10px; }.gt-card { padding: 21px 17px; border-radius: 24px; }.gt-card h2 { font-size: 21px; }.gt-top { gap: 6px; }.gt-brand { font-size: 8px; letter-spacing: 1px; }.gt-private { font-size: 8px; } }
+@media (prefers-reduced-motion: reduce) { .gt-bar { transition: none; } }
+
+/* DEVRİYE DUVARI STİLİ: BAŞLANGIÇ */
+/* DEVRİYE DUVARI — mevcut tema ile uyumlu, yalnız bu bileşene ait stiller. */
+.pw-home { margin: 20px 0 6px; }
+.pw-launch { display: block; width: 100%; border: 1px solid var(--border); border-radius: 24px; padding: 18px; background: var(--surface-container); color: var(--text-main); text-align: left; cursor: pointer; transition: border-color .2s, transform .2s; }
+.pw-launch:active { transform: scale(.985); }
+.pw-launch:focus-visible, .pw-sheet button:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; }
+.pw-launch-head, .pw-heading, .pw-bottom, .pw-sheet-head, .pw-date-nav, .pw-row-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.pw-heading { justify-content: flex-start; gap: 10px; min-width: 0; }
+.pw-emblem { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border: 1px solid var(--border); border-radius: 13px; color: var(--primary); background: var(--surface); flex-shrink: 0; }
+.pw-home svg, .pw-sheet svg { width: 18px; height: 18px; flex-shrink: 0; }
+.pw-emblem svg { width: 21px; height: 21px; }
+.pw-titles { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.pw-eyebrow { color: var(--primary); font-size: 8px; font-weight: 800; letter-spacing: 1.5px; }
+.pw-name { font-size: 14px; font-weight: 900; letter-spacing: -.3px; }
+.pw-shift-tag { padding: 7px 8px; border: 1px solid var(--border); border-radius: 9px; font-size: 9px; color: #c8c8cf; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; background: var(--surface); }
+.pw-range { display: block; color: #acacb5; font-size: 10px; line-height: 1.6; margin-top: 13px; font-variant-numeric: tabular-nums; }
+.pw-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 13px; }
+.pw-stat { display: flex; flex-direction: column; gap: 5px; min-width: 0; padding: 10px 3px; border-radius: 12px; background: var(--surface); text-align: center; }
+.pw-stat strong { font-size: 20px; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+.pw-stat small { color: #a7a7b0; font-size: 8px; font-weight: 700; white-space: nowrap; }
+.pw-done { color: #55dfa2; }
+.pw-partial { color: #f4bd72; }
+.pw-missed { color: #ff858a; }
+.pw-waiting { color: #b5b5c0; }
+.pw-bottom { margin-top: 13px; gap: 8px; }
+.pw-note { display: flex; align-items: center; gap: 6px; min-width: 0; color: #ababB5; font-size: 9px; line-height: 1.6; }
+.pw-note::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #777782; flex-shrink: 0; }
+.pw-launch[data-state="ready"] .pw-note::before { background: #55dfa2; }
+.pw-launch[data-state="error"] .pw-note::before { background: #ff858a; }
+.pw-more { display: inline-flex; align-items: center; gap: 3px; color: var(--primary); font-size: 10px; font-weight: 800; white-space: nowrap; }
+.pw-more svg { width: 14px; height: 14px; }
+.pw-overlay[hidden], .pw-sheet [hidden] { display: none !important; }
+.pw-overlay { position: fixed; inset: 0; z-index: 90000; display: flex; align-items: flex-end; justify-content: center; background: rgba(0,0,0,.82); padding: 16px 10px 0; overscroll-behavior: contain; }
+body.pw-open { overflow: hidden; }
+.pw-sheet { width: 100%; max-width: 430px; max-height: 92vh; max-height: 92dvh; display: flex; flex-direction: column; min-height: 0; border: 1px solid var(--border); border-bottom: 0; border-radius: 28px 28px 0 0; background: var(--surface-container); color: var(--text-main); box-shadow: 0 -12px 48px rgba(0,0,0,.4); overflow: hidden; outline: none; animation: pw-enter .22s ease-out; }
+@keyframes pw-enter { from { opacity: .5; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+.pw-sheet-head { padding: 22px 20px 16px; flex-shrink: 0; }
+.pw-sheet-head h2 { font-size: 20px; font-weight: 900; letter-spacing: -.6px; margin-top: 5px; }
+.pw-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 13px; background: var(--surface); color: #d8d8e0; cursor: pointer; flex-shrink: 0; }
+.pw-icon-btn:disabled { opacity: .3; cursor: default; }
+.pw-date-nav { padding: 12px; margin: 0 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; flex-shrink: 0; }
+.pw-date-center { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 0; }
+.pw-date-title { font-size: 12px; font-weight: 800; text-align: center; }
+.pw-date-hours { color: #a7a7b1; font-size: 10px; font-variant-numeric: tabular-nums; }
+.pw-date-current { border: 0; border-radius: 8px; padding: 6px 8px; font-size: 9px; font-weight: 800; background: var(--surface-container); color: var(--primary); cursor: pointer; }
+.pw-modal-stats { margin: 14px 20px 0; flex-shrink: 0; }
+.pw-modal-stats .pw-stat { padding: 11px 3px; }
+.pw-status-line { min-height: 33px; padding: 10px 20px 7px; color: #a7a7b1; font-size: 10px; line-height: 1.6; flex-shrink: 0; }
+.pw-region-tabs { display: flex; gap: 7px; padding: 2px 20px 12px; overflow-x: auto; scrollbar-width: thin; flex-shrink: 0; }
+.pw-region-tabs button { flex-shrink: 0; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: var(--surface); color: #b9b9c2; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 10px; font-weight: 700; cursor: pointer; }
+.pw-region-tabs button[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.pw-list { padding: 3px 20px 18px; overflow-y: auto; min-height: 100px; overscroll-behavior: contain; scrollbar-width: thin; flex: 1; }
+.pw-day-label { display: flex; align-items: center; gap: 8px; margin: 15px 0 10px; font-size: 9px; font-weight: 800; letter-spacing: .5px; color: #adadb8; }
+.pw-day-label::after { content: ''; height: 1px; flex: 1; background: var(--border); }
+.pw-region-title { margin: 18px 0 4px; color: var(--primary); font-size: 12px; font-weight: 800; overflow-wrap: anywhere; }
+.pw-row { margin: 8px 0; padding: 14px; border: 1px solid var(--border); border-left: 3px solid #494952; border-radius: 15px; background: var(--surface); }
+.pw-row[data-status="done"] { border-left-color: #55dfa2; }
+.pw-row[data-status="partial"] { border-left-color: #f4bd72; }
+.pw-row[data-status="missed"] { border-left-color: #ff858a; }
+.pw-row[data-status="due"] { border-left-color: var(--primary); }
+.pw-time { font-size: 18px; font-weight: 800; letter-spacing: -.5px; font-variant-numeric: tabular-nums; }
+.pw-badge { padding: 6px 9px; border-radius: 8px; background: rgba(255,255,255,.04); color: #b5b5c0; font-size: 9px; font-weight: 800; white-space: nowrap; }
+.pw-row[data-status="done"] .pw-badge { color: #55dfa2; background: rgba(85,223,162,.08); }
+.pw-row[data-status="partial"] .pw-badge { color: #f4bd72; background: rgba(244,189,114,.08); }
+.pw-row[data-status="missed"] .pw-badge { color: #ff858a; background: rgba(255,133,138,.08); }
+.pw-row[data-status="due"] .pw-badge { color: var(--primary); }
+.pw-person { display: flex; align-items: flex-start; gap: 6px; margin-top: 9px; color: #b8b8c2; font-size: 10px; line-height: 1.6; overflow-wrap: anywhere; }
+.pw-person svg { width: 13px; height: 13px; margin-top: 2px; color: #8b8b97; }
+.pw-person span { min-width: 0; }
+.pw-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; color: #a7a7b1; padding: 32px 12px; font-size: 12px; line-height: 1.8; }
+.pw-empty svg { width: 30px; height: 30px; color: var(--primary); }
+.pw-empty strong { color: var(--text-main); font-size: 14px; }
+.pw-retry { border: 1px solid var(--border); border-radius: 11px; padding: 11px 18px; color: var(--primary); background: var(--surface); font-weight: 800; font-size: 11px; cursor: pointer; }
+.pw-sheet-foot { padding: 12px 20px; padding-bottom: max(16px, env(safe-area-inset-bottom)); background: var(--surface-container); border-top: 1px solid var(--border); flex-shrink: 0; }
+.pw-sheet-foot button { width: 100%; min-height: 46px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface); color: #e2e2e8; font-size: 12px; font-weight: 800; cursor: pointer; }
+@media (min-width: 600px) { .pw-overlay { align-items: center; padding: 24px; }.pw-sheet { max-height: 88vh; max-height: 88dvh; border: 1px solid var(--border); border-radius: 28px; } }
+@media (max-width: 350px) { .pw-launch { padding: 15px; }.pw-heading { gap: 8px; }.pw-name { font-size: 13px; }.pw-shift-tag { font-size: 8px; padding: 6px; }.pw-sheet-head { padding: 19px 15px 14px; }.pw-date-nav { margin: 0 15px; padding: 8px; }.pw-modal-stats { margin-left: 15px; margin-right: 15px; }.pw-list { padding-left: 15px; padding-right: 15px; }.pw-date-title { font-size: 11px; } }
+@media (prefers-reduced-motion: reduce) { .pw-sheet { animation: none; }.pw-launch { transition: none; } }
+/* DEVRİYE DUVARI STİLİ: BİTİŞ */
 </style>
 <script type="module">
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
@@ -130,6 +256,7 @@ onAuthStateChanged(auth, (user) => {
         trackEmergencyNumbers();
 		checkAuthFlow();
 		trackActiveDevriyeBanner();
+        guardPatrolWall.start();
     const checkInterval = setInterval(() => {
             if (!navigator.onLine) {
                 updateLog("İNTERNET BAĞLANTISI YOK!");
@@ -632,10 +759,265 @@ window.checkAction = async (targetUrl, islemAdi) => {
         window.location.href = hedefUrl;
     }
 }
+// Fotoğraf aktarımına ait SDK, yalnız kullanıcı gönderim istediğinde yüklenir.
+let uploadStoragePromise;
+function loadUploadStorage() {
+    if (!uploadStoragePromise) {
+        uploadStoragePromise = import('https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js')
+            .then(m => ({ getStorage: m.getStorage, sRef: m.ref,
+                uploadBytesResumable: m.uploadBytesResumable, getDownloadURL: m.getDownloadURL }))
+            .catch(error => { uploadStoragePromise = null; throw error; });
+    }
+    return uploadStoragePromise;
+}
+function offlineUploadContext(app, db, auth, siteID) {
+    return { app, db, auth, siteID, ref, get, set, update, onAuthStateChanged };
+}
+
+// Kuyruğun sahibi ve proje kimliği birlikte kontrol edilir. Gönderim yükleme isteğiyle başlar.
+const NobetPatrolUpload = (() => {
+    const dialog = document.getElementById('guardTransferModal');
+    const ui = Object.fromEntries(['card', 'symbol', 'title', 'copy', 'count', 'summary-label', 'account',
+        'dates', 'warning-box', 'warning', 'progress', 'progress-label', 'percent', 'track', 'bar',
+        'step', 'send', 'back', 'foot', 'auth-box', 'auth-password', 'auth-message'].map(id => [id, document.getElementById('gt-' + id)]));
+    const arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 16V3m-5 5 5-5 5 5M4 15v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const tick = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m5 12 4.5 4.5L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    let pending, resolver, context, uid, records = [], busy = false, state = 'review';
+    let wakeLock, wakeRequest = false, previousFocus, inertElements = [];
+    const markerKey = () => 'kolart_index_aktarim|' + encodeURIComponent(context.siteID) + '|' + encodeURIComponent(uid);
+    function marker(action) {
+        try {
+            if (action === 'read') return !!localStorage.getItem(markerKey());
+            if (action === 'clear') localStorage.removeItem(markerKey());
+            if (action === 'write') localStorage.setItem(markerKey(), JSON.stringify({ startedAt: Date.now() }));
+        } catch (_) { /* Asıl kayıtlar IndexedDB kuyruğundadır; bu yalnız hatırlatma işaretidir. */ }
+        return false;
+    }
+    function transition(next) { state = next; ui.card.dataset.state = next; }
+    function renderRecords(rows) {
+        records = rows;
+        ui.count.textContent = String(rows.length);
+        ui['summary-label'].textContent = 'bekleyen devriye kaydı';
+        ui.account.textContent = rows[0]?.meta.username || context.auth.currentUser?.displayName || 'Güvenlik hesabınız';
+        const days = new Map();
+        for (const row of rows) {
+            const key = String(row.log.dateKey || row.meta.shiftDate || 'Tarihi belirtilmemiş');
+            days.set(key, (days.get(key) || 0) + 1);
+        }
+        ui.dates.replaceChildren();
+        for (const [day, count] of [...days].sort(([a], [b]) => a.localeCompare(b))) {
+            const line = document.createElement('div'); line.className = 'gt-date';
+            const label = document.createElement('span'), amount = document.createElement('strong');
+            const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(day);
+            label.textContent = match ? `${match[3]}.${match[2]}.${match[1]}` : day;
+            amount.textContent = `${count} devriye`;
+            line.append(label, amount); ui.dates.appendChild(line);
+        }
+    }
+    function progress(percent, step) {
+        const value = Math.max(0, Math.min(100, Math.floor(Number(percent) || 0)));
+        ui.bar.style.width = value + '%'; ui.percent.textContent = '%' + value;
+        ui.track.setAttribute('aria-valuenow', String(value));
+        ui.step.textContent = step || 'Şirketten kayıt onayı bekleniyor…';
+    }
+    function needsAuthentication() { return !!context.authorize && context.auth.currentUser?.uid !== uid; }
+    function renderAuthentication() {
+        ui['auth-box'].hidden = !needsAuthentication();
+        ui['auth-password'].disabled = busy;
+        ui['auth-message'].textContent = `${records[0]?.meta.username || 'Devriye hesabı'} hesabının şifresini girin. Yalnız bu hesaba ait kayıtlar gönderilecektir.`;
+    }
+    function focusPrimary() {
+        if (!dialog.hidden) (needsAuthentication() && !busy ? ui['auth-password'] : ui.send.hidden ? ui.card : ui.send).focus({ preventScroll: true });
+    }
+    function open() {
+        previousFocus = document.activeElement;
+        inertElements = [...document.body.children].filter(el => el !== dialog && !['SCRIPT', 'STYLE'].includes(el.tagName))
+            .map(el => [el, el.inert]);
+        for (const [el] of inertElements) el.inert = true;
+        document.body.classList.add('guard-transfer-open'); dialog.hidden = false;
+        focusPrimary();
+    }
+    function close(result) {
+        if (busy) return;
+        dialog.hidden = true; window.KolartOfflineSync?.hideModal();
+        document.body.classList.remove('guard-transfer-open');
+        for (const [el, original] of inertElements) el.inert = original;
+        inertElements = [];
+        if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
+        const done = resolver; resolver = null; pending = null;
+        ui['auth-password'].value = '';
+        if (done) done(result);
+    }
+    async function keepScreenAwake() {
+        if (!busy || document.visibilityState !== 'visible' || !navigator.wakeLock || wakeRequest || wakeLock) return;
+        wakeRequest = true;
+        try {
+            const lock = await navigator.wakeLock.request('screen');
+            if (!busy || document.visibilityState !== 'visible') await lock.release();
+            else { wakeLock = lock; lock.addEventListener('release', () => { if (wakeLock === lock) wakeLock = null; }); }
+        } catch (_) { /* Ekranı açık tutma desteği olmadığında görünür uyarı geçerlidir. */ }
+        finally { wakeRequest = false; }
+    }
+    function setBusy(value) {
+        busy = value;
+        ui['auth-password'].disabled = value;
+        if (value) { ui.send.hidden = true; ui.back.hidden = true; void keepScreenAwake(); }
+        else if (wakeLock) { const lock = wakeLock; wakeLock = null; void lock.release().catch(() => {}); }
+    }
+    function failure(message) {
+        transition('error'); ui.symbol.innerHTML = arrow;
+        ui.title.textContent = 'Kalan kayıtlarınız telefonda';
+        ui.copy.textContent = message;
+        ui.warning.textContent = 'Onaylanmamış devriyeler telefonunuzda korunur. Tekrar deneyin; tüm kayıtlar onaylandığında nöbet teslimine devam edebilirsiniz.';
+        ui['warning-box'].hidden = false;
+        ui['progress-label'].textContent = 'Gönderim tamamlanamadı';
+        ui.step.textContent = `${records.length} devriye kaydı gönderilmeyi bekliyor.`;
+        ui.send.textContent = 'Kalan kayıtları tekrar yükle'; ui.send.hidden = false;
+        ui.back.hidden = false; renderAuthentication();
+        ui.foot.textContent = 'Başarıyla iletilen kayıtlar tekrar bekleme listesine alınmaz.';
+    }
+    function friendlyError(error) {
+        const message = String(error?.code || '') + ' ' + String(error?.message || error || '');
+        if (/wrong-password|invalid-credential|invalid-login-credentials/i.test(message)) return 'Şifre doğrulanamadı. Devriye kayıtlarının ait olduğu hesabın şifresini kontrol edin.';
+        if (/ACCOUNT_INACTIVE/i.test(message)) return 'Devriye hesabınız askıya alınmış. Kayıtlarınız telefonda korunuyor; şirketinizle iletişime geçin.';
+        if (/ACCOUNT_MISMATCH/i.test(message)) return 'Hesap ile devriye kayıtları eşleşmiyor. Kayıtların ait olduğu hesabı kullanın.';
+        if (/permission|unauthorized|erişim izni/i.test(message)) return 'Şirkete gönderim yetkisi doğrulanamadı. Aynı devriye hesabıyla tekrar giriş yapın.';
+        if (/AUTH_REQUIRED|oturum|hesap|giriş gerekli/i.test(message)) return 'Devriye hesabınızın oturumu değişti. Aynı hesapla tekrar giriş yaparak kalan kayıtları gönderin.';
+        if (/diğer açık sekme/i.test(message)) return 'Kayıtlarınız diğer açık sekmede yükleniyor. O sekmedeki işlemin tamamlanmasını bekleyin.';
+        if (!navigator.onLine || /İnternet kesildi|network/i.test(message)) return 'İnternet bağlantısı kesildi. Bağlantı geldiğinde kalan kayıtları tekrar yükleyin.';
+        return 'Gönderim tamamlanamadı. İnternet bağlantınızı kontrol ederek kalan kayıtları tekrar yükleyin.';
+    }
+    async function upload() {
+        if (busy) return;
+        if (needsAuthentication() && !ui['auth-password'].value.trim()) {
+            renderAuthentication(); ui['auth-password'].focus(); return;
+        }
+        if (!context.authorize && context.auth.currentUser?.uid !== uid) { failure(friendlyError({ code: 'AUTH_REQUIRED' })); focusPrimary(); return; }
+        if (!navigator.onLine) { failure('İnternet bağlantısı yok. Bağlantı geldiğinde kalan kayıtları yükleyebilirsiniz.'); focusPrimary(); return; }
+        marker('write'); transition('sending'); setBusy(true);
+        ui.title.textContent = 'Devriyeleriniz şirkete iletiliyor';
+        ui.copy.textContent = 'Devriye kayıtlarınız gönderiliyor. Sistemin kayıt onayı bekleniyor.';
+        ui.warning.textContent = '“Şirkete iletildi” mesajını görmeden bu ekranı kapatmayın, uygulamadan çıkmayın ve ekranı kilitlemeyin.';
+        ui['warning-box'].hidden = false; ui.progress.hidden = false;
+        ui['progress-label'].textContent = 'Şirkete aktarılıyor';
+        ui.foot.textContent = 'Onaylanmayan kayıtlar telefonunuzda korunur.';
+        progress(0, 'Güvenli gönderim bağlantısı hazırlanıyor…'); ui.card.focus({ preventScroll: true });
+        try {
+            if (context.authorize) {
+                progress(0, 'Devriye hesabınız doğrulanıyor…');
+                await context.authorize(ui['auth-password'].value.trim());
+                ui['auth-password'].value = ''; renderAuthentication();
+            }
+            let timer;
+            const storage = await Promise.race([loadUploadStorage(), new Promise((_, reject) => {
+                timer = setTimeout(() => reject(new Error('Gönderim bağlantısı zaman aşımı')), 20000);
+            })]).finally(() => clearTimeout(timer));
+            if (context.auth.currentUser?.uid !== uid) throw Object.assign(new Error('Oturum değişti'), { code: 'AUTH_REQUIRED' });
+            const completed = await window.KolartOfflineSync.sync({ ...context, ...storage }, { userInitiated: true });
+            const remaining = await window.KolartOfflineSync.queueSummary(context.siteID, uid);
+            if (completed && !remaining.length) {
+                marker('clear'); transition('success'); ui.symbol.innerHTML = tick;
+                ui.title.textContent = 'Şirkete iletildi';
+                ui.copy.textContent = 'Devriye kayıtlarınızın tamamı sisteme kaydedildi. Nöbet teslim ekranına geçiliyor…';
+                ui['summary-label'].textContent = 'devriye kaydı başarıyla iletildi';
+                ui['warning-box'].hidden = true; ui['progress-label'].textContent = 'Aktarım tamamlandı';
+                progress(100, 'Tüm kayıtlar için şirket onayı alındı.');
+                ui.send.hidden = true; ui.back.hidden = true;
+                ui.foot.textContent = 'Bekleyen kayıt kalmadı. Yönlendiriliyorsunuz…';
+            } else {
+                renderRecords(remaining);
+                failure(friendlyError(document.getElementById('ks-text')?.textContent || 'Gönderim tamamlanamadı'));
+            }
+        } catch (error) {
+            try { renderRecords(await window.KolartOfflineSync.queueSummary(context.siteID, uid)); } catch (_) {}
+            failure(friendlyError(error));
+            console.warn('[Güvenlik devriye aktarımı]', error.code || error.message);
+        } finally {
+            setBusy(false); window.KolartOfflineSync?.hideModal(); focusPrimary();
+            if (state === 'success') setTimeout(() => {
+                if (context.auth.currentUser?.uid === uid) close(true);
+                else { failure(friendlyError({ code: 'AUTH_REQUIRED' })); focusPrimary(); }
+            }, 320);
+        }
+    }
+    ui.send.onclick = () => { if (state !== 'success') void upload(); };
+    ui.back.onclick = () => { if (!busy && state === 'error') close(false); };
+    ui['auth-password'].addEventListener('keydown', event => {
+        if (event.key === 'Enter') { event.preventDefault(); void upload(); }
+    });
+    window.addEventListener('kolart-sync-progress', event => {
+        if (busy) progress(Math.min(99, Number(event.detail?.percent) || 0), event.detail?.step);
+    });
+    window.addEventListener('beforeunload', event => {
+        if (!busy) return;
+        event.preventDefault(); event.returnValue = 'Devriye aktarımı sürüyor. Bu ekranı açık tutun.';
+    });
+    document.addEventListener('visibilitychange', () => {
+        if (!busy) return;
+        if (document.visibilityState === 'visible') void keepScreenAwake();
+        else ui.warning.textContent = 'Gönderimin tamamlanması için bu ekrana geri dönün. “Şirkete iletildi” mesajını görene kadar uygulamayı açık tutun.';
+    });
+    window.addEventListener('offline', () => {
+        if (busy) ui.warning.textContent = 'İnternet kesildi. Bu ekranı açık tutun. Gönderim tamamlanmazsa kalan kayıtlarınız telefonda korunur.';
+    });
+    dialog.addEventListener('keydown', event => {
+        if (event.key === 'Escape') { event.preventDefault(); return; }
+        if (event.key !== 'Tab') return;
+        const buttons = [ui['auth-password'], ui.send, ui.back].filter(el => !el.hidden && !el.disabled && el.getClientRects().length);
+        if (!buttons.length) { event.preventDefault(); ui.card.focus(); return; }
+        const first = buttons[0], last = buttons.at(-1);
+        if (event.shiftKey && (document.activeElement === first || document.activeElement === ui.card)) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && (document.activeElement === last || document.activeElement === ui.card)) { event.preventDefault(); first.focus(); }
+    });
+    return {
+        async check(c) {
+            if (pending) return pending;
+            context = c; uid = c.expectedUID || c.auth.currentUser?.uid;
+            if (!uid) return false;
+            const rows = await window.KolartOfflineSync.queueSummary(c.siteID, uid);
+            if (!c.authorize && c.auth.currentUser?.uid !== uid) return false;
+            if (!rows.length) { marker('clear'); return true; }
+            pending = new Promise(resolve => { resolver = resolve; });
+            transition('review'); renderRecords(rows); ui.symbol.innerHTML = arrow;
+            ui.title.textContent = marker('read') ? 'Yarım kalan aktarımınız var' : 'Telefonda kayıtlı devriyeleriniz var';
+            ui.copy.textContent = marker('read')
+                ? 'Önceki aktarım tamamlanmamış. Aşağıdaki kayıtların şirkete ulaşması bekleniyor. Kalan devriyeleri şimdi yükleyebilirsiniz.'
+                : 'Nöbetinizi teslim etmeden önce aşağıdaki tarihlerde telefonunuza kaydedilmiş devriyeleri sisteme yükleyin.';
+            ui.warning.textContent = 'Gönderim bitene kadar bu ekranı açık tutun. Uygulamayı kapatır veya ekranı kilitlerseniz aktarım yarım kalabilir.';
+            ui['warning-box'].hidden = false; ui.progress.hidden = true;
+            ui.send.textContent = 'Yükle ve nöbeti teslim et'; ui.send.hidden = false;
+            ui.back.hidden = true; ui['auth-password'].value = ''; renderAuthentication();
+            ui.foot.textContent = 'Tüm kayıtlar onaylandığında otomatik olarak devam edilir.';
+            progress(0, 'Gönderim onayınız bekleniyor.'); open();
+            return pending;
+        }
+    };
+})();
+
+async function finishNobetOfflineUploads(app, db, auth, siteID) {
+    if (!window.KolartOfflineSync?.queueSummary || !window.KolartOfflineSync?.sync) {
+        throw new Error('Telefondaki devriye kayıtlarını kontrol eden dosya yüklenemedi.');
+    }
+    const expectedUID = auth.currentUser?.uid;
+    if (!expectedUID) throw new Error('Devriye hesabınızın oturumu doğrulanamadı.');
+    const completed = await NobetPatrolUpload.check({
+        ...offlineUploadContext(app, db, auth, siteID), expectedUID
+    });
+    if (!completed) return false;
+    if (auth.currentUser?.uid !== expectedUID || localStorage.getItem('siteID') !== siteID) {
+        throw new Error('Gönderim sırasında hesap veya proje değişti. Tekrar giriş yapın.');
+    }
+    return true;
+}
+
 window.logout = () => { sessionStorage.clear(); window.location.href = "index.html"; };
-window.goToNobet = async () => {
+let nobetNavigationBusy = false;
+window.goToNobet = async (teslimEt = false) => {
+    if (nobetNavigationBusy) return;
+    nobetNavigationBusy = true;
     try {
         if (!currentUser) {
+            if (teslimEt) throw new Error('Güvenlik oturumu doğrulanamadı.');
             window.location.href = "nobet.html";
             return;
         }
@@ -685,12 +1067,21 @@ const mesaj = `Sayın <b style="color: var(--primary);">${usernameKey}</b>, nöb
             return; // Devriye açık olduğu için Nöbet teslim sayfasına geçişi engelliyoruz!
         }
 
-        // Aktif devriye yoksa güvenle nöbet teslim sayfasına geçiş yapabilir
+        // Aktif devriye uyarısından sonra, yalnız NÖBETİ TESLİM ET işleminde
+        // index ile aynı hesap/proje kuyruğu ve onaylı yükleme akışı kullanılır.
+        if (teslimEt && !await finishNobetOfflineUploads(app, db, auth, siteID)) return;
+
         window.location.href = "nobet.html";
 
     } catch (error) {
         console.error("Devriye kontrol hatası:", error);
-        window.location.href = "nobet.html"; 
+        if (teslimEt) {
+            window.showToast("Devriye kayıtları doğrulanamadı. Sayfayı yenileyip nöbet teslimini tekrar deneyin.", "error");
+        } else {
+            window.location.href = "nobet.html";
+        }
+    } finally {
+        nobetNavigationBusy = false;
     }
 };
 window.goToEgitim = () => { window.location.href = "egitim.html"; };
@@ -954,6 +1345,325 @@ function trackActiveDevriyeBanner() {
         }
     });
 }
+
+// DEVRİYE DUVARI KODU: BAŞLANGIÇ
+// Bu bileşen sadece okur. Devriye başlatma/bitirme ve saat kapama kayıtlarına yazmaz.
+const guardPatrolWall = (() => {
+    const SHIFT_START = 8;
+    // Şirket mobilinin mevcut kayıt günü 15:00'te başlıyor. Bu depolama kuralı
+    // değiştirilmeden, 08:00–14:59 önceki anahtardan; 15:00–ertesi 07:59
+    // vardiyanın başlangıç anahtarından okunur. Önceki vardiyanın aynı saati taşınmaz.
+    const RECORD_DAY_START = 15;
+    const zoneFormatter = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Europe/Istanbul', year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23'
+    });
+    const shortFormatter = new Intl.DateTimeFormat('tr-TR', { timeZone: 'UTC', day: 'numeric', month: 'short' });
+    const titleFormatter = new Intl.DateTimeFormat('tr-TR', { timeZone: 'UTC', day: 'numeric', month: 'long', year: 'numeric', weekday: 'long' });
+    const days = new Map();
+    let started = false, bound = false, opened = false, connected = false;
+    let settings = null, settingsReady = false, settingsError = false;
+    let qrRegions = [], qrStop = null, qrReady = true;
+    let stops = [], timer = null, currentKey = '', selectedKey = '', selectedRegion = '';
+    let lastList = '', lastTabs = '', returnFocus = null;
+    const el = id => document.getElementById(id);
+    const escape = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const svg = path => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
+    const icons = {
+        clock: svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+        person: svg('<circle cx="12" cy="8" r="3"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/>'),
+        alert: svg('<path d="M12 3 2 20h20L12 3Z"/><path d="M12 9v4m0 3v.1"/>')
+    };
+
+    function partsAt(value = Date.now()) {
+        const result = {};
+        zoneFormatter.formatToParts(new Date(value)).forEach(part => { if (part.type !== 'literal') result[part.type] = Number(part.value); });
+        return result;
+    }
+    function keyOf(parts) {
+        return `${parts.year}-${String(parts.month).padStart(2, '0')}-${String(parts.day).padStart(2, '0')}`;
+    }
+    function addDays(key, amount) {
+        const date = new Date(`${key}T12:00:00Z`);
+        date.setUTCDate(date.getUTCDate() + amount);
+        return date.toISOString().slice(0, 10);
+    }
+    function shiftKey(value = Date.now()) {
+        const parts = partsAt(value);
+        const key = keyOf(parts);
+        return parts.hour < SHIFT_START ? addDays(key, -1) : key;
+    }
+    function instant(key, hour, minute = 0) {
+        const [year, month, day] = key.split('-').map(Number);
+        const guess = Date.UTC(year, month - 1, day, hour, minute);
+        const p = partsAt(guess);
+        return guess - (Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second) - guess);
+    }
+    function slotDay(key, time) { return Number(time.split(':')[0]) < SHIFT_START ? addDays(key, 1) : key; }
+    function recordKey(key, time) {
+        const calendarDay = slotDay(key, time);
+        return Number(time.split(':')[0]) < RECORD_DAY_START ? addDays(calendarDay, -1) : calendarDay;
+    }
+    function shortDate(key) { return shortFormatter.format(new Date(`${key}T12:00:00Z`)); }
+    function rangeText(key) { return `${shortDate(key)} 08:00 → ${shortDate(addDays(key, 1))} 08:00`; }
+    function timeList(config, key) {
+        const isSunday = new Date(`${key}T12:00:00Z`).getUTCDay() === 0;
+        const source = isSunday && config.pazarSaatleri != null ? config.pazarSaatleri : config.planliSaatler;
+        const values = source && typeof source === 'object' ? Object.values(source) : [];
+        const times = values.filter(value => typeof value === 'string' && /^(?:[01]?\d|2[0-3]):[0-5]\d$/.test(value.trim()))
+            .map(value => value.trim().padStart(5, '0'));
+        const order = time => { const [h, m] = time.split(':').map(Number); return ((h - SHIFT_START + 24) % 24) * 60 + m; };
+        return [...new Set(times)].sort((a, b) => order(a) - order(b));
+    }
+    function completion(value) {
+        // Mevcut çizelgede saat değeri personel adı veya '... (Eksik)' metnidir.
+        if (typeof value !== 'string' && value !== true && typeof value !== 'number') return null;
+        const label = typeof value === 'string' ? value.trim() : '';
+        if (!value || (typeof value === 'string' && !label)) return null;
+        const lower = label.toLocaleLowerCase('tr-TR');
+        if (['atılmadı', 'bekliyor', 'zamanı gelmedi'].includes(lower)) return null;
+        const generic = ['atıldı', 'tamamlandı', 'true', '1'].includes(lower);
+        return { partial: lower.includes('eksik'), person: generic ? '' : label };
+    }
+    function modelFor(key, filter = '', now = Date.now()) {
+        const sources = [days.get(addDays(key, -1)), days.get(key)];
+        if (settingsError || sources.some(source => source && source.error)) return { state: 'error', rows: [], regions: [] };
+        if (!settingsReady || sources.some(source => !source || !source.ready) || !qrReady) return { state: 'loading', rows: [], regions: [] };
+        const config = settings || {};
+        const times = timeList(config, key);
+        const blocked = config.saatModu === 'blok';
+        const regionSet = new Set(qrRegions);
+        if (blocked) sources.forEach(source => Object.entries(source.data).forEach(([region, value]) => {
+            if (value && typeof value === 'object' && !Array.isArray(value)) regionSet.add(region);
+        }));
+        const regions = blocked ? [...regionSet].sort((a, b) => a.localeCompare(b, 'tr')) : [];
+        const activeRegions = blocked ? (filter && regions.includes(filter) ? [filter] : regions) : [''];
+        const tolerance = Math.max(0, Number(config.dakikaToleransi) || 0) * 60000;
+        const rows = [];
+        activeRegions.forEach(region => times.forEach(time => {
+            const source = days.get(recordKey(key, time));
+            const schedule = blocked ? source.data[region] : source.data;
+            const record = schedule?.[time] ?? schedule?.[time.replace(/^0/, '')];
+            const saved = completion(record);
+            const date = slotDay(key, time);
+            const [hour, minute] = time.split(':').map(Number);
+            const planned = instant(date, hour, minute);
+            let state = 'waiting';
+            if (saved) state = saved.partial ? 'partial' : 'done';
+            else if (now > planned + tolerance) state = 'missed';
+            else if (now >= planned) state = 'due';
+            rows.push({ region, time, date, planned, state, person: saved ? saved.person : '' });
+        }));
+        const counts = { done: 0, partial: 0, missed: 0, waiting: 0 };
+        rows.forEach(row => counts[row.state === 'due' ? 'waiting' : row.state]++);
+        return { state: 'ready', rows, regions, blocked, times, counts };
+    }
+    function updateCounts(prefix, model) {
+        ['done', 'partial', 'missed', 'waiting'].forEach(state => {
+            const text = model.state === 'ready' && model.rows.length ? String(model.counts[state]) : '—';
+            if (el(`${prefix}-${state}`).textContent !== text) el(`${prefix}-${state}`).textContent = text;
+        });
+    }
+    function emptyMessage(model) {
+        if (!settings) return 'Bu proje için devriye ayarları henüz tanımlanmamış.';
+        if (!model.times.length) return 'Bu vardiya için planlı devriye saati bulunmuyor.';
+        return 'Bölge kayıtları oluştuğunda çizelge burada görünecek.';
+    }
+    function renderHome() {
+        const model = modelFor(currentKey);
+        el('pw-home-range').textContent = rangeText(currentKey);
+        el('pw-open').dataset.state = model.state === 'ready' && !connected ? 'offline' : model.state;
+        updateCounts('pw-home', model);
+        let note = 'Çizelge hazırlanıyor';
+        if (model.state === 'error') note = 'Çizelge alınamadı · Yeniden dene';
+        else if (model.state === 'ready' && !model.rows.length) note = !model.times.length ? 'Planlı saat bulunmuyor' : 'Bölge kaydı bekleniyor';
+        else if (model.state === 'ready') {
+            const due = model.rows.find(row => row.state === 'due');
+            const next = model.rows.filter(row => row.state === 'waiting').sort((a, b) => a.planned - b.planned)[0];
+            note = !connected ? 'Bağlantı yok · Son alınan veriler' : due ? `${due.time} · Devriye zamanı` : next ? `Sıradaki saat ${next.time}` : 'Vardiya özeti güncel';
+        } else if (navigator.onLine === false) note = 'İnternet bağlantısı bekleniyor';
+        el('pw-home-note').textContent = note;
+    }
+    function renderDialog() {
+        if (!opened) return;
+        let model = modelFor(selectedKey, selectedRegion);
+        if (model.state === 'ready' && selectedRegion && !model.regions.includes(selectedRegion)) {
+            selectedRegion = '';
+            model = modelFor(selectedKey);
+        }
+        el('pw-date-title').textContent = titleFormatter.format(new Date(`${selectedKey}T12:00:00Z`));
+        el('pw-date-hours').textContent = rangeText(selectedKey);
+        el('pw-current').hidden = selectedKey === currentKey;
+        el('pw-next').disabled = selectedKey >= currentKey;
+        updateCounts('pw-modal', model);
+        const status = model.state === 'error' ? 'Bağlantıyı kontrol edip yeniden deneyin.'
+            : model.state === 'loading' ? (navigator.onLine === false ? 'İnternet bağlantısı bekleniyor…' : 'Vardiyanın devriye saatleri yükleniyor…')
+            : !connected ? 'Bağlantı yok. Son alınan veriler gösteriliyor.'
+            : `${selectedKey === currentKey ? 'Şimdiki vardiya' : 'Geçmiş vardiya'} · ${model.blocked ? 'Bölge bazlı' : 'Tüm proje'} · Anlık çizelge`;
+        el('pw-status').textContent = status;
+        const tabs = el('pw-regions');
+        tabs.hidden = model.state !== 'ready' || !model.blocked || !model.regions.length;
+        const tabsKey = JSON.stringify([model.regions, selectedRegion, tabs.hidden]);
+        if (lastTabs !== tabsKey) {
+            const restoreRegion = document.activeElement?.dataset.pwRegion;
+            tabs.innerHTML = tabs.hidden ? '' : ['', ...model.regions].map(region => `<button type="button" data-pw-region="${escape(region)}" aria-pressed="${region === selectedRegion}">${escape(region || 'Tüm bölgeler')}</button>`).join('');
+            lastTabs = tabsKey;
+            if (restoreRegion !== undefined) [...tabs.querySelectorAll('button')].find(button => button.dataset.pwRegion === restoreRegion)?.focus({ preventScroll: true });
+        }
+        const signature = JSON.stringify([selectedKey, model.state, model.rows, model.times]);
+        if (lastList === signature) return;
+        lastList = signature;
+        const list = el('pw-list');
+        list.setAttribute('aria-busy', String(model.state === 'loading'));
+        if (model.state === 'loading') list.innerHTML = `<div class="pw-empty">${icons.clock}<strong>Çizelge hazırlanıyor</strong><span>Devriye saatleriniz birazdan burada.</span></div>`;
+        else if (model.state === 'error') list.innerHTML = `<div class="pw-empty">${icons.alert}<strong>Çizelge yüklenemedi</strong><span>Verilere şu anda ulaşılamıyor.</span><button class="pw-retry" type="button" data-pw-retry>Yeniden dene</button></div>`;
+        else if (!model.rows.length) list.innerHTML = `<div class="pw-empty">${icons.clock}<strong>Henüz çizelge yok</strong><span>${escape(emptyMessage(model))}</span></div>`;
+        else {
+            let previousRegion = null, previousDay = null;
+            const labels = { done: 'ATILDI', partial: 'EKSİK DEVRİYE', missed: 'ATILMADI', waiting: 'BEKLİYOR', due: 'ZAMANI GELDİ' };
+            list.innerHTML = model.rows.map(row => {
+                let header = '';
+                if (model.blocked && previousRegion !== row.region) {
+                    header += `<h3 class="pw-region-title">${escape(row.region)}</h3>`;
+                    previousRegion = row.region; previousDay = null;
+                }
+                if (previousDay !== row.date) {
+                    header += `<p class="pw-day-label">${escape(shortDate(row.date))} · ${row.date === selectedKey ? 'GÜNDÜZ / AKŞAM' : 'GECE / SABAH'}</p>`;
+                    previousDay = row.date;
+                }
+                return `${header}<article class="pw-row" data-status="${row.state}"><div class="pw-row-top"><time class="pw-time" datetime="${row.date}T${row.time}">${row.time}</time><span class="pw-badge">${labels[row.state]}</span></div>${row.person ? `<p class="pw-person">${icons.person}<span>${escape(row.person)}</span></p>` : ''}</article>`;
+            }).join('');
+        }
+    }
+    function render() { if (started) { renderHome(); renderDialog(); } }
+    function syncDays() {
+        const needed = new Set([addDays(currentKey, -1), currentKey]);
+        if (opened) { needed.add(addDays(selectedKey, -1)); needed.add(selectedKey); }
+        days.forEach((source, key) => { if (!needed.has(key)) { source.stop?.(); days.delete(key); } });
+        needed.forEach(key => {
+            if (days.has(key)) return;
+            const source = { data: {}, ready: false, error: false, stop: null };
+            days.set(key, source);
+            source.stop = onValue(ref(db, `tamamlananDevriyeSaatleri/${key}`), snapshot => {
+                if (!started || days.get(key) !== source) return;
+                const value = snapshot.val();
+                source.data = value && typeof value === 'object' ? value : {};
+                source.ready = true; source.error = false;
+                render();
+            }, () => {
+                if (!started || days.get(key) !== source) return;
+                source.error = true; source.ready = true;
+                render();
+            });
+        });
+    }
+    function syncRegions() {
+        if (settings?.saatModu !== 'blok') {
+            qrStop?.(); qrStop = null; qrReady = true; qrRegions = [];
+            return;
+        }
+        if (qrStop) return;
+        qrReady = false;
+        // İlk devriye atılmadan da, QR kayıtlarında açıkça tanımlı bölgeleri göster.
+        // Bu ek okuma yetkisi yoksa mevcut çizelgenin bölge anahtarları kullanılır.
+        qrStop = onValue(ref(db, 'qrcodes'), snapshot => {
+            if (!started) return;
+            qrRegions = [...new Set(Object.values(snapshot.val() || {}).map(point => point && typeof point.bolge === 'string' ? point.bolge.trim() : '').filter(Boolean))];
+            qrReady = true; render();
+        }, () => { if (started) { qrReady = true; qrRegions = []; render(); } });
+    }
+    function tick() {
+        if (!started) return;
+        const nextKey = shiftKey();
+        if (nextKey !== currentKey) {
+            const following = selectedKey === currentKey;
+            currentKey = nextKey;
+            if (following || selectedKey > nextKey) selectedKey = nextKey;
+            syncDays();
+        }
+        render();
+    }
+    function scheduleTick() {
+        clearTimeout(timer);
+        if (started) timer = setTimeout(() => { if (!document.hidden) tick(); scheduleTick(); }, 60025 - Date.now() % 60000);
+    }
+    function changeDay(key) {
+        selectedKey = key > currentKey ? currentKey : key;
+        selectedRegion = ''; lastList = ''; lastTabs = '';
+        syncDays(); renderDialog(); el('pw-list').scrollTop = 0;
+    }
+    function open() {
+        if (!started) return;
+        tick();
+        selectedKey = currentKey; selectedRegion = ''; lastList = ''; lastTabs = '';
+        returnFocus = document.activeElement; opened = true;
+        el('pw-modal').hidden = false; el('pw-open').setAttribute('aria-expanded', 'true');
+        document.body.classList.add('pw-open');
+        syncDays(); renderDialog(); el('pw-sheet').focus({ preventScroll: true });
+    }
+    function close() {
+        if (!opened) return;
+        opened = false; el('pw-modal').hidden = true;
+        document.body.classList.remove('pw-open'); el('pw-open').setAttribute('aria-expanded', 'false');
+        if (started) syncDays();
+        if (returnFocus?.isConnected) returnFocus.focus({ preventScroll: true });
+    }
+    function retry() { stop(); start(); }
+    function bind() {
+        if (bound) return;
+        bound = true;
+        el('pw-open').addEventListener('click', open);
+        el('pw-close').addEventListener('click', close);
+        el('pw-close-bottom').addEventListener('click', close);
+        el('pw-modal').addEventListener('click', event => { if (event.target === el('pw-modal')) close(); });
+        el('pw-prev').addEventListener('click', () => changeDay(addDays(selectedKey, -1)));
+        el('pw-next').addEventListener('click', () => { if (selectedKey < currentKey) changeDay(addDays(selectedKey, 1)); });
+        el('pw-current').addEventListener('click', () => changeDay(currentKey));
+        el('pw-regions').addEventListener('click', event => {
+            const button = event.target.closest('[data-pw-region]');
+            if (!button) return;
+            selectedRegion = button.dataset.pwRegion; renderDialog(); el('pw-list').scrollTop = 0;
+        });
+        el('pw-list').addEventListener('click', event => { if (event.target.closest('[data-pw-retry]')) retry(); });
+        document.addEventListener('keydown', event => {
+            if (!opened || [...document.querySelectorAll('.modal-overlay')].some(node => getComputedStyle(node).display !== 'none') || !el('guardTransferModal').hidden) return;
+            if (event.key === 'Escape') { event.preventDefault(); close(); }
+            if (event.key !== 'Tab') return;
+            const focusable = [...el('pw-sheet').querySelectorAll('button:not([disabled])')].filter(node => node.getClientRects().length);
+            const first = focusable[0], last = focusable[focusable.length - 1];
+            if (event.shiftKey && (document.activeElement === first || document.activeElement === el('pw-sheet'))) { event.preventDefault(); last?.focus(); }
+            else if (!event.shiftKey && (document.activeElement === last || document.activeElement === el('pw-sheet'))) { event.preventDefault(); first?.focus(); }
+        });
+        document.addEventListener('visibilitychange', () => { if (!document.hidden && started) { tick(); scheduleTick(); } });
+        window.addEventListener('online', () => { if (started) tick(); });
+        window.addEventListener('offline', () => { connected = false; if (started) render(); });
+        window.addEventListener('pagehide', stop);
+        window.addEventListener('pageshow', event => { if (event.persisted && auth.currentUser) start(); });
+    }
+    function start() {
+        if (started) { tick(); return; }
+        if (!el('pw-open')) return;
+        bind(); started = true;
+        currentKey = shiftKey(); selectedKey = currentKey;
+        settingsReady = false; settingsError = false; settings = null; connected = false;
+        stops.push(onValue(ref(db, 'sistemAyarlari'), snapshot => {
+            if (!started) return;
+            settings = snapshot.val(); settingsReady = true; settingsError = false;
+            syncRegions(); render();
+        }, () => { if (started) { settingsError = true; settingsReady = true; render(); } }));
+        stops.push(onValue(ref(db, '.info/connected'), snapshot => { if (started) { connected = snapshot.val() === true; render(); } }, () => { connected = false; render(); }));
+        syncDays(); render(); scheduleTick();
+    }
+    function stop() {
+        started = false; clearTimeout(timer); timer = null;
+        stops.forEach(unsubscribe => unsubscribe()); stops = [];
+        days.forEach(source => source.stop?.()); days.clear();
+        qrStop?.(); qrStop = null; qrRegions = []; qrReady = true;
+    }
+    return { start, stop };
+})();
+// DEVRİYE DUVARI KODU: BİTİŞ
+
 </script>
 </head>
 <body><div id="toast-container"></div>
@@ -1034,13 +1744,35 @@ function trackActiveDevriyeBanner() {
             </div>
         </div>
 
-        <div id="nobet-teslim-area" class="action-item" onclick="goToNobet()" style="margin-bottom:12px; flex-direction: row; align-items: center; gap: 15px; display:none;">
+        <div id="nobet-teslim-area" class="action-item" onclick="goToNobet(true)" style="margin-bottom:12px; flex-direction: row; align-items: center; gap: 15px; display:none;">
             <div class="icon-box" style="color:var(--error); background:rgba(255, 77, 77, 0.1);"><span class="material-symbols-outlined">stop_circle</span></div>
             <div>
                 <span class="status-label" style="opacity:1; color:var(--error); margin:0; display: block;">NÖBETİ TESLİM ET</span>
                 <p style="font-size:11px; color:var(--text-muted);">Görev bitirmek için dokun</p>
             </div>
         </div>
+
+        <!-- DEVRİYE DUVARI: BAŞLANGIÇ -->
+        <section class="pw-home" aria-labelledby="pw-title">
+            <button id="pw-open" class="pw-launch" type="button" data-state="loading" aria-haspopup="dialog" aria-controls="pw-modal" aria-expanded="false">
+                <span class="pw-launch-head">
+                    <span class="pw-heading">
+                        <span class="pw-emblem" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="5" r="2"/><circle cx="18" cy="19" r="2"/><path d="M8 5h7a4 4 0 0 1 0 8H9a3 3 0 0 0 0 6h7"/></svg></span>
+                        <span class="pw-titles"><span class="pw-eyebrow">VARDİYA TAKİBİ</span><span id="pw-title" class="pw-name">Devriye duvarı</span></span>
+                    </span>
+                    <span class="pw-shift-tag">08:00 → 08:00</span>
+                </span>
+                <span id="pw-home-range" class="pw-range">Vardiya bilgisi yükleniyor…</span>
+                <span class="pw-stats" aria-label="Vardiya özeti">
+                    <span class="pw-stat pw-done"><strong id="pw-home-done">—</strong><small>Atıldı</small></span>
+                    <span class="pw-stat pw-partial"><strong id="pw-home-partial">—</strong><small>Eksik</small></span>
+                    <span class="pw-stat pw-missed"><strong id="pw-home-missed">—</strong><small>Atılmadı</small></span>
+                    <span class="pw-stat pw-waiting"><strong id="pw-home-waiting">—</strong><small>Bekliyor</small></span>
+                </span>
+                <span class="pw-bottom"><span id="pw-home-note" class="pw-note" role="status">Çizelge hazırlanıyor</span><span class="pw-more">Duvarı aç <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 5 7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            </button>
+        </section>
+        <!-- DEVRİYE DUVARI: BİTİŞ -->
 
         <h3 class="section-title">Hızlı İşlemler</h3>
         <div class="action-grid">
@@ -1278,6 +2010,45 @@ function trackActiveDevriyeBanner() {
     </div>
 </div>
 
+<!-- DEVRİYE DUVARI PENCERESİ: BAŞLANGIÇ -->
+<div id="pw-modal" class="pw-overlay" hidden>
+    <section id="pw-sheet" class="pw-sheet" role="dialog" aria-modal="true" aria-labelledby="pw-dialog-title" aria-describedby="pw-status" tabindex="-1">
+        <div class="pw-sheet-head"><div><p class="pw-eyebrow">HER SAATİ BİRLİKTE TAKİP ET</p><h2 id="pw-dialog-title">Devriye duvarı</h2></div><button id="pw-close" class="pw-icon-btn" type="button" aria-label="Devriye duvarını kapat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg></button></div>
+        <div class="pw-date-nav" aria-label="Vardiya tarihi">
+            <button id="pw-prev" class="pw-icon-btn" type="button" aria-label="Önceki vardiya"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m14 5-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <div class="pw-date-center"><span id="pw-date-title" class="pw-date-title"></span><span id="pw-date-hours" class="pw-date-hours"></span><button id="pw-current" class="pw-date-current" type="button">Şimdiki vardiya</button></div>
+            <button id="pw-next" class="pw-icon-btn" type="button" aria-label="Sonraki vardiya"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m10 5 7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+        <div class="pw-stats pw-modal-stats" aria-label="Gösterilen devriye saatlerinin özeti">
+            <div class="pw-stat pw-done"><strong id="pw-modal-done">—</strong><small>Atıldı</small></div>
+            <div class="pw-stat pw-partial"><strong id="pw-modal-partial">—</strong><small>Eksik</small></div>
+            <div class="pw-stat pw-missed"><strong id="pw-modal-missed">—</strong><small>Atılmadı</small></div>
+            <div class="pw-stat pw-waiting"><strong id="pw-modal-waiting">—</strong><small>Bekliyor</small></div>
+        </div>
+        <p id="pw-status" class="pw-status-line" role="status"></p>
+        <div id="pw-regions" class="pw-region-tabs" role="group" aria-label="Bölge seçimi" hidden></div>
+        <div id="pw-list" class="pw-list" aria-busy="true"></div>
+        <div class="pw-sheet-foot"><button id="pw-close-bottom" type="button">Kapat</button></div>
+    </section>
+</div>
+<!-- DEVRİYE DUVARI PENCERESİ: BİTİŞ -->
+
 <script src="nav.js"></script>
+<div id="guardTransferModal" class="guard-transfer" hidden role="dialog" aria-modal="true" aria-labelledby="gt-title" aria-describedby="gt-copy gt-warning">
+  <div id="gt-card" class="gt-card" data-state="review" tabindex="-1">
+    <div class="gt-top"><span class="gt-brand">KOLART · NÖBET TESLİMİ</span><span class="gt-private">● Güvenli aktarım</span></div>
+    <div id="gt-symbol" class="gt-symbol" aria-hidden="true"></div>
+    <h2 id="gt-title">Telefonda kayıtlı devriyeleriniz var</h2>
+    <p id="gt-copy" class="gt-copy"></p>
+    <div class="gt-summary"><strong id="gt-count" class="gt-count">0</strong><div><div id="gt-summary-label" class="gt-summary-label">bekleyen devriye kaydı</div><div id="gt-account" class="gt-account"></div></div></div>
+    <div id="gt-dates" class="gt-dates" aria-label="Devriye tarihleri"></div>
+    <div id="gt-warning-box" class="gt-warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 3 2.7 19h18.6L12 3Z" stroke-linejoin="round"/><path d="M12 9v4m0 3v.2" stroke-linecap="round"/></svg><p id="gt-warning"></p></div>
+    <div id="gt-auth-box" class="gt-auth" hidden><label for="gt-auth-password">Devriye hesabınızın şifresi</label><p id="gt-auth-message">Gönderim için kayıtların ait olduğu hesabı doğrulayın.</p><input id="gt-auth-password" type="password" autocomplete="current-password" placeholder="Hesap şifreniz" aria-describedby="gt-auth-message"></div>
+    <div id="gt-progress" class="gt-progress" hidden><div class="gt-progress-row"><span id="gt-progress-label">Şirkete aktarılıyor</span><strong id="gt-percent">%0</strong></div><div id="gt-track" class="gt-track" role="progressbar" aria-label="Devriye gönderimi" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="gt-bar" class="gt-bar"></div></div><p id="gt-step" class="gt-step" role="status" aria-live="polite"></p></div>
+    <div class="gt-actions"><button id="gt-send" type="button" class="gt-primary">Yükle ve nöbeti teslim et</button><button id="gt-back" type="button" class="gt-secondary" hidden>Güvenlik ekranına dön</button></div>
+    <p id="gt-foot" class="gt-foot"></p>
+  </div>
+</div>
+
 </body>
 </html>
