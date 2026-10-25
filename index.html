@@ -1905,7 +1905,7 @@ body.index-transfer-open #kolartSyncModal { display: none !important; }
 </style>
 </head>
 <body>
-<a id="offlineModeBtn" class="offline-mode-btn" href="./offline-devriye.html" aria-label="Offline Mod: çevrimdışı devriye sayfasını aç">📴 Offline Mod</a>
+<a id="offlineModeBtn" class="offline-mode-btn" href="./offline-devriye.html" aria-label="Offline Mod: çevrimdışı devriye sayfasını aç">📴 Offline</a>
 <div class="container">
     <img src="logo.png" class="cga-logo" alt="CGA Logo">
 
@@ -2358,17 +2358,32 @@ const decryptData = (encrypted) => {
     } catch (e) { return null; }
 };
 
-// MERKEZ FIREBASE
-const merkezConfig = {
-  apiKey: "AIzaSyDCJWz80wWlzNhaM2Qnw_e5UkQoc8DoJaU",
-  authDomain: "merkez-14bf8.firebaseapp.com",
-  databaseURL: "https://merkez-14bf8-default-rtdb.firebaseio.com", 
-  projectId: "merkez-14bf8",
-  storageBucket: "merkez-14bf8.firebasestorage.app",
-  messagingSenderId: "512943111807",
-  appId: "1:512943111807:web:675c769c7ede48216e494a",
-  measurementId: "G-BYS8FPKY7H"
+// --- ZAMAN AŞIMI (TIMEOUT) YARDIMCI FONKSİYONU ---
+const withTimeout = (promise, ms = 10000, customMsg = "İşlem zaman aşımına uğradı!") => {
+    return Promise.race([
+        promise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error(customMsg)), ms))
+    ]);
 };
+
+// --- MERKEZ CONFIG ÇEKME VE ŞİFRELİ KAYDETME ---
+let merkezConfig;
+const savedMerkezConfigEnc = localStorage.getItem("merkezConfigEnc");
+
+if (savedMerkezConfigEnc) {
+    merkezConfig = decryptData(savedMerkezConfigEnc);
+}
+
+if (!merkezConfig) {
+    try {
+        const configRes = await withTimeout(fetch("https://node-index-js-vug2.onrender.com/get-config"), 8000);
+        merkezConfig = await configRes.json();
+        localStorage.setItem("merkezConfigEnc", encryptData(merkezConfig));
+    } catch (err) {
+        console.error("Sunucudan merkez config bilgileri alınamadı:", err);
+    }
+}
+
 const merkezApp = getApps().find(a => a.name === "[DEFAULT]") || initializeApp(merkezConfig);
 const merkezDB = getDatabase(merkezApp);
 
@@ -2693,60 +2708,82 @@ async function loginUser(rawUsername, password, role) {
         const activeDB = getDatabase(app);
         const auth = getAuth(app);
 
-        // 1. ÖNCE VERİTABANINDAN KULLANICIYI KONTROL ET
-        const userSnap = await get(child(ref(activeDB), 'users/' + dbUsername));
-        let isSupportRecord = false;
-        let userData = null;
+        const targetEmail = formatToEmail(cleanUsername);
+        
+       let authSuccess = false;
+try {
+    await signInWithEmailAndPassword(auth, targetEmail, cleanPassword);
+    authSuccess = true;
+    if (statusText) statusText.textContent = "✅ Bilgileriniz doğrulanıyor…";
+} catch (authErr) {
+    // İnternet hatası kaldırıldı, sadece kullanıcı yok veya şifre hatalı uyarısı bırakıldı
+    return showErrorModal("❌ Kullanıcı kaydı bulunamadı veya şifre hatalı!");
+}
 
-        if (userSnap.exists()) {
-            userData = userSnap.val();
-            // Eğer bu kullanıcı geçici destek personeli kaydı ise
-            if (userData.supportBaseUsername === "DESTEK PERSONEL" || dbUsername === "DESTEK PERSONEL") {
-                isSupportRecord = true;
+   // DESTEK PERSONEL KONTROLÜ (ŞİFRELİ)
+        if (dbUsername === "DESTEK PERSONEL") {
+            const dSnap = await get(child(ref(activeDB), 'users/' + dbUsername));
+            rememberVerifiedProfile(dSnap, activeDB, dbUsername, auth);
+            if (dSnap.exists()) {
+                // ŞİFREYİ BURADA KONTROL EDİYORUZ
+                if (cleanPassword === String(dSnap.val().password).trim()) {
+                    sessionStorage.setItem("currentUser", JSON.stringify({ username: dbUsername, type: dSnap.val().type }));
+                    
+                    // ---> BENİ HATIRLA EKLENTİSİ BURADA BAŞLIYOR <---
+                    if (secRemember.checked) {
+                        localStorage.setItem("securityUser", JSON.stringify({ username: cleanUsername, password: maskPass(cleanPassword) }));
+                    } else {
+                        localStorage.removeItem("securityUser");
+                    }
+                    // ---> BENİ HATIRLA EKLENTİSİ BURADA BİTİYOR <---
+
+                    if (statusModal) statusModal.style.display = 'none';
+                    if (!await finishOfflineUploads(app,activeDB,auth,siteId)) {
+                        loginBtn.disabled=false;loginBtn.style.opacity='1';return;
+                    }
+                    if (!await preparePatrolBundle(app,activeDB,auth,siteId,dbUsername,dSnap.val().type,cleanPassword)) {
+                        loginBtn.disabled=false;loginBtn.style.opacity='1';return;
+                    }
+                    window.location.href = "guvenlik.html"; // Sadece güvenlik sayfasına yönlendiriyor
+                    return;
+                } else {
+                    return showErrorModal("❌ Destek Personeli Şifresi Hatalı!");
+                }
             }
         }
 
-        // 2. AUTH E-POSTA BELİRLEME
-        // Eğer kullanıcı destek personeli ise Auth girişi "DESTEK PERSONEL" e-postası ile yapılır.
-        const authUsername = isSupportRecord ? "DESTEK PERSONEL" : cleanUsername;
-        const targetEmail = formatToEmail(authUsername);
-        
-        let authSuccess = false;
-        try {
-            await signInWithEmailAndPassword(auth, targetEmail, cleanPassword);
-            authSuccess = true;
-            if (statusText) statusText.textContent = "✅ Bilgileriniz doğrulanıyor…";
-        } catch (authErr) {
-            return showErrorModal("❌ Kullanıcı kaydı bulunamadı veya şifre hatalı!");
-        }
-
+        // DÜZELTME 3: Eğer Admin/Destek değilse ve Auth'tan geçemediyse ŞİMDİ bloke et!
         if (!authSuccess) {
-            return showErrorModal("❌ Auth Kaydı Bulunamadı veya Şifre Hatalı!");
+            return showErrorModal("❌ AUT Kaydı Bulunamadı veya Şifre Hatalı!");
         }
 
-        // 3. KULLANICI VERİSİ KONTROLÜ
-        if (!userData) {
+        // --- NORMAL KULLANICI KONTROLLERİ ---
+        const userSnap = await get(child(ref(activeDB), 'users/' + dbUsername));
+        rememberVerifiedProfile(userSnap, activeDB, dbUsername, auth);
+        if (!userSnap.exists()) {
             return showErrorModal("❌ Kullanıcı veritabanında bulunamadı!");
         }
 
-        if (userData.isActive === false) {
+        const user = userSnap.val();
+        if (user.isActive === false) {
             return showErrorModal("❌ Hesabınız Askıya Alınmıştır!");
         }
 
-        // Session hazırlığı
-        sessionStorage.setItem("currentUser", JSON.stringify({ 
-            username: userData.username || dbUsername, 
-            type: userData.type,
-            ...(isSupportRecord ? { supportBaseUsername: "DESTEK PERSONEL" } : {})
-        }));
-
-        if (statusModal) statusModal.style.display = 'none';
-
-        if (!await finishOfflineUploads(app, activeDB, auth, siteId)) {
-            loginBtn.disabled = false; loginBtn.style.opacity = '1'; return;
+        const uPass = String(user.password).trim();
+        if (uPass === "123456" || uPass.length < 6) {
+            if (statusModal) statusModal.style.display = "none";
+            let why = uPass === "123456" ? "Şu anki şifreniz varsayılan <b>'123456'</b>'dır. 6 haneli yeni şifre oluşturun. Yeni şifre sadece rakam içermelidir." : `Şifreniz <b>${uPass.length}</b> haneli. En az 6 hane olmalı.`;
+            forcePasswordChange(user.username, user.type, activeDB, auth, why);
+            return;
         }
-        if (!await preparePatrolBundle(app, activeDB, auth, siteId, dbUsername, userData.type, cleanPassword)) {
-            loginBtn.disabled = false; loginBtn.style.opacity = '1'; return;
+
+        sessionStorage.setItem("currentUser", JSON.stringify({ username: user.username, type: user.type }));
+        if (statusModal) statusModal.style.display = 'none';
+        if (!await finishOfflineUploads(app,activeDB,auth,siteId)) {
+            loginBtn.disabled=false;loginBtn.style.opacity='1';return;
+        }
+        if (!await preparePatrolBundle(app,activeDB,auth,siteId,dbUsername,user.type,cleanPassword)) {
+            loginBtn.disabled=false;loginBtn.style.opacity='1';return;
         }
 
         if (role === "security") {
@@ -2754,9 +2791,11 @@ async function loginUser(rawUsername, password, role) {
                 localStorage.setItem("securityUser", JSON.stringify({ username: cleanUsername, password: maskPass(cleanPassword) }));
             } else localStorage.removeItem("securityUser");
 
-            if (userData.type === "amir") {
+            // TÜM DİĞER ROLLER KALDIRILDI SADECE GÜVENLİK KONTROLÜ VAR
+           // AMİR VE GÜVENLİK KONTROLÜ
+            if (user.type === "amir") {
                 window.location.href = "amir.html";
-            } else if (userData.type === "security") {
+            } else if (user.type === "security") {
                 window.location.href = "guvenlik.html";
             } else {
                 return showErrorModal("❌ Sadece amir veya güvenlik yetkisine sahip kullanıcılar giriş yapabilir!");
