@@ -1377,10 +1377,8 @@ function trackActiveDevriyeBanner() {
 // Bu bileşen sadece okur. Devriye başlatma/bitirme ve saat kapama kayıtlarına yazmaz.
 const guardPatrolWall = (() => {
     const SHIFT_START = 8;
-    // Şirket mobilinin mevcut kayıt günü 15:00'te başlıyor. Bu depolama kuralı
-    // değiştirilmeden, 08:00–14:59 önceki anahtardan; 15:00–ertesi 07:59
-    // vardiyanın başlangıç anahtarından okunur. Önceki vardiyanın aynı saati taşınmaz.
-    const RECORD_DAY_START = 15;
+    // Saat kapatma koduyla aynı vardiya anahtarı kullanılır: 08:00–ertesi 08:00.
+    // Vardiyanın bütün saatleri, vardiyanın başladığı tarihin kaydından okunur.
     const zoneFormatter = new Intl.DateTimeFormat('en-GB', {
         timeZone: 'Europe/Istanbul', year: 'numeric', month: '2-digit', day: '2-digit',
         hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23'
@@ -1427,10 +1425,6 @@ const guardPatrolWall = (() => {
         return guess - (Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second) - guess);
     }
     function slotDay(key, time) { return Number(time.split(':')[0]) < SHIFT_START ? addDays(key, 1) : key; }
-    function recordKey(key, time) {
-        const calendarDay = slotDay(key, time);
-        return Number(time.split(':')[0]) < RECORD_DAY_START ? addDays(calendarDay, -1) : calendarDay;
-    }
     function shortDate(key) { return shortFormatter.format(new Date(`${key}T12:00:00Z`)); }
     function rangeText(key) { return `${shortDate(key)} 08:00 → ${shortDate(addDays(key, 1))} 08:00`; }
     function timeList(config, key) {
@@ -1453,7 +1447,7 @@ const guardPatrolWall = (() => {
         return { partial: lower.includes('eksik'), person: generic ? '' : label };
     }
     function modelFor(key, filter = '', now = Date.now()) {
-        const sources = [days.get(addDays(key, -1)), days.get(key)];
+        const sources = [days.get(key)];
         if (settingsError || sources.some(source => source && source.error)) return { state: 'error', rows: [], regions: [] };
         if (!settingsReady || sources.some(source => !source || !source.ready) || !qrReady) return { state: 'loading', rows: [], regions: [] };
         const config = settings || {};
@@ -1468,7 +1462,7 @@ const guardPatrolWall = (() => {
         const patrolWindowMs = 60 * 60 * 1000;
         const rows = [];
         activeRegions.forEach(region => times.forEach(time => {
-            const source = days.get(recordKey(key, time));
+            const source = days.get(key);
             const schedule = blocked ? source.data[region] : source.data;
             const record = schedule?.[time] ?? schedule?.[time.replace(/^0/, '')];
             const saved = completion(record);
@@ -1564,8 +1558,8 @@ const guardPatrolWall = (() => {
     }
     function render() { if (started) { renderHome(); renderDialog(); } }
     function syncDays() {
-        const needed = new Set([addDays(currentKey, -1), currentKey]);
-        if (opened) { needed.add(addDays(selectedKey, -1)); needed.add(selectedKey); }
+        const needed = new Set([currentKey]);
+        if (opened) needed.add(selectedKey);
         days.forEach((source, key) => { if (!needed.has(key)) { source.stop?.(); days.delete(key); } });
         needed.forEach(key => {
             if (days.has(key)) return;
