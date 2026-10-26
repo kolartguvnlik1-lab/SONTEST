@@ -123,7 +123,7 @@
                 const state = offline ? 'offline' : this.failed ? 'error' : forcedState || (this.delayed ? 'slow' : 'loading');
                 loader.dataset.state = state;
                 const views = {
-                    loading: ['Hazırlanıyor',
+                    loading: ['Güvenli Bağlantı Hazırlanıyor',
                         this.connected ? 'Nöbet bilgileriniz ve devriye duvarınız hazırlanıyor.' : 'Güvenlik ekranınız hazırlanıyor.',
                         this.connected ? 'BİLGİLER HAZIRLANIYOR' : 'BAĞLANTI KONTROLÜ'],
                     offline: ['İnternet bağlantısı yok', 'Wi-Fi veya mobil verinizi kontrol edin. Bağlantı geri geldiğinde otomatik olarak devam edeceğiz.', 'ÇEVRİMDIŞI'],
