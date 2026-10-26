@@ -1438,7 +1438,7 @@ const guardPatrolWall = (() => {
         }));
         const regions = blocked ? [...regionSet].sort((a, b) => a.localeCompare(b, 'tr')) : [];
         const activeRegions = blocked ? (filter && regions.includes(filter) ? [filter] : regions) : [''];
-        const tolerance = Math.max(0, Number(config.dakikaToleransi) || 0) * 60000;
+        const patrolWindowMs = 60 * 60 * 1000;
         const rows = [];
         activeRegions.forEach(region => times.forEach(time => {
             const source = days.get(recordKey(key, time));
@@ -1450,7 +1450,7 @@ const guardPatrolWall = (() => {
             const planned = instant(date, hour, minute);
             let state = 'waiting';
             if (saved) state = saved.partial ? 'partial' : 'done';
-            else if (now > planned + tolerance) state = 'missed';
+            else if (now >= planned + patrolWindowMs) state = 'missed';
             else if (now >= planned) state = 'due';
             rows.push({ region, time, date, planned, state, person: saved ? saved.person : '' });
         }));
