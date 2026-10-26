@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>KOLART — Güvenlik Denetim Sistemi</title>
     <script>
-    // Karşılama ekranı: aynı klasördeki pug.png doğrudan gösterilir.
-    // Tamamlanma sinyalleri mevcut dinleyicilerden gelir; ek Firebase sorgusu yapılmaz.
+    // Hızlı açılış: oturum, nöbet, yetki, profil ve talimat kontrolleri korunur.
+    // Görsel ve devriye duvarı girişin tamamlanmasını bekletmez.
     (function () {
         const root = document.documentElement;
-        const required = ['shift', 'settings', 'messages', 'profile', 'patrol', 'wall', 'artwork', 'site'];
-        let cryptoResolve, waitTimer = null, artTimer = null, finishTimer = null;
+        const required = ['shift', 'settings', 'messages', 'profile'];
+        let cryptoResolve, waitTimer = null, finishFrame = null;
         const boot = window.GuardPageBoot = {
             ready: false, moduleStarted: false, connected: false, dataReady: false,
             sawOffline: navigator.onLine === false,
@@ -20,12 +20,6 @@
             cryptoLoaded(ok) {
                 if (!ok) this.dependencyFailed = true;
                 cryptoResolve(ok);
-            },
-            iconsLoaded() {
-                if (!document.fonts?.load) return;
-                document.fonts.load('24px "Material Symbols Outlined"', 'security').then(faces => {
-                    if (faces.length) root.classList.remove('guard-icons-pending');
-                }).catch(() => {});
             },
             paint() {
                 try {
@@ -39,10 +33,8 @@
                 } catch (_) {}
                 const image = document.getElementById('boot-artwork');
                 if (image?.complete) this.artworkLoaded(image.naturalWidth > 0);
-                if (!this.artworkReady && artTimer === null) {
-                    // Yavaş/eksik bir görsel giriş işlemini süresiz bekletmez.
-                    artTimer = setTimeout(() => this.artworkLoaded(false), 5000);
-                }
+                if (!image?.complete) this.artworkLoaded(false);
+                window.GuardIcons.start();
                 this.armWait(); this.update();
                 document.getElementById('loading-overlay')?.focus({ preventScroll: true });
             },
@@ -54,7 +46,7 @@
                 }, 12000);
             },
             pending() {
-                this.cycle++; clearTimeout(finishTimer); finishTimer = null;
+                this.cycle++; this.cancelFinish();
                 this.ready = false; this.dataReady = false; this.connected = false;
                 this.failed = ''; this.delayed = false;
                 this.tasks = new Set(this.artworkReady ? ['artwork'] : []);
@@ -80,7 +72,6 @@
                 this.update(); this.tryFinish();
             },
             artworkLoaded(ok) {
-                clearTimeout(artTimer); artTimer = null;
                 this.artworkReady = true;
                 const image = document.getElementById('boot-artwork');
                 const fallback = document.getElementById('boot-artwork-fallback');
@@ -89,18 +80,17 @@
                 this.mark('artwork');
             },
             cancelFinish() {
-                clearTimeout(finishTimer); finishTimer = null;
+                cancelAnimationFrame(finishFrame); finishFrame = null;
                 document.getElementById('loading-overlay')?.classList.remove('boot-leaving');
             },
             tryFinish() {
-                if (this.ready || finishTimer !== null || !this.dataReady || !this.connected ||
+                if (this.ready || finishFrame !== null || !this.dataReady || !this.connected ||
                     this.failed || navigator.onLine === false || !required.every(task => this.tasks.has(task))) return;
                 const cycle = this.cycle;
                 this.update('ready');
-                document.getElementById('loading-overlay')?.classList.add('boot-leaving');
-                // Yalnız kısa bir geçiş; zamanlayıcı hiçbir kontrolü atlamaz.
-                finishTimer = setTimeout(() => {
-                    finishTimer = null;
+                // Zorunlu kontroller bitince sonraki çizimde açılır; sabit bekleme yok.
+                finishFrame = requestAnimationFrame(() => {
+                    finishFrame = null;
                     if (cycle !== this.cycle || !this.connected || this.failed || navigator.onLine === false) return;
                     this.ready = true; root.dataset.guardReady = 'true';
                     clearTimeout(waitTimer); waitTimer = null;
@@ -108,7 +98,8 @@
                     if (loader) loader.style.display = 'none';
                     const app = document.getElementById('guard-app');
                     if (app) { app.inert = false; app.removeAttribute('aria-hidden'); }
-                }, 180);
+                    document.dispatchEvent(new Event('guard:ready'));
+                });
             },
             fail(message) { this.error(message); },
             error(message) {
@@ -150,7 +141,13 @@
             root.setAttribute('data-theme', localStorage.getItem('kolart-theme-tone') || 'elite-neon');
         } catch (_) { root.setAttribute('data-theme', 'elite-neon'); }
         root.dataset.guardReady = 'false';
-        if (document.fonts?.load) root.classList.add('guard-icons-pending');
+        // Düşük donanımda animasyon ve gölge maliyetini azalt; renkleri koru.
+        const connection = navigator.connection;
+        if ((navigator.deviceMemory && navigator.deviceMemory <= 2) ||
+            (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+            connection?.saveData || /^(slow-2g|2g)$/.test(connection?.effectiveType || '')) {
+            root.classList.add('guard-lite');
+        }
         document.addEventListener('click', event => {
             if (boot.ready || event.target.closest?.('[data-boot-control]') || !event.target.closest?.('button, a, [onclick]')) return;
             event.preventDefault(); event.stopImmediatePropagation(); boot.update();
@@ -178,19 +175,64 @@
     </script>
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js" crossorigin>
     <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js" crossorigin>
     <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js" crossorigin>
-    <script defer src="./offline-sync.js?v=20261008-2050"></script>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" onload="window.GuardPageBoot.cryptoLoaded(true)" onerror="window.GuardPageBoot.cryptoLoaded(false)"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" media="print" onload="this.media='all'; window.GuardPageBoot.iconsLoaded()">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet"></noscript>
+
+    <script>
+    // Sayfa ve gezinme ikonları dosyanın içinde; ilk çizimde font indirmesi yok.
+    (function () {
+        const names = new Set(['security', 'location_on', 'history', 'qr_code_scanner', 'play_circle', 'stop_circle', 'directions_walk', 'book', 'report_problem', 'forum', 'emergency', 'call', 'app_registration', 'account_circle', 'settings', 'share_location', 'badge', 'school', 'manage_accounts', 'visibility', 'visibility_off', 'lock', 'warning', 'close', 'cancel', 'emergency_home', 'medical_services', 'phone_in_talk', 'local_police', 'light_mode', 'dark_mode', 'check_circle', 'error', 'report', 'info', 'edit_document', 'home', 'person', 'notifications', 'chat', 'menu', 'logout', 'dashboard', 'assignment', 'arrow_back', 'arrow_forward', 'chevron_right', 'expand_more', 'refresh', 'schedule', 'event', 'groups', 'mail', 'chat_bubble', 'description', 'more_horiz']);
+        const selector = '.material-symbols-outlined, .material-symbols-rounded, .material-icons';
+        let observer, fontRequested = false;
+        const svg = name => '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-' + name + '" xlink:href="#kod-i-' + name + '"></use></svg>';
+        window.guardIcon = name => svg(names.has(name) ? name : 'info');
+        window.setGuardIcon = (node, name) => {
+            if (!node || (node.dataset.kodIcon === name && node.firstElementChild)) return;
+            node.dataset.kodIcon = name;
+            node.innerHTML = window.guardIcon(name);
+        };
+        function upgrade(node) {
+            const name = node.textContent.trim();
+            if (!/^[a-z][a-z0-9_]*$/.test(name)) return;
+            if (names.has(name)) { window.setGuardIcon(node, name); return; }
+            // nav.js başka bir ikon eklerse eski ikon desteğini isteğe bağlı yükle.
+            node.classList.add('guard-font-icon');
+            if (fontRequested) return;
+            fontRequested = true;
+            const link = document.createElement('link');
+            link.rel = 'stylesheet'; link.media = 'print';
+            link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200';
+            link.onload = () => { link.media = 'all'; };
+            document.head.appendChild(link);
+        }
+        function scan(node) {
+            if (node.nodeType !== 1) return;
+            if (node.matches(selector)) upgrade(node);
+            node.querySelectorAll(selector).forEach(upgrade);
+        }
+        window.GuardIcons = { start() {
+            if (observer) return;
+            scan(document.body);
+            observer = new MutationObserver(records => {
+                for (const record of records) {
+                    if (record.type === 'characterData') {
+                        const parent = record.target.parentElement;
+                        if (parent?.matches(selector)) upgrade(parent);
+                    } else {
+                        if (record.target.nodeType === 1 && record.target.matches(selector)) upgrade(record.target);
+                        record.addedNodes.forEach(scan);
+                    }
+                }
+            });
+            observer.observe(document.body, { childList: true, characterData: true, subtree: true });
+        }};
+    })();
+    </script>
 
     <style>
-.app-container,body{transition:background-color .3s;display:flex}.status-card{box-shadow:0 10px 30px var(--primary-glow)}header,nav{z-index:100}.action-item,.nav-link{text-decoration:none;cursor:pointer}.app-container,.modal-content,nav{max-width:390px;width:100%}.form-group label,.guard-name,.modal-btn,.section-title,.site-name-inline,.status-label,.terminal-id{text-transform:uppercase}*{box-sizing:border-box}.action-item,.menu-btn,.modal-btn,.nav-link,.pass-toggle,.qr-opacity,.qr-toggle-btn{cursor:pointer}:root{--text-main:#ffffff;--text-muted:rgba(255, 255, 255, 0.4);--border:rgba(255, 255, 255, 0.05);--error:#FF4D4D;--success:#00E676}html[data-theme=elite-neon]{--primary:#CCFF00;--on-primary:#000;--bg-dark:#080808;--surface:#0C0C0C;--surface-container:#161616;--card-bg:#1a1f00;--card-border:#CCFF00;--primary-glow:rgba(204, 255, 0, 0.2)}html[data-theme=cyber-cyan]{--primary:#00E5FF;--on-primary:#000;--bg-dark:#050A0C;--surface:#0A1013;--surface-container:#121A1D;--card-bg:#00191f;--card-border:#00E5FF;--primary-glow:rgba(0, 229, 255, 0.25)}html[data-theme=hex-purple]{--primary:#bd00ff;--on-primary:#fff;--bg-dark:#08050a;--surface:#0c0a0e;--surface-container:#16121a;--card-bg:#17001f;--card-border:#bd00ff;--primary-glow:rgba(189, 0, 255, 0.25)}html[data-theme=deep-orange]{--primary:#ff5500;--on-primary:#fff;--bg-dark:#0a0805;--surface:#0e0c0a;--surface-container:#1a1612;--card-bg:#1f0f00;--card-border:#ff5500;--primary-glow:rgba(255, 85, 0, 0.25)}html[data-theme=electric-blue]{--primary:#0066ff;--on-primary:#fff;--bg-dark:#050608;--surface:#0a0b0d;--surface-container:#12141a;--card-bg:#000d1f;--card-border:#0066ff;--primary-glow:rgba(0, 102, 255, 0.25)}html[data-theme=matrix-green]{--primary:#00ff66;--on-primary:#000;--bg-dark:#050805;--surface:#0a0d0a;--surface-container:#121a12;--card-bg:#001f0d;--card-border:#00ff66;--primary-glow:rgba(0, 255, 102, 0.25)}html[data-theme=ruby-red]{--primary:#ff0055;--on-primary:#fff;--bg-dark:#080506;--surface:#0d0a0b;--surface-container:#1a1214;--card-bg:#1f000a;--card-border:#ff0055;--primary-glow:rgba(255, 0, 85, 0.25)}*{margin:0;padding:0;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent}body{background-color:var(--bg-dark);color:var(--text-main);justify-content:center;overflow-x:hidden}.app-container{background-color:var(--surface);border-left:1px solid var(--border);border-right:1px solid var(--border)}.status-card{background-color:var(--primary);color:var(--on-primary)}.action-item,.menu-btn{background-color:var(--surface-container);border:1px solid var(--border);color:var(--text-main)}.kart-yapisi{background-color:var(--card-bg);border:1px solid var(--card-border);color:color-mix(in srgb,var(--primary),#fff 20%)}.icon-box,.nav-link.active,.terminal-id .highlight{color:var(--primary)}.icon-box{background:color-mix(in srgb,var(--primary),transparent 90%)}.logo-text,.terminal-id span{color:#fff}.app-container{background-color:var(--surface);min-height:100vh;flex-direction:column;border-left:1px solid var(--border);border-right:1px solid var(--border);position:relative}header{padding:16px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.1);background:var(--surface);position:sticky;top:0;transition:background .3s}.logo-area,.terminal-id{align-items:center;gap:6px;display:flex}.logo-text{font-weight:900;letter-spacing:1.5px;font-size:16px}.terminal-id{font-family:monospace;font-size:8.5px;font-weight:900}.terminal-id div{display:flex;align-items:center}.menu-btn span:first-child,.nav-link.active,.terminal-id .highlight{color:var(--primary);transition:color .3s}main{flex:1;overflow-y:auto;padding:20px 16px 120px}.status-card{background-color:var(--primary);border-radius:32px;padding:24px 28px;color:var(--on-primary);position:relative;overflow:hidden;margin-bottom:24px;transition:background-color .3s,color .3s,box-shadow .3s}.status-label{font-size:10px;font-weight:800;opacity:.6;letter-spacing:1px;margin-bottom:2px}.guard-name{font-size:24px;font-weight:900;letter-spacing:-1px;line-height:1.1}.info-row{display:flex;justify-content:space-between;margin-top:30px;align-items:flex-end;gap:15px}.site-info-wrapper{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}.site-name-inline{font-weight:800;font-size:14px;display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nobet-timer{font-family:monospace;font-size:20px;font-weight:700;letter-spacing:-.5px;line-height:1}.section-title,.shift-info{font-size:11px;font-weight:800}.card-footer{margin-top:18px;padding-top:12px;border-top:1px solid rgba(0,0,0,.1);display:flex;justify-content:space-between;align-items:center}.shift-info{display:flex;align-items:center;gap:5px}.section-title{color:var(--text-muted);margin:24px 0 12px 4px;letter-spacing:1.5px}.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.action-item{background:var(--surface-container);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;border:1px solid var(--border);transition:transform .2s, background-color .2s;color:inherit}.action-item:active{transform:scale(.95);background:#202020}
+.app-container,body{transition:background-color .3s;display:flex}.status-card{box-shadow:0 10px 30px var(--primary-glow)}header,nav{z-index:100}.action-item,.nav-link{text-decoration:none;cursor:pointer}.app-container,.modal-content,nav{max-width:390px;width:100%}.form-group label,.guard-name,.modal-btn,.section-title,.site-name-inline,.status-label,.terminal-id{text-transform:uppercase}*{box-sizing:border-box}.action-item,.menu-btn,.modal-btn,.nav-link,.pass-toggle,.qr-opacity,.qr-toggle-btn{cursor:pointer}:root{--text-main:#ffffff;--text-muted:rgba(255, 255, 255, 0.4);--border:rgba(255, 255, 255, 0.05);--error:#FF4D4D;--success:#00E676}html[data-theme=elite-neon]{--primary:#CCFF00;--on-primary:#000;--bg-dark:#080808;--surface:#0C0C0C;--surface-container:#161616;--card-bg:#1a1f00;--card-border:#CCFF00;--primary-glow:rgba(204, 255, 0, 0.2)}html[data-theme=cyber-cyan]{--primary:#00E5FF;--on-primary:#000;--bg-dark:#050A0C;--surface:#0A1013;--surface-container:#121A1D;--card-bg:#00191f;--card-border:#00E5FF;--primary-glow:rgba(0, 229, 255, 0.25)}html[data-theme=hex-purple]{--primary:#bd00ff;--on-primary:#fff;--bg-dark:#08050a;--surface:#0c0a0e;--surface-container:#16121a;--card-bg:#17001f;--card-border:#bd00ff;--primary-glow:rgba(189, 0, 255, 0.25)}html[data-theme=deep-orange]{--primary:#ff5500;--on-primary:#fff;--bg-dark:#0a0805;--surface:#0e0c0a;--surface-container:#1a1612;--card-bg:#1f0f00;--card-border:#ff5500;--primary-glow:rgba(255, 85, 0, 0.25)}html[data-theme=electric-blue]{--primary:#0066ff;--on-primary:#fff;--bg-dark:#050608;--surface:#0a0b0d;--surface-container:#12141a;--card-bg:#000d1f;--card-border:#0066ff;--primary-glow:rgba(0, 102, 255, 0.25)}html[data-theme=matrix-green]{--primary:#00ff66;--on-primary:#000;--bg-dark:#050805;--surface:#0a0d0a;--surface-container:#121a12;--card-bg:#001f0d;--card-border:#00ff66;--primary-glow:rgba(0, 255, 102, 0.25)}html[data-theme=ruby-red]{--primary:#ff0055;--on-primary:#fff;--bg-dark:#080506;--surface:#0d0a0b;--surface-container:#1a1214;--card-bg:#1f000a;--card-border:#ff0055;--primary-glow:rgba(255, 0, 85, 0.25)}*{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;-webkit-tap-highlight-color:transparent}body{background-color:var(--bg-dark);color:var(--text-main);justify-content:center;overflow-x:hidden}.app-container{background-color:var(--surface);border-left:1px solid var(--border);border-right:1px solid var(--border)}.status-card{background-color:var(--primary);color:var(--on-primary)}.action-item,.menu-btn{background-color:var(--surface-container);border:1px solid var(--border);color:var(--text-main)}.kart-yapisi{background-color:var(--card-bg);border:1px solid var(--card-border);color:color-mix(in srgb,var(--primary),#fff 20%)}.icon-box,.nav-link.active,.terminal-id .highlight{color:var(--primary)}.icon-box{background:color-mix(in srgb,var(--primary),transparent 90%)}.logo-text,.terminal-id span{color:#fff}.app-container{background-color:var(--surface);min-height:100vh;flex-direction:column;border-left:1px solid var(--border);border-right:1px solid var(--border);position:relative}header{padding:16px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.1);background:var(--surface);position:sticky;top:0;transition:background .3s}.logo-area,.terminal-id{align-items:center;gap:6px;display:flex}.logo-text{font-weight:900;letter-spacing:1.5px;font-size:16px}.terminal-id{font-family:monospace;font-size:8.5px;font-weight:900}.terminal-id div{display:flex;align-items:center}.menu-btn span:first-child,.nav-link.active,.terminal-id .highlight{color:var(--primary);transition:color .3s}main{flex:1;overflow-y:auto;padding:20px 16px 120px}.status-card{background-color:var(--primary);border-radius:32px;padding:24px 28px;color:var(--on-primary);position:relative;overflow:hidden;margin-bottom:24px;transition:background-color .3s,color .3s,box-shadow .3s}.status-label{font-size:10px;font-weight:800;opacity:.6;letter-spacing:1px;margin-bottom:2px}.guard-name{font-size:24px;font-weight:900;letter-spacing:-1px;line-height:1.1}.info-row{display:flex;justify-content:space-between;margin-top:30px;align-items:flex-end;gap:15px}.site-info-wrapper{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}.site-name-inline{font-weight:800;font-size:14px;display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nobet-timer{font-family:monospace;font-size:20px;font-weight:700;letter-spacing:-.5px;line-height:1}.section-title,.shift-info{font-size:11px;font-weight:800}.card-footer{margin-top:18px;padding-top:12px;border-top:1px solid rgba(0,0,0,.1);display:flex;justify-content:space-between;align-items:center}.shift-info{display:flex;align-items:center;gap:5px}.section-title{color:var(--text-muted);margin:24px 0 12px 4px;letter-spacing:1.5px}.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.action-item{background:var(--surface-container);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;border:1px solid var(--border);transition:transform .2s, background-color .2s;color:inherit}.action-item:active{transform:scale(.95);background:#202020}
 
 /* KASMA YAPAN BACKDROP-FILTER KALDIRILDI, SOLID RENK VERİLDİ */
 nav{position:fixed;bottom:0;background:#0c0c0c;display:flex;justify-content:space-around;padding:12px 10px 24px;border-top:1px solid var(--border)}.nav-link{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--text-muted);font-size:9px;font-weight:700;position:relative}.badge-online{background:#000;color:var(--primary);padding:4px 12px;border-radius:20px;font-size:10px;font-weight:900;transition:color .3s}
@@ -205,16 +247,8 @@ nav{position:fixed;bottom:0;background:#0c0c0c;display:flex;justify-content:spac
 /* DROP-SHADOW KALDIRILDI */
 .unread-glow{color:var(--error)!important;}
 
-#toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);width:calc(100% - 40px);max-width:350px;z-index:100001;pointer-events:none}.toast{background:#1a1a1a;border-left:4px solid var(--primary);color:#fff;padding:16px;border-radius:12px;margin-bottom:10px;box-shadow:0 10px 30px rgba(0,0,0,.5);display:flex;align-items:center;gap:12px;animation:.3s forwards slideIn;transition:border-left-color .3s}.toast.error{border-left-color:var(--error)}.toast.success{border-left-color:var(--success)}@keyframes slideIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}@keyframes slideOut{to{opacity:0;transform:translateY(-20px)}}.material-symbols-outlined{font-family:'Material Symbols Outlined';font-weight:400;font-style:normal;font-size:24px;letter-spacing:normal;text-transform:none;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:'liga';-webkit-font-smoothing:antialiased;display:inline-flex!important;align-items:center!important;justify-content:center!important;vertical-align:middle!important;width:1em;height:1em;overflow:visible!important;line-height:1!important;position:relative;flex-shrink:0}.material-symbols-outlined.size-14{width:14px;height:14px;font-size:14px}.material-symbols-outlined.size-18{width:18px;height:18px;font-size:18px}.qr-opacity{font-weight:700;opacity:.4;transition:transform .2s,opacity .2s}.qr-opacity:active{opacity:.8}.icon-box{background:rgba(204,255,0,.1);color:var(--primary);width:42px;height:42px;border-radius:14px;transition:color .3s;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden;flex-shrink:0}.kart-yapisi{background-color:var(--card-bg);border:1px solid var(--card-border);color:color-mix(in srgb,var(--primary),#fff 20%);padding:20px;border-radius:20px;transition:.3s;margin-bottom:15px}.qr-toggle-btn{display:inline-block;font-size:100px;padding:10px;transform-origin:center;transition:transform .15s,opacity .2s,color .2s}.qr-toggle-btn:active{color:var(--primary)}
+#toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);width:calc(100% - 40px);max-width:350px;z-index:100001;pointer-events:none}.toast{background:#1a1a1a;border-left:4px solid var(--primary);color:#fff;padding:16px;border-radius:12px;margin-bottom:10px;box-shadow:0 10px 30px rgba(0,0,0,.5);display:flex;align-items:center;gap:12px;animation:.3s forwards slideIn;transition:border-left-color .3s}.toast.error{border-left-color:var(--error)}.toast.success{border-left-color:var(--success)}@keyframes slideIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}@keyframes slideOut{to{opacity:0;transform:translateY(-20px)}}.material-symbols-outlined{font-family:inherit;font-weight:400;font-style:normal;font-size:24px;letter-spacing:normal;text-transform:none;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:'liga';-webkit-font-smoothing:antialiased;display:inline-flex!important;align-items:center!important;justify-content:center!important;vertical-align:middle!important;width:1em;height:1em;overflow:visible!important;line-height:1!important;position:relative;flex-shrink:0}.material-symbols-outlined.size-14{width:14px;height:14px;font-size:14px}.material-symbols-outlined.size-18{width:18px;height:18px;font-size:18px}.qr-opacity{font-weight:700;opacity:.4;transition:transform .2s,opacity .2s}.qr-opacity:active{opacity:.8}.icon-box{background:rgba(204,255,0,.1);color:var(--primary);width:42px;height:42px;border-radius:14px;transition:color .3s;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden;flex-shrink:0}.kart-yapisi{background-color:var(--card-bg);border:1px solid var(--card-border);color:color-mix(in srgb,var(--primary),#fff 20%);padding:20px;border-radius:20px;transition:.3s;margin-bottom:15px}.qr-toggle-btn{display:inline-block;font-size:100px;padding:10px;transform-origin:center;transition:transform .15s,opacity .2s,color .2s}.qr-toggle-btn:active{color:var(--primary)}
 .material-symbols-outlined { position: relative; display: inline-flex !important; align-items: center; justify-content: center; }
-#loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
-.loader-wrap { position: relative; width: 200px; height: 200px; display: flex; align-items: center; justify-content: center; }
-.outer-ring { position: absolute; width: 100%; height: 100%; border: 2px solid transparent; border-top: 2px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
-.inner-scan { width: 140px; height: 2px; background: var(--primary); box-shadow: 0 0 20px var(--primary); animation: scanVertical 2s ease-in-out infinite; position: absolute; }
-@keyframes scanVertical { 0%, 100% { transform: translateY(-60px); opacity: 0; } 50% { transform: translateY(60px); opacity: 1; } }
-.status-box { margin-top: 30px; text-align: center; }
-.status-box h2 { color: var(--primary); font-size: 18px; letter-spacing: 5px; margin-bottom: 10px; }
-.log-line { font-size: 10px; color: #555; text-transform: uppercase; font-family: 'Share Tech Mono', monospace; }
 /* Profil modalı içerisindeki buton tasarımı */
 #profileMenuModal button:not(:last-child) {
     background: #000000;
@@ -406,7 +440,12 @@ body.pw-open { overflow: hidden; }
 /* DEVRİYE DUVARI STİLİ: BİTİŞ */
 
 /* KARŞILAMA EKRANI: BAŞLANGIÇ */
-.guard-icons-pending .material-symbols-outlined { visibility: hidden; }
+.material-symbols-outlined > svg, .material-symbols-rounded > svg, .material-icons > svg { display: block; width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.material-symbols-rounded, .material-icons { display: inline-flex; width: 1em; height: 1em; }
+.guard-font-icon { font-family: 'Material Symbols Outlined' !important; }
+.guard-lite .status-card { box-shadow: none; }
+.guard-lite .msg-badge, .guard-lite .live-dot { animation: none; }
+.guard-lite .status-card, .guard-lite .action-item, .guard-lite .modal-content { transition: none; }
 html[data-guard-ready="false"], html[data-guard-ready="false"] body { overflow: hidden; }
 #loading-overlay { --boot-accent: #e2e5e9; position: fixed; inset: 0; z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; width: 100%; height: 100vh; height: 100dvh; min-height: 0; max-width: none; padding: 0; margin: 0; border: 0; border-radius: 0; background: #08090b; color: #f5f5f7; box-shadow: none; backdrop-filter: none; transform: none; pointer-events: auto; overflow-y: auto; overscroll-behavior: contain; opacity: 1; transition: opacity .18s ease; outline: none; }
 #loading-overlay::before, #loading-overlay::after { display: none; }
@@ -414,26 +453,26 @@ html[data-guard-ready="false"], html[data-guard-ready="false"] body { overflow: 
 #loading-overlay.boot-leaving { opacity: 0; }
 .boot-shell { width: 100%; max-width: 700px; height: 100%; min-height: 490px; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: clamp(24px, 4vh, 42px); padding: max(26px, env(safe-area-inset-top)) clamp(22px, 6vw, 40px) max(30px, env(safe-area-inset-bottom)); margin: 0 auto; }
 .boot-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; width: 100%; }
-.boot-wordmark { color: #f5f5f7; font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; font-weight: 900; line-height: 1; letter-spacing: 1.7px; }
+.boot-wordmark { color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 15px; font-weight: 900; line-height: 1; letter-spacing: 1.7px; }
 .boot-service { color: #747980; font-size: 10px; font-weight: 500; line-height: 1; letter-spacing: .2px; }
 .boot-art { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; min-width: 0; min-height: 0; padding: 0; margin: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
 .boot-art::before, .boot-art::after { display: none; }
 #boot-artwork { display: block; width: 100%; height: 100%; min-width: 0; min-height: 0; max-width: 100%; max-height: 100%; object-fit: contain; object-position: center; border: 0; border-radius: 0; box-shadow: none; filter: none; opacity: 1; }
 .boot-art-fallback { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 13px; padding: 24px 0; }
-.boot-art-fallback strong { font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: clamp(62px, 18vw, 110px); font-weight: 900; line-height: .9; letter-spacing: -.075em; color: #f5f5f7; }
+.boot-art-fallback strong { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; font-size: clamp(62px, 18vw, 110px); font-weight: 900; line-height: .9; letter-spacing: -.075em; color: #f5f5f7; }
 .boot-art-fallback small { color: #7f858e; font-size: 9px; font-weight: 500; letter-spacing: 2.5px; }
 .boot-panel { width: 100%; max-width: 400px; margin: 0 auto; padding: 0; text-align: left; }
 .boot-title-line { display: flex; align-items: center; gap: 10px; }
 .boot-status-icon { display: flex; align-items: center; justify-content: center; width: 17px; height: 17px; margin: 0; flex-shrink: 0; color: var(--boot-accent); }
 .boot-status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
 .boot-offline-icon, .boot-check-icon { display: none; width: 17px; height: 17px; }
-#loading-overlay #loadingTitle { margin: 0; padding: 0; color: #f1f2f5; font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: clamp(16px, 4.3vw, 18px); font-weight: 600; line-height: 1.4; letter-spacing: -.35px; text-transform: none; }
-#loading-overlay #logLine { margin: 9px 0 0 27px; padding: 0; color: #858b95; font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 12px; font-weight: 400; line-height: 1.75; letter-spacing: 0; text-transform: none; }
+#loading-overlay #loadingTitle { margin: 0; padding: 0; color: #f1f2f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; font-size: clamp(16px, 4.3vw, 18px); font-weight: 600; line-height: 1.4; letter-spacing: -.35px; text-transform: none; }
+#loading-overlay #logLine { margin: 9px 0 0 27px; padding: 0; color: #858b95; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 12px; font-weight: 400; line-height: 1.75; letter-spacing: 0; text-transform: none; }
 .boot-progress { position: relative; height: 2px; margin: 24px 0 0; overflow: hidden; border-radius: 1px; background: #202329; }
 #loading-overlay[data-state="loading"] #logLine, #loading-overlay[data-state="ready"] #logLine { display: none; }
 .boot-progress::after { content: ''; position: absolute; inset: 0; width: 36%; background: var(--boot-accent); border-radius: inherit; transform: translateX(-110%); animation: boot-slide 1.7s ease-in-out infinite; }
 @keyframes boot-slide { from { transform: translateX(-110%); } to { transform: translateX(390%); } }
-#boot-retry { display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%; min-height: 48px; margin: 21px 0 0; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; background: #f0f2f5; color: #16191e; font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+#boot-retry { display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%; min-height: 48px; margin: 21px 0 0; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; background: #f0f2f5; color: #16191e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
 #boot-retry svg { width: 15px; height: 15px; }
 #boot-retry:active { background: #dce0e6; }
 #boot-retry:focus-visible { outline: 2px solid #e8edf3; outline-offset: 5px; }
@@ -501,7 +540,7 @@ let guardTrackingUID = '';
 const guardSubscriptions = new Set();
 const settingsSubscribers = new Set();
 let settingsUnsubscribe = null, latestSettingsSnapshot = null;
-let wallStartFrame = null, wallTrackingUID = '';
+let cancelWallStart = null, wallTrackingUID = '';
 
 function watchGuardValue(target, callback, onError, bootTask) {
     const stop = onValue(target, snapshot => {
@@ -539,25 +578,42 @@ function stopGuardTracking() {
     guardSubscriptions.forEach(stop => stop());
     guardSubscriptions.clear(); settingsSubscribers.clear();
     settingsUnsubscribe = null; latestSettingsSnapshot = null;
-    if (wallStartFrame !== null) cancelAnimationFrame(wallStartFrame);
-    wallStartFrame = null;
+    cancelWallStart?.(); cancelWallStart = null;
     wallTrackingUID = '';
     guardPatrolWall.stop();
     clearInterval(nobetTimerInterval); nobetTimerInterval = null;
     nobetStartValue = null;
     isDataLoaded = false; isNobetActive = false;
 }
+// Ağır isteğe bağlı işleri ilk kullanılabilir çizimden sonraya bırak.
+function afterGuardPaint(callback, timeout = 700) {
+    let cancelled = false, idle = null, timer = null;
+    const frame = requestAnimationFrame(() => {
+        const run = () => { if (!cancelled) callback(); };
+        if (window.requestIdleCallback) idle = requestIdleCallback(run, { timeout });
+        else timer = setTimeout(run, 0);
+    });
+    return () => {
+        cancelled = true; cancelAnimationFrame(frame);
+        if (idle !== null) cancelIdleCallback(idle);
+        if (timer !== null) clearTimeout(timer);
+    };
+}
 function startGuardWallAfterPaint() {
-    if (wallStartFrame !== null || wallTrackingUID === guardTrackingUID) return;
+    if (!window.GuardPageBoot.ready || cancelWallStart || wallTrackingUID === guardTrackingUID) return;
     const uid = guardTrackingUID;
-    wallStartFrame = requestAnimationFrame(() => {
-        wallStartFrame = null;
+    cancelWallStart = afterGuardPaint(() => {
+        cancelWallStart = null;
         if (guardTrackingUID === uid && auth.currentUser?.uid === uid) {
             guardPatrolWall.start();
             wallTrackingUID = uid;
         }
     });
 }
+document.addEventListener('guard:ready', () => {
+    startGuardWallAfterPaint();
+    afterGuardPaint(() => { loadOfflineSync().catch(() => {}); }, 1200);
+});
 onAuthStateChanged(auth, (user) => {
     if (!user) {
         if (guardTrackingUID) stopGuardTracking();
@@ -570,6 +626,15 @@ onAuthStateChanged(auth, (user) => {
     if (guardTrackingUID) stopGuardTracking();
     guardTrackingUID = user.uid;
     window.GuardPageBoot.pending();
+    // Bağlantı doğrulaması, isteğe bağlı devriye duvarından bağımsızdır.
+    watchGuardValue(ref(db, '.info/connected'), snapshot => {
+        const connected = snapshot.val() === true;
+        window.GuardPageBoot.connection(connected);
+        guardPatrolWall.connection(connected);
+    }, () => {
+        window.GuardPageBoot.connection(false);
+        guardPatrolWall.connection(false);
+    });
     initUI();
     loadSiteName();
     trackActiveNobet();
@@ -596,14 +661,14 @@ window.showToast = (msg, type = 'primary') => {
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     const icon = type === 'error' ? 'report' : (type === 'success' ? 'check_circle' : 'info');
-    toast.innerHTML = `<span class="material-symbols-outlined">${icon}</span><span style="font-size:13px; font-weight:600;">${msg}</span>`;
+    toast.innerHTML = `<span class="material-symbols-outlined">${guardIcon(icon)}</span><span style="font-size:13px; font-weight:600;">${msg}</span>`;
     container.appendChild(toast);
     setTimeout(() => {
         toast.style.animation = 'slideOut 0.3s ease forwards';
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
-async function loadSiteName() {
+function loadSiteName() {
     const siteNameEl = document.getElementById('site-name-display');
     if (!siteNameEl) return;
     const cacheKey = 'KOD_GUVENLIK_SITE_NAME_' + siteID;
@@ -611,14 +676,13 @@ async function loadSiteName() {
         const cached = localStorage.getItem(cacheKey);
         if (cached) siteNameEl.textContent = cached;
     } catch (_) {}
-    try {
-        const snap = await get(ref(db, "settings/siteName"));
-        const name = snap.exists() ? String(snap.val()).toUpperCase() : "TANIMSIZ SİTE";
+    onGuardSettings(snapshot => {
+        const settings = snapshot.val() || {};
+        const name = settings.siteName ? String(settings.siteName).toUpperCase() : 'TANIMSIZ SİTE';
         if (siteNameEl.textContent !== name) siteNameEl.textContent = name;
         try { localStorage.setItem(cacheKey, name); } catch (_) {}
-    } catch (e) {
-        if (!siteNameEl.textContent || siteNameEl.textContent === '...') siteNameEl.textContent = "HATA";
-    } finally { window.GuardPageBoot.mark('site'); }
+        window.GuardPageBoot.mark('site');
+    });
 }
 function startNobetCounter(startTimeStr) {
     const startTime = new Date(startTimeStr).getTime();
@@ -668,13 +732,13 @@ function trackActiveNobet() {
             if (sIcon && sText) {
                 const shiftVal = activeRecord.shift ? activeRecord.shift.toLowerCase() : "";
                 if (shiftVal === "gece") {
-                    sIcon.textContent = "dark_mode";
+                    setGuardIcon(sIcon, "dark_mode");
                     sText.textContent = "Gece Vardiyası";
                 } else if (shiftVal === "gündüz") {
-                    sIcon.textContent = "light_mode";
+                    setGuardIcon(sIcon, "light_mode");
                     sText.textContent = "Gündüz Vardiyası";
                 } else {
-                    sIcon.textContent = "history";
+                    setGuardIcon(sIcon, "history");
                     sText.textContent = activeRecord.shift || "Belirsiz";
                 }
             }
@@ -686,11 +750,10 @@ function trackActiveNobet() {
             if(timerEl) timerEl.textContent = "00:00:00";
             if(nobetAlArea) nobetAlArea.style.display = 'flex';
             if(nobetTeslimArea) nobetTeslimArea.style.display = 'none';
-            if(sIcon) sIcon.textContent = "history";
+            if(sIcon) setGuardIcon(sIcon, "history");
             if(sText) sText.textContent = "Nöbet Bekleniyor";
         }
         window.GuardPageBoot.complete();
-        startGuardWallAfterPaint();
     };
     // Bitmiş nöbet geçmişi yerine aktif nöbetler sorgulanır. Yazma yolları değişmez.
     const activeQuery = query(ref(db, 'nobetRecords'), orderByChild('status'), equalTo('started'));
@@ -884,9 +947,9 @@ window.togglePassword = () => {
     const icon = document.getElementById('passIcon');
     if(!passInput || !icon) return;
     if (passInput.type === "password") {
-        passInput.type = "text"; icon.textContent = "visibility_off";
+        passInput.type = "text"; setGuardIcon(icon, "visibility_off");
     } else {
-        passInput.type = "password"; icon.textContent = "visibility";
+        passInput.type = "password"; setGuardIcon(icon, "visibility");
     }
 }
 window.handlePassInput = (e) => {
@@ -898,10 +961,10 @@ window.handlePassInput = (e) => {
         if(!el) return;
         const icon = el.querySelector('span');
         if (isOk) {
-            if(icon) { icon.textContent = "check_circle"; icon.style.color = "var(--primary)"; }
+            if(icon) { setGuardIcon(icon, "check_circle"); icon.style.color = "var(--primary)"; }
             el.style.color = "var(--primary)";
         } else {
-            if(icon) { icon.textContent = "cancel"; icon.style.color = "#ff4d4d"; }
+            if(icon) { setGuardIcon(icon, "cancel"); icon.style.color = "#ff4d4d"; }
             el.style.color = "#ccc";
         }
     };
@@ -1001,10 +1064,10 @@ function updateLocModal(title, desc, type) {
     if(!statusIconArea || !statusTitle) return;
     if(type === "success") {
         statusTitle.style.color = "var(--success)";
-        statusIconArea.innerHTML = '<span class="material-symbols-outlined" style="font-size:48px; color:var(--success)">check_circle</span>';
+        statusIconArea.innerHTML = '<span class="material-symbols-outlined" style="font-size:48px; color:var(--success)" data-kod-icon="check_circle"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-check_circle" xlink:href="#kod-i-check_circle"></use></svg></span>';
     } else {
         statusTitle.style.color = "var(--error)";
-        statusIconArea.innerHTML = '<span class="material-symbols-outlined" style="font-size:48px; color:var(--error)">error</span>';
+        statusIconArea.innerHTML = '<span class="material-symbols-outlined" style="font-size:48px; color:var(--error)" data-kod-icon="error"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-error" xlink:href="#kod-i-error"></use></svg></span>';
     }
 }
 window.goToKimlikKartim = () => {
@@ -1087,6 +1150,33 @@ window.checkAction = async (targetUrl, islemAdi) => {
         window.location.href = hedefUrl;
     }
 }
+// İlk ekran offline-sync.js dosyasını beklemez. Nöbet teslimi bu kontrolü atlayamaz.
+let offlineSyncPromise = null;
+function loadOfflineSync() {
+    if (window.KolartOfflineSync?.queueSummary && window.KolartOfflineSync?.sync) {
+        return Promise.resolve(window.KolartOfflineSync);
+    }
+    if (offlineSyncPromise) return offlineSyncPromise;
+    offlineSyncPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        let settled = false;
+        const finish = error => {
+            if (settled) return;
+            settled = true; clearTimeout(timer);
+            script.onload = script.onerror = null;
+            if (error) { script.remove(); reject(error); }
+            else resolve(window.KolartOfflineSync);
+        };
+        const timer = setTimeout(() => finish(new Error('Devriye kayıt kontrolü yüklenemedi. Tekrar deneyin.')), 15000);
+        script.src = './offline-sync.js?v=20261008-2050';
+        script.async = true; script.fetchPriority = 'low';
+        script.onload = () => finish(window.KolartOfflineSync?.queueSummary && window.KolartOfflineSync?.sync
+            ? null : new Error('Telefondaki devriye kayıtlarını kontrol eden dosya yüklenemedi.'));
+        script.onerror = () => finish(new Error('Devriye kayıt kontrolü yüklenemedi. Bağlantıyı kontrol edin.'));
+        document.head.appendChild(script);
+    }).catch(error => { offlineSyncPromise = null; throw error; });
+    return offlineSyncPromise;
+}
 // Fotoğraf aktarımına ait SDK, yalnız kullanıcı gönderim istediğinde yüklenir.
 let uploadStoragePromise;
 function loadUploadStorage() {
@@ -1103,7 +1193,12 @@ function offlineUploadContext(app, db, auth, siteID) {
 }
 
 // Kuyruğun sahibi ve proje kimliği birlikte kontrol edilir. Gönderim yükleme isteğiyle başlar.
-const NobetPatrolUpload = (() => {
+let nobetUploadUI;
+const NobetPatrolUpload = { check(context) {
+    if (!nobetUploadUI) nobetUploadUI = createNobetPatrolUpload();
+    return nobetUploadUI.check(context);
+}};
+function createNobetPatrolUpload() {
     const dialog = document.getElementById('guardTransferModal');
     const ui = Object.fromEntries(['card', 'symbol', 'title', 'copy', 'count', 'summary-label', 'account',
         'dates', 'warning-box', 'warning', 'progress', 'progress-label', 'percent', 'track', 'bar',
@@ -1293,7 +1388,7 @@ const NobetPatrolUpload = (() => {
         if (event.key !== 'Tab') return;
         const buttons = [ui['auth-password'], ui.send, ui.back].filter(el => !el.hidden && !el.disabled && el.getClientRects().length);
         if (!buttons.length) { event.preventDefault(); ui.card.focus(); return; }
-        const first = buttons[0], last = buttons.at(-1);
+        const first = buttons[0], last = buttons[buttons.length - 1];
         if (event.shiftKey && (document.activeElement === first || document.activeElement === ui.card)) { event.preventDefault(); last.focus(); }
         else if (!event.shiftKey && (document.activeElement === last || document.activeElement === ui.card)) { event.preventDefault(); first.focus(); }
     });
@@ -1320,9 +1415,10 @@ const NobetPatrolUpload = (() => {
             return pending;
         }
     };
-})();
+}
 
 async function finishNobetOfflineUploads(app, db, auth, siteID) {
+    await loadOfflineSync();
     if (!window.KolartOfflineSync?.queueSummary || !window.KolartOfflineSync?.sync) {
         throw new Error('Telefondaki devriye kayıtlarını kontrol eden dosya yüklenemedi.');
     }
@@ -1608,13 +1704,13 @@ function showKimlikUyariModal() {
         modal.innerHTML = `
             <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(13, 17, 23, 0.95); z-index: 99999; display: flex; align-items: center; justify-content: center; ">
                 <div style="background: #161b22; border: 1px solid #ff4d4d; border-radius: 16px; padding: 30px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 0 30px rgba(255, 77, 77, 0.2);">
-                    <span class="material-symbols-outlined" style="font-size: 64px; color: #ff4d4d; margin-bottom: 15px;">badge</span>
+                    <span class="material-symbols-outlined" style="font-size: 64px; color: #ff4d4d; margin-bottom: 15px;" data-kod-icon="badge"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-badge" xlink:href="#kod-i-badge"></use></svg></span>
                     <h2 style="color: #fff; margin-bottom: 15px; font-size: 20px;">KİMLİK BİLGİSİ EKSİK!</h2>
                     <p style="color: #8b949e; font-size: 14px; margin-bottom: 25px; line-height: 1.5;">
                         Güvenlik kimlik bilgileriniz sistemde eksik veya onaylanmamış. Sisteme devam edebilmek için lütfen kimlik bilgilerinizi güncelleyin.
                     </p>
                     <button onclick="window.location.href='kart.html'" style="background: #00f2fe; color: #000; border: none; padding: 15px 20px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.25);">
-                        <span class="material-symbols-outlined">edit_document</span> KART BİLGİLERİNİ GİR
+                        <span class="material-symbols-outlined" data-kod-icon="edit_document"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-edit_document" xlink:href="#kod-i-edit_document"></use></svg></span> KART BİLGİLERİNİ GİR
                     </button>
                 </div>
             </div>
@@ -1671,7 +1767,16 @@ function trackActiveDevriyeBanner() {
 
 // DEVRİYE DUVARI KODU: BAŞLANGIÇ
 // Bu bileşen sadece okur. Devriye başlatma/bitirme ve saat kapama kayıtlarına yazmaz.
-const guardPatrolWall = (() => {
+let patrolWallUI;
+const guardPatrolWall = {
+    start() {
+        if (!patrolWallUI) patrolWallUI = createGuardPatrolWall();
+        patrolWallUI.start();
+    },
+    stop() { patrolWallUI?.stop(); },
+    connection(value) { patrolWallUI?.connection(value); }
+};
+function createGuardPatrolWall() {
     const SHIFT_START = 8;
     // Saat kapatma koduyla aynı vardiya anahtarı kullanılır: 08:00–ertesi 08:00.
     // Vardiyanın bütün saatleri, vardiyanın başladığı tarihin kaydından okunur.
@@ -1976,13 +2081,12 @@ const guardPatrolWall = (() => {
         if (!el('pw-open')) return;
         bind(); started = true;
         currentKey = shiftKey(); selectedKey = currentKey;
-        settingsReady = false; settingsError = false; settings = null; connected = false;
+        settingsReady = false; settingsError = false; settings = null; connected = window.GuardPageBoot.connected;
         stops.push(onValue(ref(db, 'sistemAyarlari'), snapshot => {
             if (!started) return;
             settings = snapshot.val(); settingsReady = true; settingsError = false;
             syncRegions(); render();
         }, () => { if (started) { settingsError = true; settingsReady = true; render(); } }));
-        stops.push(onValue(ref(db, '.info/connected'), snapshot => { if (started) { connected = snapshot.val() === true; window.GuardPageBoot.connection(connected); render(); } }, () => { connected = false; window.GuardPageBoot.connection(false); render(); }));
         syncDays(); render(); scheduleTick();
     }
     function stop() {
@@ -1993,19 +2097,20 @@ const guardPatrolWall = (() => {
         days.forEach(source => source.stop?.()); days.clear();
         qrStop?.(); qrStop = null; qrRegions = []; qrReady = true;
     }
-    return { start, stop };
-})();
+    function connection(value) { connected = value === true; if (started) render(); }
+    return { start, stop, connection };
+}
 // DEVRİYE DUVARI KODU: BİTİŞ
 
 </script>
 </head>
-<body><div id="toast-container"></div>
+<body><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden;pointer-events:none"><symbol id="kod-i-security" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6Z"/><path d="m8 12 3 3 5-6"/></symbol><symbol id="kod-i-location_on" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol><symbol id="kod-i-history" viewBox="0 0 24 24"><path d="M3 10a9 9 0 1 1 2 8M3 4v6h6M12 7v5l3 2"/></symbol><symbol id="kod-i-qr_code_scanner" viewBox="0 0 24 24"><path d="M3 8V3h5m8 0h5v5M3 16v5h5m8 0h5v-5M6 6h3v3H6Zm9 0h3v3h-3ZM6 15h3v3H6Zm9 0h3v3h-3Z"/></symbol><symbol id="kod-i-play_circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/></symbol><symbol id="kod-i-stop_circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9h6v6H9Z"/></symbol><symbol id="kod-i-directions_walk" viewBox="0 0 24 24"><circle cx="14" cy="4" r="1.5"/><path d="m7 21 4-7m-2-5 3-2 3 4 4 1m-7-5-2 7 5 3v4M5 12l3-3"/></symbol><symbol id="kod-i-book" viewBox="0 0 24 24"><path d="M4 3h13a2 2 0 0 1 2 2v16H6a2 2 0 0 1-2-2Zm0 15h15M8 3v9l3-2 3 2V3"/></symbol><symbol id="kod-i-report_problem" viewBox="0 0 24 24"><path d="m12 3 10 18H2Zm0 6v5m0 3v.3"/></symbol><symbol id="kod-i-forum" viewBox="0 0 24 24"><path d="M3 3h14v11H8l-5 4Zm6 11v4h7l5 4V8h-4"/></symbol><symbol id="kod-i-emergency" viewBox="0 0 24 24"><path d="M10 3h4v6l5-3 2 4-5 2 5 2-2 4-5-3v6h-4v-6l-5 3-2-4 5-2-5-2 2-4 5 3Z"/></symbol><symbol id="kod-i-call" viewBox="0 0 24 24"><path d="M7 3H3v3c0 8 7 15 15 15h3v-4l-5-2-2 3a14 14 0 0 1-8-8l3-2Z"/></symbol><symbol id="kod-i-app_registration" viewBox="0 0 24 24"><path d="M4 4h5v5H4Zm11 0h5v5h-5ZM4 15h5v5H4Zm11 2 5-5 2 2-5 5-3 1Z"/></symbol><symbol id="kod-i-account_circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="9" r="3"/><path d="M5 18a8 8 0 0 1 14 0"/></symbol><symbol id="kod-i-settings" viewBox="0 0 24 24"><path d="m10 3-1 3-3 1-2-1-2 4 2 2v2l-2 2 2 4 3-1 2 1 1 3h4l1-3 2-1 3 1 2-4-2-2v-2l2-2-2-4-3 1-2-1-1-3Z"/><circle cx="12" cy="13" r="3"/></symbol><symbol id="kod-i-share_location" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14"/></symbol><symbol id="kod-i-badge" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M9 5V2h6v3m0 6h3m-3 4h3M5 18a4 4 0 0 1 8 0"/><circle cx="9" cy="12" r="2"/></symbol><symbol id="kod-i-school" viewBox="0 0 24 24"><path d="m2 8 10-5 10 5-10 5ZM6 10v7c4 3 8 3 12 0v-7m4-2v9"/></symbol><symbol id="kod-i-manage_accounts" viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><path d="M2 21v-2a7 7 0 0 1 10-6m5 0v2m0 6v2m-5-5h2m6 0h2m-9-4 2 2m4 4 2 2m0-8-2 2m-4 4-2 2"/><circle cx="17" cy="18" r="3"/></symbol><symbol id="kod-i-visibility" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol><symbol id="kod-i-visibility_off" viewBox="0 0 24 24"><path d="m3 3 18 18M9 5a13 13 0 0 1 13 7 18 18 0 0 1-3 4M6 6a18 18 0 0 0-4 6s4 7 10 7a13 13 0 0 0 5-1m-7-8 4 4"/></symbol><symbol id="kod-i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/></symbol><symbol id="kod-i-warning" viewBox="0 0 24 24"><path d="m12 3 10 18H2Zm0 6v5m0 3v.3"/></symbol><symbol id="kod-i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol><symbol id="kod-i-cancel" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 8 8 8m0-8-8 8"/></symbol><symbol id="kod-i-emergency_home" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8M5 10v11h14V10m-9 3h4m-2-2v4m-3 6v-4h6v4"/></symbol><symbol id="kod-i-medical_services" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="15" rx="2"/><path d="M8 6V3h8v3m-4 4v7m-3-3h6"/></symbol><symbol id="kod-i-phone_in_talk" viewBox="0 0 24 24"><path d="M7 3H3v3c0 8 7 15 15 15h3v-4l-5-2-2 3a14 14 0 0 1-8-8l3-2Zm8 0a6 6 0 0 1 6 6m-6-2a2 2 0 0 1 2 2"/></symbol><symbol id="kod-i-local_police" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6Zm0 4 1.5 3 3.5.5-2.5 2.5.5 3.5-3-1.5-3 1.5.5-3.5L7 10.5l3.5-.5Z"/></symbol><symbol id="kod-i-light_mode" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2"/></symbol><symbol id="kod-i-dark_mode" viewBox="0 0 24 24"><path d="M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12Z"/></symbol><symbol id="kod-i-check_circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m7 12 3 3 7-7"/></symbol><symbol id="kod-i-error" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v6m0 4v.1"/></symbol><symbol id="kod-i-report" viewBox="0 0 24 24"><path d="m8 3-5 5v8l5 5h8l5-5V8l-5-5ZM12 7v6m0 4v.1"/></symbol><symbol id="kod-i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.1"/></symbol><symbol id="kod-i-edit_document" viewBox="0 0 24 24"><path d="M13 3H5v18h14v-9M13 3v6h6m-8 6 8-8 2 2-8 8-3 1Z"/></symbol><symbol id="kod-i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></symbol><symbol id="kod-i-person" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></symbol><symbol id="kod-i-notifications" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0v6l2 3H4l2-3Zm4 12h4"/></symbol><symbol id="kod-i-chat" viewBox="0 0 24 24"><path d="M3 3h18v14H8l-5 4Zm4 5h10M7 12h7"/></symbol><symbol id="kod-i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol><symbol id="kod-i-logout" viewBox="0 0 24 24"><path d="M9 3H3v18h6m4-15 6 6-6 6M8 12h13"/></symbol><symbol id="kod-i-dashboard" viewBox="0 0 24 24"><path d="M3 3h8v8H3Zm12 0h6v6h-6ZM3 15h8v6H3Zm12-2h6v8h-6Z"/></symbol><symbol id="kod-i-assignment" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M8 4V2h8v2M8 9h8m-8 5h8m-8 4h5"/></symbol><symbol id="kod-i-arrow_back" viewBox="0 0 24 24"><path d="m12 4-8 8 8 8M4 12h17"/></symbol><symbol id="kod-i-arrow_forward" viewBox="0 0 24 24"><path d="m12 4 8 8-8 8M3 12h17"/></symbol><symbol id="kod-i-chevron_right" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol><symbol id="kod-i-expand_more" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></symbol><symbol id="kod-i-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4.5 16a8 8 0 0 0 13.7 2M19.5 8A8 8 0 0 0 5.8 6"/></symbol><symbol id="kod-i-schedule" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></symbol><symbol id="kod-i-event" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6m10-6v6M3 11h18m-14 4h3m4 0h3"/></symbol><symbol id="kod-i-groups" viewBox="0 0 24 24"><circle cx="12" cy="7" r="3"/><path d="M6 21v-3a6 6 0 0 1 12 0v3M4 7a3 3 0 0 0 0 6m16-6a3 3 0 0 1 0 6M1 21v-3a4 4 0 0 1 3-4m19 7v-3a4 4 0 0 0-3-4"/></symbol><symbol id="kod-i-mail" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m3 6 9 7 9-7"/></symbol><symbol id="kod-i-chat_bubble" viewBox="0 0 24 24"><path d="M3 3h18v14H8l-5 4Zm4 5h10M7 12h7"/></symbol><symbol id="kod-i-description" viewBox="0 0 24 24"><path d="M14 3H5v18h14V8Zm0 0v5h5M8 12h8m-8 4h8"/></symbol><symbol id="kod-i-more_horiz" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol></svg><div id="toast-container"></div>
 <div id="loading-overlay" class="boot-overlay" data-state="loading" role="dialog" aria-modal="true" aria-labelledby="loadingTitle" aria-describedby="logLine" tabindex="-1">
     <div class="boot-shell">
         <div class="boot-header" aria-label="KOD Online Denetim"><span class="boot-wordmark">KOD</span><span class="boot-service">Online Denetim</span></div>
         <div class="boot-art">
             <!-- Büyük ve çerçevesiz görsel. Özel günlerde yalnız pug.png dosyasını değiştirin. -->
-            <img id="boot-artwork" src="./pug.png" alt="Karşılama görseli" decoding="async" fetchpriority="high" onload="window.GuardPageBoot.artworkLoaded(true)" onerror="window.GuardPageBoot.artworkLoaded(false)">
+            <img id="boot-artwork" src="./pug.png" alt="Karşılama görseli" decoding="async" fetchpriority="low" onload="window.GuardPageBoot.artworkLoaded(true)" onerror="window.GuardPageBoot.artworkLoaded(false)">
             <div id="boot-artwork-fallback" class="boot-art-fallback" hidden><strong>KOD</strong><small>ONLINE DENETİM</small></div>
         </div>
         <div class="boot-panel">
@@ -2027,7 +2132,7 @@ const guardPatrolWall = (() => {
 <div class="app-container" id="guard-app" inert aria-hidden="true">
     <header>
         <div class="logo-area">
-            <span class="material-symbols-outlined" style="color:var(--primary); font-weight: bold; font-size: 20px;">security</span>
+            <span class="material-symbols-outlined" style="color:var(--primary); font-weight: bold; font-size: 20px;" data-kod-icon="security"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-security" xlink:href="#kod-i-security"></use></svg></span>
             <span class="logo-text">KOD</span>
         </div>
         <div class="terminal-id">
@@ -2060,7 +2165,7 @@ const guardPatrolWall = (() => {
                 <div class="site-info-wrapper">
                     <p class="status-label">GÖREV YERİ</p>
                     <p class="site-name-inline" style="display: flex; align-items: center; gap: 4px;">
-                        <span class="material-symbols-outlined size-14">location_on</span>
+                        <span class="material-symbols-outlined size-14" data-kod-icon="location_on"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-location_on" xlink:href="#kod-i-location_on"></use></svg></span>
                         <span id="site-name-display">...</span>
                     </p>
                 </div>
@@ -2072,12 +2177,12 @@ const guardPatrolWall = (() => {
 
             <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center;">
                 <div class="shift-info" style="display: flex; align-items: center; gap: 4px;">
-                    <span id="shift-icon" class="material-symbols-outlined size-14">history</span>
+                    <span id="shift-icon" class="material-symbols-outlined size-14" data-kod-icon="history"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-history" xlink:href="#kod-i-history"></use></svg></span>
                     <span id="shift-text">Nöbet kontrol ediliyor…</span>
                 </div>
                 <span class="material-symbols-outlined size-18 qr-opacity qr-toggle-btn" 
                       onclick="toggleEliteTone()" 
-                      title="Ekran Tonunu Değiştir">qr_code_scanner</span>
+                      title="Ekran Tonunu Değiştir" data-kod-icon="qr_code_scanner"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-qr_code_scanner" xlink:href="#kod-i-qr_code_scanner"></use></svg></span>
             </div>
 
             <!-- DEVRİYE DUVARI: BAŞLANGIÇ -->
@@ -2105,7 +2210,7 @@ const guardPatrolWall = (() => {
 
         <h3 class="section-title">Nöbet Yönetimi</h3>
         <div id="nobet-al-area" class="action-item" onclick="goToNobet()" style="margin-bottom:12px; display: flex; flex-direction: row; align-items: center; gap: 15px;">
-            <div class="icon-box"><span class="material-symbols-outlined">play_circle</span></div>
+            <div class="icon-box"><span class="material-symbols-outlined" data-kod-icon="play_circle"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-play_circle" xlink:href="#kod-i-play_circle"></use></svg></span></div>
             <div>
                 <span class="status-label" style="opacity:1; color:var(--primary); margin:0; display: block;">NÖBETİ BAŞLAT</span>
                 <p style="font-size:11px; color:var(--text-muted);">Göreve başlamak için dokun</p>
@@ -2113,55 +2218,52 @@ const guardPatrolWall = (() => {
         </div>
 
         <div id="nobet-teslim-area" class="action-item" onclick="goToNobet(true)" style="margin-bottom:12px; flex-direction: row; align-items: center; gap: 15px; display:none;">
-            <div class="icon-box" style="color:var(--error); background:rgba(255, 77, 77, 0.1);"><span class="material-symbols-outlined">stop_circle</span></div>
+            <div class="icon-box" style="color:var(--error); background:rgba(255, 77, 77, 0.1);"><span class="material-symbols-outlined" data-kod-icon="stop_circle"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-stop_circle" xlink:href="#kod-i-stop_circle"></use></svg></span></div>
             <div>
                 <span class="status-label" style="opacity:1; color:var(--error); margin:0; display: block;">NÖBETİ TESLİM ET</span>
                 <p style="font-size:11px; color:var(--text-muted);">Görev bitirmek için dokun</p>
             </div>
         </div>
 
-
-
         <h3 class="section-title">Hızlı İşlemler</h3>
         <div class="action-grid">
             <div onclick="checkAction('devriye.html', 'Devriye başlatmak')" class="action-item">
-                <div class="icon-box"><span class="material-symbols-outlined">directions_walk</span></div>
+                <div class="icon-box"><span class="material-symbols-outlined" data-kod-icon="directions_walk"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-directions_walk" xlink:href="#kod-i-directions_walk"></use></svg></span></div>
                 <span class="status-label" style="opacity:1; color:#fff">Devriye BAŞLAT</span>
             </div>
  <div onclick="checkAction('devirteslim.html', 'Devir teslim bakmak')" class="action-item">
                 <div class="icon-box">
-                    <span class="material-symbols-outlined">book</span>
+                    <span class="material-symbols-outlined" data-kod-icon="book"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-book" xlink:href="#kod-i-book"></use></svg></span>
                 </div>
                 <span class="status-label" style="opacity:1; color:#fff">Dijital Devir Teslim</span>
             </div>
             <div onclick="checkAction('olay.html', 'Olay bildirmek')" class="action-item">
-                <div class="icon-box"><span class="material-symbols-outlined">report_problem</span></div>
+                <div class="icon-box"><span class="material-symbols-outlined" data-kod-icon="report_problem"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-report_problem" xlink:href="#kod-i-report_problem"></use></svg></span></div>
                 <span class="status-label" style="opacity:1; color:#fff">Olay Bildir</span>
             </div>
 
 <div id="btn-haberlesme" onclick="checkAction('iletisim.html', 'Haberleşme paneline erişmek')" class="action-item" style="cursor: pointer; display: none;">
     <div class="icon-box">
-        <span class="material-symbols-outlined">forum</span>
+        <span class="material-symbols-outlined" data-kod-icon="forum"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-forum" xlink:href="#kod-i-forum"></use></svg></span>
     </div>
     <span class="status-label" style="color:#fff">Haberleşme</span>
 </div>
 
             <div class="action-item" style="border-color: rgba(255, 77, 77, 0.4);" onclick="openEmergencyModal()">
-                <div class="icon-box" style="color:var(--error); background:rgba(255, 77, 77, 0.1);"><span class="material-symbols-outlined">emergency</span></div>
+                <div class="icon-box" style="color:var(--error); background:rgba(255, 77, 77, 0.1);"><span class="material-symbols-outlined" data-kod-icon="emergency"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-emergency" xlink:href="#kod-i-emergency"></use></svg></span></div>
                 <span class="status-label" style="color:var(--error); opacity:1;">Acil Durum</span>
             </div>
 
            <div onclick="window.location.href='ara.html'" class="action-item" style="cursor: pointer;">
                 <div class="icon-box">
-                    <span class="material-symbols-outlined">call</span>
+                    <span class="material-symbols-outlined" data-kod-icon="call"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-call" xlink:href="#kod-i-call"></use></svg></span>
                 </div>
                 <span class="status-label" style="color:#fff">Hızlı Arama</span>
             </div>
         </div>
-		
 
         <div id="araKayitButonAlani" class="action-item" onclick="window.location.href='kayit.html'" style="display:none; border-color: var(--primary); margin-top: 12px; grid-column: span 2; flex-direction: row; align-items: center; gap: 15px;">
-            <div class="icon-box"><span class="material-symbols-outlined">app_registration</span></div>
+            <div class="icon-box"><span class="material-symbols-outlined" data-kod-icon="app_registration"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-app_registration" xlink:href="#kod-i-app_registration"></use></svg></span></div>
             <div>
                 <span class="status-label" style="opacity:1; color:var(--primary); margin:0; display: block;">KAYIT PANELİ</span>
                 <p style="font-size:11px; color:var(--text-muted);">Hızlı Arama Kayıt Ekranı</p>
@@ -2169,26 +2271,26 @@ const guardPatrolWall = (() => {
         </div><div id="profileMenuModal" class="modal-overlay" onclick="toggleProfileMenu(false)">
     <div class="modal-content" onclick="event.stopPropagation()">
         <div class="modal-title" style="display: flex; align-items: center; gap: 8px;">
-            <span class="material-symbols-outlined">account_circle</span> Profil İşlemleri
+            <span class="material-symbols-outlined" data-kod-icon="account_circle"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-account_circle" xlink:href="#kod-i-account_circle"></use></svg></span> Profil İşlemleri
         </div>
         
         <div class="menu-btn" onclick="openSettings()">
-            <span class="material-symbols-outlined">settings</span>
+            <span class="material-symbols-outlined" data-kod-icon="settings"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-settings" xlink:href="#kod-i-settings"></use></svg></span>
             <span>Profil Ayarlarım</span>
         </div>
         
         <div class="menu-btn" onclick="sendLiveLocation()">
-            <span class="material-symbols-outlined">share_location</span>
+            <span class="material-symbols-outlined" data-kod-icon="share_location"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-share_location" xlink:href="#kod-i-share_location"></use></svg></span>
             <span>Merkeze Konum Gönder</span>
         </div>
 
         <div class="menu-btn" onclick="goToKimlikKartim()">
-            <span class="material-symbols-outlined">badge</span>
+            <span class="material-symbols-outlined" data-kod-icon="badge"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-badge" xlink:href="#kod-i-badge"></use></svg></span>
             <span>Güvenlik Kimlik Kartım</span>
         </div>
         
         <div class="menu-btn" onclick="goToEgitim()" style="border-color: #3498db33;">
-            <span class="material-symbols-outlined" style="color:#3498db">school</span>
+            <span class="material-symbols-outlined" style="color:#3498db" data-kod-icon="school"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-school" xlink:href="#kod-i-school"></use></svg></span>
             <span>Eğitim Paneli</span>
         </div>
 
@@ -2208,7 +2310,7 @@ const guardPatrolWall = (() => {
         <div id="settingsModal" class="modal-overlay" onclick="closeSettings()">
             <div class="modal-content" onclick="event.stopPropagation()">
                 <div class="modal-title">
-                    <span class="material-symbols-outlined" style="color:var(--primary)">manage_accounts</span>
+                    <span class="material-symbols-outlined" style="color:var(--primary)" data-kod-icon="manage_accounts"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-manage_accounts" xlink:href="#kod-i-manage_accounts"></use></svg></span>
                     Profil Ayarları
                 </div>
                 
@@ -2231,14 +2333,14 @@ const guardPatrolWall = (() => {
                            placeholder="YENİ ŞİFRE SADECE RAKAM İÇERMELİDİR" 
                            oninput="handlePassInput(event)">
                     
-                    <span class="material-symbols-outlined pass-toggle" id="passIcon" onclick="togglePassword()">visibility</span>
+                    <span class="material-symbols-outlined pass-toggle" id="passIcon" onclick="togglePassword()" data-kod-icon="visibility"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-visibility" xlink:href="#kod-i-visibility"></use></svg></span>
                     
                     <div id="password-requirements" style="margin-top: 12px; font-size: 11px; color: #ccc; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
                         <div id="req-length" style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
-                            <span class="material-symbols-outlined" style="font-size: 16px; color: #ff4d4d;">cancel</span> 6 - 15 Hane Arası
+                            <span class="material-symbols-outlined" style="font-size: 16px; color: #ff4d4d;" data-kod-icon="cancel"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-cancel" xlink:href="#kod-i-cancel"></use></svg></span> 6 - 15 Hane Arası
                         </div>
                         <div id="req-only-num" style="display: flex; align-items: center; gap: 8px;">
-                            <span class="material-symbols-outlined" style="font-size: 16px; color: #ff4d4d;">cancel</span> Sadece Rakam Girilebilir
+                            <span class="material-symbols-outlined" style="font-size: 16px; color: #ff4d4d;" data-kod-icon="cancel"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-cancel" xlink:href="#kod-i-cancel"></use></svg></span> Sadece Rakam Girilebilir
                         </div>
                     </div>
                 </div>
@@ -2249,7 +2351,7 @@ const guardPatrolWall = (() => {
 
         <div id="nobetUyariModal" class="modal-overlay" onclick="const m=document.getElementById('nobetUyariModal'); m.querySelector('.modal-content').classList.remove('show'); setTimeout(()=>m.style.display='none',300)">
             <div class="modal-content" onclick="event.stopPropagation()" style="border-top: 1px solid var(--error); padding-bottom: 40px;">
-                <div class="modal-title" style="color: var(--error); margin-bottom: 10px;"><span class="material-symbols-outlined">lock</span>ERİŞİM KISITLANDI</div>
+                <div class="modal-title" style="color: var(--error); margin-bottom: 10px;"><span class="material-symbols-outlined" data-kod-icon="lock"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-lock" xlink:href="#kod-i-lock"></use></svg></span>ERİŞİM KISITLANDI</div>
                 <p id="nobetUyariMesaj" style="color: var(--text-main); font-size: 15px; font-weight: 600; line-height: 1.6; margin-bottom: 25px; opacity: 0.9;">İşlem için önce nöbeti teslim almalısın.</p>
                 <button class="modal-btn btn-primary" onclick="window.location.href='nobet.html'">ŞİMDİ NÖBETİ BAŞLAT</button>
                 <button class="modal-btn btn-secondary" onclick="const m=document.getElementById('nobetUyariModal'); m.querySelector('.modal-content').classList.remove('show'); setTimeout(()=>m.style.display='none',300)" style="margin-top: 10px; opacity: 0.6;">KAPAT</button>
@@ -2260,7 +2362,7 @@ const guardPatrolWall = (() => {
             <div class="modal-content" style="border: 2px solid var(--primary); background: #111111; border-radius: 24px; padding: 30px 20px; text-align: center; box-shadow: 0 0 25px var(--primary-glow); width: 100%; max-width: 360px; max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; justify-content: center; box-sizing: border-box;">
                 
                 <div class="modal-title" style="color: var(--primary); justify-content: center; margin-bottom: 15px; font-weight: 800; font-size: 18px; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-                    <span class="material-symbols-outlined" style="font-size: 32px; color: var(--primary);">warning</span>
+                    <span class="material-symbols-outlined" style="font-size: 32px; color: var(--primary);" data-kod-icon="warning"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-warning" xlink:href="#kod-i-warning"></use></svg></span>
                     ONAYLANMAMIŞ TALİMAT
                 </div>
                 
@@ -2283,7 +2385,7 @@ const guardPatrolWall = (() => {
         
         <!-- İkon Rozeti -->
         <div style="width: 60px; height: 60px; background: rgba(var(--primary-rgb, 255, 255, 255), 0.1); border: 1px solid var(--primary); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; box-shadow: 0 8px 20px rgba(0,0,0,0.4);">
-            <span class="material-symbols-outlined" style="font-size: 30px; color: var(--primary);">call</span>
+            <span class="material-symbols-outlined" style="font-size: 30px; color: var(--primary);" data-kod-icon="call"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-call" xlink:href="#kod-i-call"></use></svg></span>
         </div>
 
         <!-- Başlık & Açıklama -->
@@ -2316,16 +2418,16 @@ const guardPatrolWall = (() => {
             
             <span class="material-symbols-outlined" 
                   onclick="closeEmergencyModal()" 
-                  style="position: absolute; top: 20px; right: 20px; color: var(--text-muted); cursor: pointer;">close</span>
+                  style="position: absolute; top: 20px; right: 20px; color: var(--text-muted); cursor: pointer;" data-kod-icon="close"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-close" xlink:href="#kod-i-close"></use></svg></span>
 
             <div class="modal-title" style="color: var(--error); justify-content: center; margin-bottom: 30px;">
-                <span class="material-symbols-outlined" style="font-size: 30px;">emergency_home</span>
+                <span class="material-symbols-outlined" style="font-size: 30px;" data-kod-icon="emergency_home"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-emergency_home" xlink:href="#kod-i-emergency_home"></use></svg></span>
                 ACİL YARDIM PANELİ
             </div>
             
             <div style="display: flex; flex-direction: column; gap: 16px;">
                 <a href="tel:112" class="menu-btn" style="background: #7a0000; border: 2px solid #ff4d4d; padding: 25px; height: auto; flex-direction: row; justify-content: center; text-decoration: none;">
-                    <span class="material-symbols-outlined" style="font-size: 35px; color: #fff;">medical_services</span>
+                    <span class="material-symbols-outlined" style="font-size: 35px; color: #fff;" data-kod-icon="medical_services"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-medical_services" xlink:href="#kod-i-medical_services"></use></svg></span>
                     <div style="text-align: left;">
                         <div style="font-size: 20px; font-weight: 900; color: #fff; letter-spacing: 1px;">112 ACİL ARA</div>
                         <div style="font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 600;">AMBULANS / POLİS / İTFAİYE</div>
@@ -2333,7 +2435,7 @@ const guardPatrolWall = (() => {
                 </a>
 
                 <a href="#" id="btn-call-merkez" class="menu-btn" style="background: #000; border: 2px solid var(--primary); padding: 25px; height: auto; flex-direction: row; justify-content: center; text-decoration: none;">
-                    <span class="material-symbols-outlined" style="font-size: 35px; color: var(--primary);">phone_in_talk</span>
+                    <span class="material-symbols-outlined" style="font-size: 35px; color: var(--primary);" data-kod-icon="phone_in_talk"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-phone_in_talk" xlink:href="#kod-i-phone_in_talk"></use></svg></span>
                     <div style="text-align: left;">
                         <div style="font-size: 20px; font-weight: 900; color: #fff; letter-spacing: 1px;">MERKEZİ ARA</div>
                         <div style="font-size: 11px; color: var(--primary); font-weight: 600;">KOLART GÜVENLİK </div>
@@ -2341,7 +2443,7 @@ const guardPatrolWall = (() => {
                 </a>
 
                 <a href="#" id="btn-call-karakol" class="menu-btn" style="background: #000; border: 2px solid #3498db; padding: 25px; height: auto; flex-direction: row; justify-content: center; text-decoration: none;">
-                    <span class="material-symbols-outlined" style="font-size: 35px; color: #3498db;">local_police</span>
+                    <span class="material-symbols-outlined" style="font-size: 35px; color: #3498db;" data-kod-icon="local_police"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kod-i-local_police" xlink:href="#kod-i-local_police"></use></svg></span>
                     <div style="text-align: left;">
                         <div style="font-size: 20px; font-weight: 900; color: #fff; letter-spacing: 1px;">KARAKOLU ARA</div>
                         <div style="font-size: 11px; color: #3498db; font-weight: 600;">BÖLGE KARAKOLU</div>
