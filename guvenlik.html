@@ -201,28 +201,30 @@ body.pw-open { overflow: hidden; }
 @media (min-width: 600px) { .pw-overlay { align-items: center; padding: 24px; }.pw-sheet { max-height: 88vh; max-height: 88dvh; border: 1px solid var(--border); border-radius: 28px; } }
 @media (max-width: 350px) { .pw-launch { padding: 15px; }.pw-heading { gap: 8px; }.pw-name { font-size: 13px; }.pw-shift-tag { font-size: 8px; padding: 6px; }.pw-sheet-head { padding: 19px 15px 14px; }.pw-date-nav { margin: 0 15px; padding: 8px; }.pw-modal-stats { margin-left: 15px; margin-right: 15px; }.pw-list { padding-left: 15px; padding-right: 15px; }.pw-date-title { font-size: 11px; } }
 @media (prefers-reduced-motion: reduce) { .pw-sheet { animation: none; }.pw-launch { transition: none; } }
-/* İsim kartına entegre devriye özeti; yalnız bu alanın görünümünü düzenler. */
-.status-card-with-wall .pw-home { margin: 14px -28px -24px; padding: 12px 22px 15px; border-top: 1px solid rgba(255,255,255,.07); background: var(--surface-container); color: var(--text-main); }
+/* İsim kartına entegre devriye özeti: seçili tema ile bütünleşen alt bölüm. */
+.status-card-with-wall .pw-home { --pw-shade-top: .16; --pw-shade-bottom: .24; margin: 14px -28px -24px; padding: 12px 22px 15px; border-top: 1px solid rgba(255,255,255,.22); background-color: var(--primary); background-image: linear-gradient(180deg, rgba(0,0,0,var(--pw-shade-top)), rgba(0,0,0,var(--pw-shade-bottom))); color: var(--on-primary); }
+html[data-theme="deep-orange"] .status-card-with-wall .pw-home { --pw-shade-top: .24; --pw-shade-bottom: .30; }
 .status-card-with-wall .pw-launch { position: relative; padding: 0; border: 0; border-radius: 0; background: transparent; color: inherit; }
-.status-card-with-wall .pw-launch:focus-visible { outline: 2px solid var(--primary); outline-offset: 5px; border-radius: 8px; }
+.status-card-with-wall .pw-launch:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; border-radius: 8px; }
 .status-card-with-wall .pw-launch-head { gap: 8px; }
 .status-card-with-wall .pw-heading { gap: 7px; }
-.status-card-with-wall .pw-emblem { width: 18px; height: 18px; border: 0; border-radius: 0; background: transparent; }
+.status-card-with-wall .pw-emblem { width: 18px; height: 18px; border: 0; border-radius: 0; background: transparent; color: inherit; }
 .status-card-with-wall .pw-emblem svg { width: 18px; height: 18px; }
 .status-card-with-wall .pw-titles { gap: 0; }
 .status-card-with-wall .pw-eyebrow { display: none; }
 .status-card-with-wall .pw-name { font-size: 12px; font-weight: 800; line-height: 1.4; letter-spacing: -.15px; }
-.status-card-with-wall .pw-shift-tag { padding: 0; border: 0; border-radius: 0; background: transparent; color: #b5b5c0; font-size: 9px; line-height: 1.4; }
+.status-card-with-wall .pw-shift-tag { padding: 0; border: 0; border-radius: 0; background: transparent; color: inherit; font-size: 9px; line-height: 1.4; opacity: .92; }
 /* Tarih aralığı ekran okuyucuda korunur; ayrıntı penceresinde görünür. */
 .status-card-with-wall .pw-range { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
 .status-card-with-wall .pw-stats { gap: 0; margin-top: 10px; }
-.status-card-with-wall .pw-stat { gap: 4px; padding: 0 3px; border-radius: 0; background: transparent; }
-.status-card-with-wall .pw-stat + .pw-stat { border-left: 1px solid var(--border); }
-.status-card-with-wall .pw-stat strong { font-size: 18px; line-height: 1; }
-.status-card-with-wall .pw-stat small { font-size: 10px; line-height: 1.3; }
+.status-card-with-wall .pw-stat { gap: 4px; padding: 0 3px; border-radius: 0; background: transparent; color: inherit; }
+.status-card-with-wall .pw-stat + .pw-stat { border-left: 1px solid rgba(255,255,255,.2); }
+.status-card-with-wall .pw-stat strong { display: inline-flex; align-items: center; justify-content: center; align-self: center; min-width: 30px; min-height: 22px; padding: 0 5px; border-radius: 7px; color: inherit; font-size: 18px; line-height: 22px; }
+.status-card-with-wall .pw-stat small { color: inherit; font-size: 10px; line-height: 1.3; opacity: .92; }
+.status-card-with-wall .pw-stat.pw-missed strong { background: #791529; color: #fff5f6; }
 .status-card-with-wall .pw-bottom { gap: 8px; margin-top: 10px; }
-.status-card-with-wall .pw-note { font-size: 10px; line-height: 1.45; }
-.status-card-with-wall .pw-more { gap: 3px; font-size: 10px; line-height: 1.45; }
+.status-card-with-wall .pw-note { color: inherit; font-size: 10px; line-height: 1.45; opacity: .92; }
+.status-card-with-wall .pw-more { gap: 3px; color: inherit; font-size: 10px; font-weight: 900; line-height: 1.45; }
 .status-card-with-wall .pw-more svg { width: 13px; height: 13px; }
 @media (max-width: 350px) {
     .status-card-with-wall .pw-home { padding: 12px 18px 14px; }
