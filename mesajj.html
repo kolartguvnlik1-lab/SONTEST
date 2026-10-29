@@ -3,302 +3,339 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#0c0c0c">
-    <title>KOLART — Mesajlar</title>
+    <title>KOLART — TALİMATLAR</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <script>
         const savedTheme = localStorage.getItem('kolart-theme-tone') || 'elite-neon';
         document.documentElement.setAttribute('data-theme', savedTheme);
     </script>
     <style>
-        :root,html[data-theme=elite-neon]{--primary:#CCFF00;--on-primary:#000;--bg-dark:#080808;--surface:#0C0C0C;--surface-container:#161616;--primary-glow:rgba(204,255,0,.12)}
-        :root{--text-main:#f5f5f6;--text-muted:#929298;--border:rgba(255,255,255,.085);--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--error:#ff9b9b}
-        html[data-theme=cyber-cyan]{--primary:#00E5FF;--on-primary:#000;--bg-dark:#050A0C;--surface:#0A1013;--surface-container:#121A1D;--primary-glow:rgba(0,229,255,.12)}
-        html[data-theme=hex-purple]{--primary:#bd00ff;--on-primary:#fff;--bg-dark:#08050a;--surface:#0c0a0e;--surface-container:#16121a;--primary-glow:rgba(189,0,255,.12)}
-        html[data-theme=deep-orange]{--primary:#ff5500;--on-primary:#fff;--bg-dark:#0a0805;--surface:#0e0c0a;--surface-container:#1a1612;--primary-glow:rgba(255,85,0,.12)}
-        html[data-theme=electric-blue]{--primary:#0066ff;--on-primary:#fff;--bg-dark:#050608;--surface:#0a0b0d;--surface-container:#12141a;--primary-glow:rgba(0,102,255,.12)}
-        html[data-theme=matrix-green]{--primary:#00ff66;--on-primary:#000;--bg-dark:#050805;--surface:#0a0d0a;--surface-container:#121a12;--primary-glow:rgba(0,255,102,.12)}
-        html[data-theme=ruby-red]{--primary:#ff0055;--on-primary:#fff;--bg-dark:#080506;--surface:#0d0a0b;--surface-container:#1a1214;--primary-glow:rgba(255,0,85,.12)}
-        *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-        body{background:var(--bg-dark);color:var(--text-main);font-family:Inter,Arial,sans-serif;min-height:100vh;display:flex;justify-content:center}
-        button,a,input{font:inherit}button,a{touch-action:manipulation}button{cursor:pointer}a{color:inherit}button:disabled{cursor:default}
-        [hidden]{display:none!important}.kod-icon{display:inline-block;vertical-align:middle;flex-shrink:0}
-        .app-container{width:100%;max-width:430px;min-height:100vh;display:flex;flex-direction:column;background:var(--surface);border-inline:1px solid var(--border)}
-        header{position:sticky;top:0;z-index:1000;display:flex;justify-content:space-between;align-items:center;gap:14px;padding:calc(15px + var(--safe-top)) 22px 15px;background:var(--surface);border-bottom:1px solid var(--border)}
-        .back-btn{width:42px;height:42px;border:1px solid var(--border);border-radius:14px;background:#ffffff05;display:grid;place-items:center;text-decoration:none;color:#dedee1}
-        .header-brand{display:flex;align-items:center;gap:11px}.header-brand b{font-size:14px;font-weight:900;letter-spacing:2px}.header-brand small{display:block;font-size:8px;color:var(--text-muted);letter-spacing:1.5px;margin-top:4px}
-        .user-block{min-width:0;max-width:47%;text-align:right}.user-block strong{display:block;font-size:10px;color:var(--primary);font-weight:800;overflow-wrap:anywhere;line-height:1.5}.user-block small{display:block;color:var(--text-muted);font-size:9px;margin-top:4px}
-        main{flex:1;padding:27px 20px calc(110px + var(--safe-bottom))}
-        .eyebrow{font-size:9px;font-weight:800;letter-spacing:2px;color:var(--primary);display:flex;gap:8px;align-items:center;margin-bottom:13px}.eyebrow:before{content:'';width:17px;height:2px;background:var(--primary)}
-        h1{font-size:32px;line-height:1.12;font-weight:800;letter-spacing:-1.5px;margin-bottom:10px}.page-intro{font-size:12px;color:#9a9aa2;line-height:1.8;max-width:290px}
-        .inbox-summary{display:flex;align-items:center;justify-content:space-between;gap:13px;padding:17px 18px;margin-top:23px;background:var(--surface-container);border:1px solid var(--border);border-radius:19px}
-        .summary-copy{display:flex;align-items:center;gap:13px}.summary-number{font-size:29px;font-weight:800;letter-spacing:-1px;color:var(--primary);font-variant-numeric:tabular-nums}.summary-copy strong{font-size:11px;display:block;font-weight:700}.summary-copy small{font-size:10px;display:block;margin-top:5px;color:var(--text-muted)}.summary-icon{color:var(--primary);width:40px;height:40px;border:1px solid var(--border);background:var(--primary-glow);border-radius:13px;display:grid;place-items:center}
-        .filters{display:flex;gap:7px;margin:23px 0 25px}.filter{border:1px solid var(--border);color:#a8a8af;background:transparent;padding:10px 12px;border-radius:12px;min-height:40px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:10px;font-weight:700;flex:1;white-space:nowrap}.filter.active{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}.filter-count{font-size:9px;opacity:.7;font-variant-numeric:tabular-nums}
-        .list-heading{display:flex;align-items:center;gap:9px;margin-bottom:14px;color:#777780;font-size:9px;font-weight:700;letter-spacing:1.5px}.list-heading:after{content:'';height:1px;background:var(--border);flex:1}.list-heading .kod-icon{width:13px;height:13px}
-        .msg-card{border:1px solid var(--border);border-radius:23px;background:var(--surface-container);margin-bottom:16px;overflow:hidden;position:relative;scroll-margin-top:95px}
-        .msg-card.unread{border-color:color-mix(in srgb,var(--primary),transparent 65%)}.msg-card.unread:before{content:'';position:absolute;top:23px;bottom:23px;left:0;width:3px;background:var(--primary);border-radius:0 3px 3px 0}
-        .card-inner{padding:20px}.msg-header{display:flex;gap:10px;align-items:center;margin-bottom:20px}.sender-avatar{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;color:var(--primary);background:var(--primary-glow);border:1px solid var(--border);font-size:11px;font-weight:800;flex-shrink:0}.sender-info{flex:1;min-width:0}.sender-info strong{font-size:11px;font-weight:700;display:block;color:#e6e6ea;overflow-wrap:anywhere;line-height:1.5}.time{display:block;font-size:9px;color:var(--text-muted);margin-top:4px;font-variant-numeric:tabular-nums;line-height:1.4}.message-kind{color:var(--primary);display:flex;align-items:center;gap:6px;font-size:8px;font-weight:800;letter-spacing:.8px;margin-bottom:12px}.message-kind .kod-icon{width:13px;height:13px}.kind-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
-        .content{font-size:13px;font-weight:400;line-height:1.85;color:#d3d3d8;white-space:pre-wrap;overflow-wrap:anywhere;margin-bottom:21px}.content:empty{display:none}
-        .btn-confirm{width:100%;min-height:46px;display:flex;align-items:center;justify-content:center;gap:9px;padding:13px 10px;border:0;border-radius:13px;background:var(--primary);color:var(--on-primary);font-size:11px;font-weight:800;transition:transform .15s}.btn-confirm:active{transform:scale(.98)}.btn-confirm .kod-icon{width:17px;height:17px}.btn-confirm:disabled{background:#ffffff05;border:1px solid var(--border);color:#9ca49d}.read-time{font-size:9px;color:#83838d;line-height:1.6;margin-top:10px;text-align:center;font-variant-numeric:tabular-nums}.read-time .kod-icon{width:12px;height:12px;color:#94bd85;margin-right:4px}
-        .bayram-card{--celebration:#edce96;--celebration-rgb:237,206,150;background:#171614;border-color:#edce963b}.bayram-card[data-tone=national]{--celebration:#ffbdc0;--celebration-rgb:255,189,192;background:#1b1418;border-color:#da68794f}.bayram-card .sender-avatar{color:var(--celebration);background:rgba(var(--celebration-rgb),.065);border-color:rgba(var(--celebration-rgb),.15)}
-        .bayram-art{position:relative;min-height:163px;padding:22px;display:flex;align-items:center;justify-content:space-between;gap:5px;overflow:hidden;border-bottom:1px solid rgba(var(--celebration-rgb),.12);background:radial-gradient(ellipse at 105% 100%,#bb87374a,transparent 70%),linear-gradient(120deg,#282119,#1a1816)}
-        [data-tone=national] .bayram-art{background:radial-gradient(ellipse at 105% 100%,#ec3d5760,transparent 73%),linear-gradient(120deg,#371820,#25121b)}.bayram-art:after{content:'';position:absolute;width:214px;height:214px;border:1px solid rgba(var(--celebration-rgb),.14);border-radius:50%;right:-68px;top:-23px;box-shadow:0 0 0 30px rgba(var(--celebration-rgb),.035)}
-        .bayram-art-copy{position:relative;z-index:1;max-width:63%}.bayram-label{font-size:8px;font-weight:800;letter-spacing:2px;line-height:1.6;color:var(--celebration);margin-bottom:9px}.bayram-title{font-size:22px;line-height:1.2;letter-spacing:-.6px;font-weight:800;color:#fff3e8}.bayram-emblem{position:relative;z-index:1;flex-shrink:0;width:87px;height:80px;color:var(--celebration)}.bayram-emblem svg{width:100%;height:100%}[data-tone=national] .bayram-emblem{color:#fff1e9}.bayram-star{position:absolute;color:var(--celebration);font-size:10px;right:47px;top:24px;opacity:.65}
-        .bayram-card .content{color:#d6cacf}.bayram-signoff{display:flex;align-items:center;gap:8px;border-top:1px solid rgba(var(--celebration-rgb),.12);padding-top:15px;color:var(--celebration);font-size:10px;line-height:1.7}.bayram-signoff .kod-icon{width:17px;height:17px}
-        .media-container{overflow:hidden;border-radius:13px;border:1px solid var(--border);background:#050505;margin:5px 0 17px}.media-container img{display:block;width:100%;max-height:400px;object-fit:contain}.image-button{border:0;display:block;width:100%;padding:0;background:#000}.video-wrapper{position:relative;aspect-ratio:16/9}.video-wrapper video,.video-wrapper iframe{width:100%;height:100%;border:0;display:block;background:#000}
-        .btn-fs-trigger,.btn-ext-link{width:100%;min-height:42px;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border:1px solid var(--border);border-radius:12px;background:#ffffff04;color:#c8c8d0;font-size:10px;font-weight:700;text-decoration:none;margin-bottom:18px}.btn-fs-trigger .kod-icon,.btn-ext-link .kod-icon{width:16px;height:16px}
-        .card-read-error{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-top:12px;color:var(--error);font-size:10px;line-height:1.6}.retry-small{border:1px solid #ff9b9b45;background:transparent;color:var(--error);padding:7px 9px;border-radius:8px;font-size:10px}
-        .empty-state{text-align:center;padding:35px 18px 25px;border:1px dashed var(--border);border-radius:22px;color:#93939c}.empty-icon{width:56px;height:56px;margin:0 auto 18px;display:grid;place-items:center;border-radius:18px;background:var(--surface-container);color:var(--primary)}.empty-state h2{color:#e6e6eb;font-size:15px;font-weight:700;margin-bottom:10px}.empty-state p{font-size:12px;line-height:1.8}.more-button{width:100%;min-height:45px;border:1px solid var(--border);background:transparent;color:#acacb7;border-radius:14px;font-size:11px;font-weight:600;margin:6px 0 18px}.inbox-footer{display:flex;align-items:center;justify-content:center;gap:6px;color:#62626d;font-size:9px;margin-top:23px}.inbox-footer .kod-icon{width:13px;height:13px}
-        .boot-state{width:100%;padding:90px 20px;text-align:center;color:var(--text-muted);font-size:12px}.spinner{width:27px;height:27px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .85s linear infinite;margin:0 auto 15px}@keyframes spin{to{transform:rotate(360deg)}}
-        .modal-overlay{position:fixed;inset:0;z-index:10001;display:flex;align-items:center;justify-content:center;background:#020306ed;padding:20px}.modal-box{width:100%;max-width:350px;border:1px solid var(--border);border-top:2px solid var(--primary);border-radius:27px;background:var(--surface-container);padding:29px 24px;max-height:90vh;max-height:90dvh;overflow-y:auto;outline:none;box-shadow:0 24px 70px #0009}.modal-icon{width:53px;height:53px;display:grid;place-items:center;color:var(--primary);background:var(--primary-glow);border:1px solid var(--border);border-radius:17px;margin-bottom:22px}.modal-box h2{font-size:22px;letter-spacing:-.7px;font-weight:800;margin-bottom:13px}.modal-box p{font-size:12px;line-height:1.9;color:#b9b9c2;margin-bottom:20px}.modal-box b{color:#efeff3}.modal-actions{display:flex;flex-direction:column;gap:9px}.m-btn{border:0;width:100%;min-height:46px;border-radius:13px;font-size:11px;font-weight:800}.m-yes{background:var(--primary);color:var(--on-primary)}.m-no{background:transparent;color:#a9a9b3;border:1px solid var(--border)}.m-btn:disabled{opacity:.6;cursor:wait}.confirm-error{color:var(--error)!important;font-size:11px!important;overflow-wrap:anywhere}.modal-open{overflow:hidden}
-        #toast{position:fixed;bottom:calc(90px + var(--safe-bottom));left:50%;transform:translateX(-50%);z-index:10002;width:max-content;max-width:88%;padding:13px 20px;background:var(--primary);color:var(--on-primary);border-radius:14px;font-size:11px;font-weight:800;box-shadow:0 12px 40px #0008;text-align:center}
-        .img-modal-overlay{position:fixed;inset:0;z-index:10005;display:flex;align-items:center;justify-content:center;background:#030305f7;padding:16px}.img-modal-content{max-width:100%;max-height:88vh;max-height:88dvh;object-fit:contain;border-radius:12px}.img-modal-close{position:absolute;right:18px;top:max(18px,var(--safe-top));width:45px;height:45px;border-radius:50%;background:#19191e;border:1px solid var(--border);color:#fff;display:grid;place-items:center}
-        nav,.bottom-nav{position:fixed!important;bottom:0!important;width:100%!important;max-width:430px!important;z-index:9900!important}button:focus-visible,a:focus-visible{outline:2px solid var(--primary);outline-offset:3px}
-        @media(max-width:350px){header{padding-inline:16px}main{padding-inline:15px}h1{font-size:29px}.filter{padding-inline:8px;font-size:9px}.card-inner{padding:18px}.bayram-art{padding:20px}.bayram-title{font-size:20px}.bayram-emblem{width:74px}.user-block strong{font-size:9px}}
-        @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+        :root,html[data-theme=elite-neon]{--primary:#CCFF00;--bg-dark:#080808;--surface:#0C0C0C;--surface-container:#161616;--card-bg:#1a1f00;--card-border:#CCFF00;--primary-glow:rgba(204, 255, 0, 0.2)}
+        :root{--on-primary:#000000;--text-main:#ffffff;--text-muted:rgba(255, 255, 255, 0.4);--border:rgba(255, 255, 255, 0.08);--error:#FF4D4D;--safe-top:env(safe-area-inset-top);--safe-bottom:env(safe-area-inset-bottom);--project-accent:#FFD700;--on-primary:#000}
+        
+        /* DİĞER TEMALAR */
+        html[data-theme=cyber-cyan]{--primary:#00E5FF;--on-primary:#000;--bg-dark:#050A0C;--surface:#0A1013;--surface-container:#121A1D;--card-bg:#00191f;--card-border:#00E5FF;--primary-glow:rgba(0, 229, 255, 0.25)}
+        html[data-theme=hex-purple]{--primary:#bd00ff;--on-primary:#fff;--bg-dark:#08050a;--surface:#0c0a0e;--surface-container:#16121a;--card-bg:#17001f;--card-border:#bd00ff;--primary-glow:rgba(189, 0, 255, 0.25)}
+        html[data-theme=deep-orange]{--primary:#ff5500;--on-primary:#fff;--bg-dark:#0a0805;--surface:#0e0c0a;--surface-container:#1a1612;--card-bg:#1f0f00;--card-border:#ff5500;--primary-glow:rgba(255, 85, 0, 0.25)}
+        html[data-theme=electric-blue]{--primary:#0066ff;--on-primary:#fff;--bg-dark:#050608;--surface:#0a0b0d;--surface-container:#12141a;--card-bg:#000d1f;--card-border:#0066ff;--primary-glow:rgba(0, 102, 255, 0.25)}
+        html[data-theme=matrix-green]{--primary:#00ff66;--on-primary:#000;--bg-dark:#050805;--surface:#0a0d0a;--surface-container:#121a12;--card-bg:#001f0d;--card-border:#00ff66;--primary-glow:rgba(0, 255, 102, 0.25)}
+        html[data-theme=ruby-red]{--primary:#ff0055;--on-primary:#fff;--bg-dark:#080506;--surface:#0d0a0b;--surface-container:#1a1214;--card-bg:#1f000a;--card-border:#ff0055;--primary-glow:rgba(255, 0, 85, 0.25)}
+
+        body { background-color: var(--bg-dark); color: var(--text-main); font-family: Inter, sans-serif; min-height: 100vh; display: flex; justify-content: center; margin: 0; padding: 0; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        
+        .app-container { background-color: var(--surface); width: 100%; max-width: 390px; min-height: 100vh; display: flex; flex-direction: column; border-left: 1px solid var(--border); border-right: 1px solid var(--border); position: relative; }
+        
+        header { padding: calc(16px + var(--safe-top)) 20px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: rgba(12,12,12,.9); backdrop-filter: blur(15px); position: sticky; top: 0; z-index: 1000; }
+        .back-btn { font-size: 11px; gap: 8px; display: flex; background: rgba(255,255,255,.05); border: 1px solid var(--border); color: var(--primary); padding: 10px 16px; border-radius: 12px; font-weight: 900; text-decoration: none; align-items: center; }
+        .section-title { font-size: 11px; gap: 8px; display: flex; font-weight: 900; text-transform: uppercase; color: var(--text-muted); margin-bottom: 20px; letter-spacing: 1.5px; align-items: center; }
+        
+        main { flex: 1; padding: 20px 16px 120px; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .msg-card { background: var(--surface-container); border: 1px solid var(--border); border-radius: 24px; padding: 20px; margin-bottom: 16px; position: relative; transition: .3s; animation: fadeInUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+        .msg-card.unread { border-left: 4px solid var(--primary); box-shadow: 0 10px 30px var(--primary-glow); }
+        .msg-card.bayram-card { border-left: 4px solid #FFD700; background: linear-gradient(145deg, rgba(255, 215, 0, 0.05) 0%, rgba(0,0,0,0) 100%); }
+        
+        .msg-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .sender-info { font-size: 12px; color: var(--primary); gap: 6px; display: flex; align-items: center; font-weight: 900; text-transform: uppercase; }
+        .bayram-card .sender-info { color: #FFD700; }
+        .time { font-size: 10px; color: var(--text-muted); font-family: monospace; font-weight: 700; }
+        .content { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,.9); margin-bottom: 20px; white-space: pre-wrap; word-break: break-word; }
+        
+        .btn-confirm { width: 100%; cursor: pointer; padding: 16px; background: var(--primary); color: #000; border: none; border-radius: 16px; font-size: 13px; display: flex; justify-content: center; align-items: center; gap: 10px; transition: .2s; font-weight: 900; }
+        .btn-confirm:active { transform: scale(.96); }
+        .btn-confirm:disabled { background: rgba(255,255,255,.05); color: var(--text-muted); cursor: default; }
+
+        /* VİDEO VE MEDYA BİLEŞENLERİ */
+        .media-container { margin: 15px 0 10px 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); background: #000; position: relative; }
+        .media-container img { width: 100%; display: block; max-height: 350px; object-fit: contain; cursor: pointer; }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
+        .video-wrapper video, .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; outline: none; background: #000; }
+        
+        /* TAM EKRAN TETİKLEYİCİ BUTON */
+        .btn-fs-trigger { display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255,255,255,0.05); color: var(--primary); padding: 12px; border-radius: 12px; font-weight: 900; font-size: 12px; border: 1px solid var(--border); margin-bottom: 25px; transition: 0.2s; cursor: pointer; width: 100%; }
+        .btn-fs-trigger:active { background: var(--primary-glow); transform: scale(0.98); }
+
+        .btn-ext-link { display: flex; align-items: center; justify-content: center; gap: 10px; background: rgba(255,255,255,0.05); color: var(--primary); padding: 16px; border-radius: 12px; text-decoration: none; font-weight: 900; font-size: 13px; border: 1px solid var(--border); transition: 0.2s; margin-bottom: 20px; }
+        .bayram-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255, 215, 0, 0.15); color: #FFD700; padding: 6px 12px; border-radius: 50px; font-size: 10px; font-weight: 900; letter-spacing: 1px; margin-bottom: 15px; border: 1px solid rgba(255, 215, 0, 0.3); }
+
+        /* ONAY MODALI */
+        #toast, .modal-overlay { position: fixed; display: none; }
+        .modal-overlay { top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.96); backdrop-filter: blur(12px); align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+        .modal-box { background: var(--surface-container); border: 1px solid var(--primary); width: 100%; max-width: 340px; border-radius: 32px; padding: 40px 25px; text-align: center; }
+        .modal-icon { font-size: 48px; color: var(--primary); margin-bottom: 20px; }
+        .modal-box p { font-size: 15px; line-height: 1.6; color: #fff; margin-bottom: 30px; }
+        .modal-box b { color: var(--primary); }
+        .modal-actions { display: flex; flex-direction: column; gap: 12px; }
+        .m-btn { width: 100%; cursor: pointer; padding: 18px; border-radius: 16px; border: none; font-size: 14px; font-weight: 900; }
+        .m-yes { background: var(--primary); color: #000; box-shadow: 0 5px 20px var(--primary-glow); }
+        .m-no { background: 0 0; color: var(--text-muted); }
+        #toast { bottom: calc(80px + var(--safe-bottom)); left: 50%; transform: translateX(-50%); padding: 14px 30px; border-radius: 50px; z-index: 10000; font-size: 12px; font-weight: 900; background: var(--primary); color: #000; box-shadow: 0 10px 30px var(--primary-glow); }
+
+        /* YENİ EKLENEN RESİM MODALI (LIGHTBOX) STİLLERİ */
+        .img-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 10005; opacity: 0; transition: opacity 0.3s ease; }
+        .img-modal-overlay.active { display: flex; opacity: 1; }
+        .img-modal-content { max-width: 95%; max-height: 90vh; border-radius: 12px; object-fit: contain; transform: scale(0.9); transition: transform 0.3s ease; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+        .img-modal-overlay.active .img-modal-content { transform: scale(1); }
+        .img-modal-close { position: absolute; top: 25px; right: 25px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); color: var(--primary); width: 45px; height: 45px; border-radius: 50%; font-size: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; z-index: 10006; }
+        .img-modal-close:active { transform: scale(0.9); background: var(--primary-glow); }
+
+        nav, .bottom-nav { position: fixed !important; bottom: 0 !important; width: 100% !important; max-width: 390px !important; z-index: 9900 !important; }
     </style>
-    <script>
-/* Her iki sayfada aynı mesaj türü ve okundu bilgisi kullanılır. */
-window.KodMessageUI = (() => {
-    const paths = {
-        arrow: '<path d="m14 7-5 5 5 5M9 12h12"/>',
-        next: '<path d="m10 7 5 5-5 5"/>',
-        close: '<path d="m6 6 12 12M6 18 18 6"/>',
-        check: '<path d="m5 12 4 4L19 6"/>',
-        double: '<path d="m2 12 4 4L16 6m-4 10L22 6"/>',
-        mail: '<rect x="3" y="5" width="18" height="14" rx="4"/><path d="m4 7 8 6 8-6"/>',
-        note: '<rect x="5" y="3" width="14" height="18" rx="3"/><path d="M9 8h6m-6 4h6m-6 4h3"/>',
-        sparkle: '<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3ZM20 2v4m-2-2h4"/>',
-        expand: '<path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/>',
-        link: '<path d="M14 3h7v7m0-7L10 14m0-9H6a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-4"/>',
-        clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
-        refresh: '<path d="M20 7v5h-5M4 17v-5h5"/><path d="M6 6a8 8 0 0 1 13 3M5 15a8 8 0 0 0 13 3"/>'
+</head>
+<body>
+
+<div id="toast">İŞLEM BAŞARILI</div>
+
+<!-- ONAY MODALI -->
+<div id="confirmModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-icon"><i class="fas fa-shield-halved"></i></div>
+        <p id="modalText">...</p>
+        <div class="modal-actions">
+            <button class="m-btn m-yes" id="finalConfirmBtn">ONAYLIYORUM</button>
+            <button class="m-btn m-no" onclick="closeModal()">İPTAL</button>
+        </div>
+    </div>
+</div>
+
+<!-- YENİ EKLENEN RESİM BÜYÜTME MODALI -->
+<div id="imageLightboxModal" class="img-modal-overlay" onclick="closeImageModal()">
+    <div class="img-modal-close" onclick="closeImageModal()"><i class="fas fa-times"></i></div>
+    <img id="lightboxExpandedImg" class="img-modal-content" src="" alt="Büyütülmüş Medya" onclick="event.stopPropagation()">
+</div>
+
+<div class="app-container" style="display: none;">
+    <header>
+        <a href="guvenlik.html" class="back-btn"><i class="fas fa-arrow-left"></i> GERİ</a>
+        <div style="text-align: right;">
+            <div id="userDisplay" style="font-size: 13px; font-weight: 900; color: var(--primary);">...</div>
+            <div style="font-size: 9px; color: var(--text-muted); font-weight: 700;">KOLART GÜVENLİK</div>
+        </div>
+    </header>
+
+    <main>
+        <div class="section-title"><i class="fas fa-bell" style="color: var(--primary)"></i> TALİMATLAR VE MESAJLAR</div>
+        <div id="msgList">
+            <div style="text-align: center; padding-top: 50px;"><i class="fas fa-circle-notch fa-spin" style="color:var(--primary); font-size: 24px;"></i></div>
+        </div>
+    </main>
+</div>
+
+<script type="module">
+    import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import { getDatabase, ref, onValue, update, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+    const SECURITY_CONFIG = { KEY: "KOLART_SİSTEM_2026_CGA" };
+
+    const decryptAES = (data) => {
+        if(!data) return null;
+        try {
+            const bytes = CryptoJS.AES.decrypt(data, SECURITY_CONFIG.KEY);
+            const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+            return decrypted ? JSON.parse(decrypted) : null;
+        } catch (e) { return null; }
     };
-    const icon = (name) => `<svg class="kod-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || paths.mail}</svg>`;
-    const isCelebration = (msg) => msg && (msg.BYR === true || msg.BYR === 'true');
-    const isRead = (msg) => msg && (msg.is_read === true || msg.is_read === 'true');
-    const getCelebration = (msg) => {
-        const text = String(msg.content || '').toLocaleLowerCase('tr-TR');
-        if (/cumhuriyet|29\s*[.\/-]?\s*ekim/.test(text)) return {tone:'national',label:'29 EKİM',title:'Cumhuriyet Bayramımız kutlu olsun.',wish:'Birlikte nice aydınlık yarınlara.'};
-        if (/30\s*ağustos|zafer bayram/.test(text)) return {tone:'national',label:'30 AĞUSTOS',title:'Zafer Bayramımız kutlu olsun.',wish:'Birlikte nice güzel bayramlara.'};
-        if (/23\s*nisan/.test(text)) return {tone:'national',label:'23 NİSAN',title:'23 Nisan kutlu olsun.',wish:'Geleceğe umutla, birlikte.'};
-        if (/19\s*mayıs/.test(text)) return {tone:'national',label:'19 MAYIS',title:'19 Mayıs kutlu olsun.',wish:'Birlikte nice aydınlık yarınlara.'};
-        if (/ramazan/.test(text)) return {tone:'gold',label:'RAMAZAN BAYRAMI',title:'Bayramınız kutlu olsun.',wish:'Sağlık, huzur ve sevdiklerinizle nice bayramlara.'};
-        if (/kurban/.test(text)) return {tone:'gold',label:'KURBAN BAYRAMI',title:'Bayramınız kutlu olsun.',wish:'Sağlık, huzur ve sevdiklerinizle nice bayramlara.'};
-        return {tone:'gold',label:'BAYRAM KUTLAMASI',title:'Bayramınız kutlu olsun.',wish:'Birlikte nice güzel bayramlara.'};
+
+    const siteID = localStorage.getItem("siteID");
+    const encryptedConfig = localStorage.getItem("siteConfig");
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+    const siteConfig = decryptAES(encryptedConfig);
+
+    if (!siteID || !siteConfig || !currentUser) { 
+        window.location.href = "index.html"; 
+        throw new Error("Güvenlik ihlali: Yetkisiz erişim denemesi!");
+    }
+
+    const app = getApps().find(a => a.name === `siteApp-${siteID}`) || initializeApp(siteConfig, `siteApp-${siteID}`);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+
+    document.getElementById("userDisplay").innerText = currentUser.username.toUpperCase();
+    const userUID = currentUser.username;
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.querySelector('.app-container').style.display = 'flex';
+            loadMessages(); 
+        } else {
+            window.location.href = "index.html";
+        }
+    });
+
+    function loadMessages() {
+        const messagesQuery = query(ref(db, `user_messages/${userUID}`), orderByChild("timestamp"), limitToLast(20));
+
+        onValue(messagesQuery, (snapshot) => {
+            const list = document.getElementById("msgList");
+            list.innerHTML = "";
+            const data = snapshot.val();
+            
+            if (!data) { 
+                list.innerHTML = `<div style="text-align:center; color:var(--text-muted); margin-top:50px; font-weight:800; font-size:12px; letter-spacing:1px;">TALİMAT BULUNMUYOR</div>`; 
+                return; 
+            }
+
+            let delayIndex = 0;
+            
+            Object.keys(data).sort((a,b) => data[b].timestamp - data[a].timestamp).forEach(key => {
+                const msg = data[key];
+                const isBayram = msg.BYR === true;
+                
+                if (isBayram && !msg.is_read) {
+                    update(ref(db, `user_messages/${userUID}/${key}`), { is_read: true, read_at: Date.now() });
+                }
+
+                let displayTime = msg.saat || "";
+                if (msg.timestamp) {
+                    const d = new Date(msg.timestamp);
+                    displayTime = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+                }
+
+                let readTimeDisplay = "";
+                if (msg.is_read && msg.read_at) {
+                    const rd = new Date(msg.read_at);
+                    readTimeDisplay = `${String(rd.getDate()).padStart(2,'0')}.${String(rd.getMonth()+1).padStart(2,'0')}.${rd.getFullYear()} ${String(rd.getHours()).padStart(2,'0')}:${String(rd.getMinutes()).padStart(2,'0')}`;
+                }
+
+                let mediaHtml = "";
+                let mediaType = msg.mediaType || (msg.imageUrl ? 'image' : null);
+                let mediaUrl = msg.mediaUrl || msg.imageUrl;
+                const mediaId = `media-${key}`; // Her medyaya özel ID
+
+                if (mediaUrl && mediaUrl.toLowerCase().includes('.mp4')) {
+                    mediaType = 'video';
+                }
+
+                if (mediaUrl) {
+                    if (mediaType === 'image') {
+                        // DEĞİŞEN KISIM: A etiketi kaldırıldı ve onclick eklendi
+                        mediaHtml = `<div class="media-container" style="margin-bottom: 25px;" onclick="openImageModal('${mediaUrl}')"><img src="${mediaUrl}" alt="Medya" loading="lazy"></div>`;
+                    } else if (mediaType === 'video') {
+                        mediaHtml = `<div class="media-container video-wrapper">
+                                        <video id="${mediaId}" controls preload="metadata" playsinline controlsList="nodownload">
+                                            <source src="${mediaUrl}" type="video/mp4">
+                                        </video>
+                                     </div>
+                                     <button class="btn-fs-trigger" onclick="triggerNativeFullscreen('${mediaId}')">
+                                        <i class="fas fa-expand"></i> TAM EKRAN İZLE
+                                     </button>`;
+                    } else if (mediaType === 'youtube_link') {
+                        mediaHtml = `<div class="media-container video-wrapper">
+                                        <iframe id="${mediaId}" src="${mediaUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                     </div>
+                                     <button class="btn-fs-trigger" onclick="triggerNativeFullscreen('${mediaId}')">
+                                        <i class="fas fa-expand"></i> TAM EKRAN İZLE
+                                     </button>`;
+                    } else {
+                        mediaHtml = `<a href="${mediaUrl}" target="_blank" class="btn-ext-link"><i class="fas fa-external-link-alt"></i> BAĞLANTIYI AÇ VE İNCELE</a>`;
+                    }
+                }
+
+                let textContent = msg.content ? `<div class="content">${msg.content}</div>` : '';
+                let bayramBadgeHtml = isBayram ? `<div class="bayram-badge"><i class="fas fa-star"></i> BAYRAM MESAJI</div>` : '';
+                
+                let actionHtml = "";
+                if (isBayram) {
+                    actionHtml = `<div style="text-align: center; color: #FFD700; font-size: 14px; font-weight: 900; margin-top: 10px; letter-spacing: 1px;"><i class="fas fa-gift"></i> İYİ BAYRAMLAR</div>`;
+                } else {
+                    if (msg.is_read) {
+                        actionHtml = `<button class="btn-confirm" disabled><i class="fas fa-check"></i> ONAYLANDI</button>`;
+                        if (readTimeDisplay) {
+                            actionHtml += `<div style="display: flex; justify-content: flex-end; align-items: center; gap: 5px; margin-top: 15px; font-size: 10px; color: var(--text-muted); font-family: monospace; width: 100%;">
+                                            <i class="fas fa-check-double" style="color: var(--primary);"></i> Onay: ${readTimeDisplay}
+                                          </div>`;
+                        }
+                    } else {
+                        actionHtml = `<button class="btn-confirm" onclick="openModal('${key}', '${msg.from}')">OKUDUM, ANLADIM</button>`;
+                    }
+                }
+
+                const div = document.createElement("div");
+                div.className = `msg-card ${msg.is_read || isBayram ? '' : 'unread'} ${isBayram ? 'bayram-card' : ''}`;
+                div.style.animationDelay = `${delayIndex * 0.1}s`; 
+                
+                div.innerHTML = `
+                    <div class="msg-header">
+                        <div class="sender-info"><i class="fas fa-user-tie"></i> ${msg.from}</div>
+                        <div class="time">${displayTime}</div>
+                    </div>
+                    ${bayramBadgeHtml}
+                    ${textContent}
+                    ${mediaHtml}
+                    ${actionHtml}
+                `;
+                
+                list.appendChild(div);
+                delayIndex++;
+            });
+        });
+    }
+
+    // DOĞRUDAN VİDEO İÇİ TAM EKRAN BUTONUNU TETİKLEYEN FONKSİYON
+    window.triggerNativeFullscreen = (elementId) => {
+        const elem = document.getElementById(elementId);
+        if (!elem) return;
+
+        if (elem.tagName.toLowerCase() === 'video' && elem.webkitEnterFullscreen) {
+            elem.webkitEnterFullscreen();
+            return;
+        }
+
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen().catch(err => console.log("Tam ekran hatası:", err));
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+        }
     };
-    const emblem = '<svg viewBox="0 0 120 100" fill="currentColor" aria-hidden="true"><path d="M71 17a35 35 0 1 0 0 66 29 29 0 1 1 0-66Z"/><path d="m83 29 4.9 14.5 15.3.2-12.3 9.1 4.6 14.6L83 58.5l-12.5 8.9 4.6-14.6-12.3-9.1 15.3-.2Z"/></svg>';
-    const formatDate = (msg) => {
-        const value = Number(msg.timestamp);
-        if (!value || !Number.isFinite(value)) return String(msg.saat || '');
-        const d = new Date(value);
-        if (Number.isNaN(d.getTime())) return String(msg.saat || '');
-        return new Intl.DateTimeFormat('tr-TR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(d);
+
+    // ONAY MODAL FONKSİYONLARI
+    let activeKey = null;
+    window.openModal = (key, sender) => {
+        activeKey = key;
+        const currentPerson = currentUser.username.toUpperCase();
+        document.getElementById("modalText").innerHTML = `<b>${currentPerson}</b>, Yetkili <b>${sender}</b> tarafından gönderilen talimatı okuduğunuzu ve anladığınızı onaylıyor musunuz?`;
+        document.getElementById("confirmModal").style.display = "flex";
     };
-    const safeUrl = (value, image = false) => {
-        if (typeof value !== 'string' || !value.trim()) return '';
-        if (image && /^data:image\/(png|jpe?g|gif|webp);base64,/i.test(value)) return value;
-        try { const u = new URL(value, location.href); return /^https?:$/.test(u.protocol) ? u.href : ''; } catch { return ''; }
+
+    window.closeModal = () => document.getElementById("confirmModal").style.display = "none";
+
+    document.getElementById("finalConfirmBtn").onclick = async () => {
+        await update(ref(db, `user_messages/${userUID}/${activeKey}`), { is_read: true, read_at: Date.now() });
+        closeModal();
+        const t = document.getElementById("toast");
+        t.style.display = "block"; setTimeout(() => t.style.display = "none", 2000);
     };
-    return {icon,isCelebration,isRead,getCelebration,emblem,formatDate,safeUrl};
-})();
+
+    // YENİ EKLENEN: RESİM MODALI (LIGHTBOX) FONKSİYONLARI
+    window.openImageModal = (url) => {
+        const modal = document.getElementById("imageLightboxModal");
+        const img = document.getElementById("lightboxExpandedImg");
+        img.src = url;
+        modal.classList.add("active");
+    };
+
+    window.closeImageModal = () => {
+        const modal = document.getElementById("imageLightboxModal");
+        modal.classList.remove("active");
+        setTimeout(() => { 
+            document.getElementById("lightboxExpandedImg").src = ""; 
+        }, 300); // animasyon bittikten sonra src'yi temizler
+    };
 
 </script>
 
-</head>
-<body>
-    <div id="bootState" class="boot-state" role="status"><div class="spinner" aria-hidden="true"></div>Mesajlarınız hazırlanıyor…</div>
-    <div id="toast" hidden role="status" aria-live="polite">Talimat onayınız kaydedildi.</div>
-    <div id="confirmModal" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="modalText">
-        <section class="modal-box" tabindex="-1">
-            <div class="modal-icon" data-icon="note"></div><h2 id="confirmTitle">Talimatı onayla</h2><p id="modalText"></p>
-            <p id="confirmError" class="confirm-error" role="alert" hidden></p>
-            <div class="modal-actions"><button type="button" class="m-btn m-yes" id="finalConfirmBtn">Okudum, anladım ve onaylıyorum</button><button type="button" class="m-btn m-no" id="cancelConfirmBtn">Vazgeç</button></div>
-        </section>
-    </div>
-    <div id="imageLightboxModal" class="img-modal-overlay" hidden role="dialog" aria-modal="true" aria-label="Mesaj görseli">
-        <button type="button" class="img-modal-close" id="closeImageBtn" aria-label="Görseli kapat" data-icon="close"></button><img id="lightboxExpandedImg" class="img-modal-content" alt="Mesaja eklenen görsel">
-    </div>
-    <div class="app-container" hidden>
-        <header><div class="header-brand"><a href="guvenlik.html" class="back-btn" aria-label="Ana sayfaya dön" data-icon="arrow"></a><div><b>KOD<span style="color:var(--primary)">.</span></b><small>MESAJ MERKEZİ</small></div></div><div class="user-block"><strong id="userDisplay">…</strong><small>KOLART GÜVENLİK</small></div></header>
-        <main>
-            <section aria-labelledby="inboxTitle"><div class="eyebrow">SİZİNLE İLETİŞİMDEYİZ</div><h1 id="inboxTitle">Gelen kutunuz.</h1><p class="page-intro">Görevinize dair notlar, önemli talimatlar ve güzel günlerin kutlamaları.</p>
-                <div class="inbox-summary"><div class="summary-copy"><span class="summary-number" id="unreadCount">—</span><div><strong id="summaryTitle">Mesajlar yükleniyor</strong><small id="summaryDetail">Birazdan burada görünecek.</small></div></div><span class="summary-icon" data-icon="mail"></span></div>
-            </section>
-            <div class="filters" role="group" aria-label="Mesaj türü"><button type="button" class="filter active" data-filter="all" aria-pressed="true">Tümü <span class="filter-count" id="allCount">—</span></button><button type="button" class="filter" data-filter="instructions" aria-pressed="false">Talimatlar <span class="filter-count" id="instructionCount">—</span></button><button type="button" class="filter" data-filter="celebrations" aria-pressed="false">Kutlamalar <span class="filter-count" id="celebrationCount">—</span></button></div>
-            <div class="list-heading"><span id="listHeading">ÖNCE OKUNMAYAN TALİMATLAR</span></div><div id="msgList" aria-busy="true"><div class="boot-state"><div class="spinner"></div>Mesajlar alınıyor…</div></div>
-            <button type="button" class="more-button" id="moreMessages" hidden>Daha fazla mesaj göster</button><div class="inbox-footer"><span data-icon="double"></span> KOD · KOLART ONLINE DENETİM</div>
-        </main>
-    </div>
-    <script type="module">
-        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-
-        const ui = window.KodMessageUI;
-        const el = (id) => document.getElementById(id);
-        document.querySelectorAll('[data-icon]').forEach(node => node.innerHTML = ui.icon(node.dataset.icon));
-        const SECURITY_CONFIG = { KEY: "KOLART_SİSTEM_2026_CGA" };
-        const decryptAES = (data) => {
-            if (!data) return null;
-            try { const bytes = CryptoJS.AES.decrypt(data,SECURITY_CONFIG.KEY); const decrypted = bytes.toString(CryptoJS.enc.Utf8); return decrypted ? JSON.parse(decrypted) : null; } catch { return null; }
-        };
-        const siteID = localStorage.getItem('siteID');
-        const siteConfig = decryptAES(localStorage.getItem('siteConfig'));
-        let currentUser = null;
-        try { currentUser = JSON.parse(sessionStorage.getItem('currentUser')); } catch {}
-        if (!siteID || !siteConfig || !currentUser || !currentUser.username) {
-            window.location.href = 'index.html';
-            throw new Error('Oturum bilgileri bulunamadı.');
-        }
-        const app = getApps().find(a => a.name === `siteApp-${siteID}`) || initializeApp(siteConfig,`siteApp-${siteID}`);
-        const db = getDatabase(app), auth = getAuth(app), userUID = currentUser.username;
-        el('userDisplay').textContent = currentUser.username.toLocaleUpperCase('tr-TR');
-
-        let messages = {}, filter = 'all', shownLimit = 20, unsubscribe = null, activeKey = null, confirming = false, modalFocus = null, imageFocus = null, toastTimer = null, hashHandled = false;
-        const cardCache = new Map(), readInFlight = new Set(), readFailed = new Set();
-        const isUnreadInstruction = (msg) => !ui.isCelebration(msg) && !ui.isRead(msg);
-        const observer = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
-            entries.forEach(entry => { if (entry.isIntersecting) { observer.unobserve(entry.target); markCelebrationRead(entry.target.dataset.key); } });
-        },{threshold:.15}) : null;
-
-        onAuthStateChanged(auth,user => {
-            if (!user) { if (unsubscribe) unsubscribe(); location.href = 'index.html'; return; }
-            el('bootState').hidden = true;
-            document.querySelector('.app-container').hidden = false;
-            loadMessages();
-        });
-
-        function loadMessages() {
-            if (unsubscribe) unsubscribe();
-            el('msgList').setAttribute('aria-busy','true');
-            // Ana panelle aynı yol okunur. Eski bir okunmamış talimat, son 20 kaydın dışında kalmaz.
-            unsubscribe = onValue(ref(db,`user_messages/${userUID}`),snapshot => {
-                messages = snapshot.val() || {};
-                el('msgList').setAttribute('aria-busy','false');
-                renderMessages();
-            },error => {
-                el('msgList').setAttribute('aria-busy','false');
-                showEmpty('Mesajlar alınamadı','Bağlantınızı kontrol edip tekrar deneyin.','refresh');
-                const retry = document.createElement('button');retry.type='button';retry.className='more-button';retry.textContent='Tekrar dene';retry.onclick=loadMessages;el('msgList').append(retry);
-                el('summaryTitle').textContent='Bağlantı kurulamadı';el('summaryDetail').textContent=String(error.code || 'Veriler yeniden denenebilir.');el('moreMessages').hidden=true;
-            });
-        }
-        function showEmpty(title,text,icon='mail') {
-            const box=document.createElement('div');box.className='empty-state';box.innerHTML=`<div class="empty-icon">${ui.icon(icon)}</div><h2></h2><p></p>`;box.querySelector('h2').textContent=title;box.querySelector('p').textContent=text;el('msgList').replaceChildren(box);
-        }
-        function renderMessages() {
-            const all=Object.entries(messages).filter(([,msg])=>msg&&typeof msg==='object');
-            const unread=all.filter(([,msg])=>isUnreadInstruction(msg)).length;
-            el('unreadCount').textContent=String(unread).padStart(2,'0');
-            el('summaryTitle').textContent=unread ? 'Onay bekleyen talimat' : 'Her şey güncel';
-            el('summaryDetail').textContent=unread ? 'İncelemeniz için en üstte sıralandı.' : 'Yeni mesajlarınız burada görünecek.';
-            el('allCount').textContent=all.length;el('instructionCount').textContent=all.filter(([,msg])=>!ui.isCelebration(msg)).length;el('celebrationCount').textContent=all.filter(([,msg])=>ui.isCelebration(msg)).length;
-            const selected=all.filter(([,msg])=>filter==='all'||(filter==='celebrations'?ui.isCelebration(msg):!ui.isCelebration(msg)));
-            selected.sort((a,b)=>Number(isUnreadInstruction(b[1]))-Number(isUnreadInstruction(a[1]))||(Number(b[1].timestamp)||0)-(Number(a[1].timestamp)||0));
-            let targetId='';try {targetId=decodeURIComponent(location.hash.slice(1));}catch{}
-            if (!hashHandled && targetId) {const targetIndex=selected.findIndex(([key])=>`mesaj-${key}`===targetId);if(targetIndex>=0)shownLimit=Math.max(shownLimit,targetIndex+1);}
-            const visible=selected.slice(0,Math.max(shownLimit,selected.filter(([,msg])=>isUnreadInstruction(msg)).length));
-            el('listHeading').textContent=filter==='celebrations'?'GÜZEL GÜNLERİN MESAJLARI':unread?'ÖNCE OKUNMAYAN TALİMATLAR':'MESAJLARINIZ';
-            el('moreMessages').hidden=visible.length>=selected.length;
-            const list=el('msgList');
-            if (!visible.length) {showEmpty(filter==='celebrations'?'Henüz kutlama mesajı yok':filter==='instructions'?'Talimat bulunmuyor':'Gelen kutunuz hazır','Size gönderilen mesajlar bu alanda görünecek.',filter==='celebrations'?'sparkle':'mail');return;}
-            list.querySelectorAll('.empty-state,.boot-state,.more-button').forEach(node=>node.remove());
-            const wanted=new Set();let cursor=list.firstElementChild;
-            visible.forEach(([key,msg])=>{
-                const signature=JSON.stringify(ui.isCelebration(msg)?{...msg,is_read:undefined,read_at:undefined}:msg);
-                let cached=cardCache.get(key);
-                if (!cached || cached.signature!==signature) {
-                    const node=createCard(key,msg);
-                    if(cached&&cached.node.parentNode===list){if(cursor===cached.node)cursor=cached.node.nextElementSibling;cached.node.replaceWith(node);}
-                    cached={signature,node};cardCache.set(key,cached);
-                }
-                const node=cached.node;wanted.add(node);
-                if (node===cursor) cursor=cursor.nextElementSibling;
-                else list.insertBefore(node,cursor);
-                if (ui.isCelebration(msg)&&!ui.isRead(msg)&&!readFailed.has(key)) {if(observer)observer.observe(node);else markCelebrationRead(key);}
-            });
-            [...list.children].forEach(node=>{if(!wanted.has(node)){if(observer)observer.unobserve(node);node.remove();}});
-            for(const [key,item] of cardCache)if(!messages[key]){if(observer)observer.unobserve(item.node);cardCache.delete(key);}
-            if (!hashHandled&&targetId) {hashHandled=true;requestAnimationFrame(()=>el(targetId)?.scrollIntoView({block:'start',behavior:'auto'}));}
-        }
-        function createCard(key,msg) {
-            const celebration=ui.isCelebration(msg), read=ui.isRead(msg), card=document.createElement('article');
-            card.id=`mesaj-${key}`;card.dataset.key=key;card.className=`msg-card${!celebration&&!read?' unread':''}${celebration?' bayram-card':''}`;
-            let greeting=null;
-            if(celebration){greeting=ui.getCelebration(msg);card.dataset.tone=greeting.tone;const art=document.createElement('div');art.className='bayram-art';art.innerHTML=`<div class="bayram-art-copy"><div class="bayram-label"></div><h2 class="bayram-title"></h2></div><div class="bayram-emblem">${ui.emblem}</div><span class="bayram-star" aria-hidden="true">✦</span>`;art.querySelector('.bayram-label').textContent=greeting.label;art.querySelector('h2').textContent=greeting.title;card.append(art);}
-            const inner=document.createElement('div');inner.className='card-inner';
-            inner.innerHTML='<div class="msg-header"><div class="sender-avatar" aria-hidden="true"></div><div class="sender-info"><strong></strong><time class="time"></time></div></div>';
-            const sender=String(msg.from||'KOLART GÜVENLİK');inner.querySelector('.sender-avatar').textContent=sender.split(/\s+/).slice(0,2).map(word=>word[0]||'').join('').toLocaleUpperCase('tr-TR');inner.querySelector('.sender-info strong').textContent=sender;inner.querySelector('.time').textContent=ui.formatDate(msg);
-            if(!celebration){const kind=document.createElement('div');kind.className='message-kind';kind.innerHTML=read?`${ui.icon('check')} ONAYLANAN TALİMAT`:'<span class="kind-dot"></span> ONAY BEKLEYEN TALİMAT';inner.append(kind);}
-            if(msg.content){const content=document.createElement('div');content.className='content';content.textContent=String(msg.content);inner.append(content);}
-            appendMedia(inner,key,msg);
-            if(celebration){const footer=document.createElement('div');footer.className='bayram-signoff';footer.innerHTML=ui.icon('sparkle');const text=document.createElement('span');text.textContent=greeting.wish;footer.append(text);inner.append(footer);const error=document.createElement('div');error.className='card-read-error';error.hidden=true;error.setAttribute('role','status');inner.append(error);}
-            else {
-                const button=document.createElement('button');button.type='button';button.className='btn-confirm';button.disabled=read;button.innerHTML=`${ui.icon(read?'double':'check')} ${read?'Okundu ve onaylandı':'Okudum, anladım'}`;if(!read)button.onclick=()=>window.openModal(key,sender);inner.append(button);
-                if(read&&msg.read_at){const time=document.createElement('div');time.className='read-time';time.innerHTML=ui.icon('double');time.append(document.createTextNode(`Onay: ${ui.formatDate({timestamp:msg.read_at})}`));inner.append(time);}
-            }
-            card.append(inner);return card;
-        }
-        function appendMedia(parent,key,msg) {
-            let mediaType=msg.mediaType||(msg.imageUrl?'image':null);
-            const raw=msg.mediaUrl||msg.imageUrl,url=ui.safeUrl(raw,mediaType==='image');if(!url)return;
-            if(/\.mp4(?:[?#]|$)/i.test(url))mediaType='video';
-            const mediaId=`media-${key}`;
-            if(mediaType==='image') {const box=document.createElement('div');box.className='media-container';const button=document.createElement('button');button.type='button';button.className='image-button';button.setAttribute('aria-label','Mesaj görselini büyüt');button.onclick=()=>window.openImageModal(url);const img=document.createElement('img');img.src=url;img.alt='Mesaja eklenen görsel';img.loading='lazy';button.append(img);box.append(button);parent.append(box);}
-            else if(mediaType==='video'||mediaType==='youtube_link') {
-                const box=document.createElement('div');box.className='media-container video-wrapper';const media=document.createElement(mediaType==='video'?'video':'iframe');media.id=mediaId;
-                if(mediaType==='video'){media.controls=true;media.preload='metadata';media.playsInline=true;media.setAttribute('controlsList','nodownload');media.src=url;}
-                else {media.src=url;media.title='Mesaja eklenen video';media.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';media.allowFullscreen=true;media.loading='lazy';}
-                box.append(media);parent.append(box);const full=document.createElement('button');full.type='button';full.className='btn-fs-trigger';full.innerHTML=`${ui.icon('expand')} Tam ekran izle`;full.onclick=()=>window.triggerNativeFullscreen(mediaId);parent.append(full);
-            }else {const link=document.createElement('a');link.href=url;link.target='_blank';link.rel='noopener noreferrer';link.className='btn-ext-link';link.innerHTML=`${ui.icon('link')} Bağlantıyı aç ve incele`;parent.append(link);}
-        }
-        async function markCelebrationRead(key) {
-            const msg=messages[key];if(!ui.isCelebration(msg)||ui.isRead(msg)||readInFlight.has(key))return;
-            readInFlight.add(key);const box=cardCache.get(key)?.node.querySelector('.card-read-error');if(box)box.hidden=true;
-            try {await update(ref(db,`user_messages/${userUID}/${key}`),{is_read:true,read_at:Date.now()});readFailed.delete(key);}
-            catch(error) {readFailed.add(key);if(box){box.replaceChildren(document.createTextNode('Görüldü bilgisi kaydedilemedi. '));const retry=document.createElement('button');retry.className='retry-small';retry.textContent='Tekrar dene';retry.type='button';retry.onclick=()=>markCelebrationRead(key);box.append(retry);box.hidden=false;}}
-            finally {readInFlight.delete(key);}
-        }
-        document.querySelectorAll('[data-filter]').forEach(button=>button.onclick=()=>{
-            filter=button.dataset.filter;shownLimit=20;
-            document.querySelectorAll('[data-filter]').forEach(item=>{const selected=item===button;item.classList.toggle('active',selected);item.setAttribute('aria-pressed',String(selected));});renderMessages();
-        });
-        el('moreMessages').onclick=()=>{shownLimit+=20;renderMessages();};
-
-        window.triggerNativeFullscreen = elementId => {
-            const media=el(elementId);if(!media)return;
-            try {if(media.tagName.toLowerCase()==='video'&&media.webkitEnterFullscreen){media.webkitEnterFullscreen();return;}const request=media.requestFullscreen||media.webkitRequestFullscreen||media.msRequestFullscreen;if(request){const result=request.call(media);if(result?.catch)result.catch(()=>showToast('Tam ekran için videonun kendi düğmesini kullanın.'));}}
-            catch {showToast('Tam ekran için videonun kendi düğmesini kullanın.');}
-        };
-        window.openModal = (key,sender) => {
-            if(!messages[key]||ui.isCelebration(messages[key])||ui.isRead(messages[key]))return;
-            activeKey=key;modalFocus=document.activeElement;el('modalText').replaceChildren();
-            const name=document.createElement('b');name.textContent=currentUser.username.toLocaleUpperCase('tr-TR');const from=document.createElement('b');from.textContent=String(sender||'KOLART GÜVENLİK');
-            el('modalText').append(name,document.createTextNode(', '),from,document.createTextNode(' tarafından gönderilen talimatı okuduğunuzu ve anladığınızı onaylıyor musunuz?'));
-            el('confirmError').hidden=true;el('confirmModal').hidden=false;document.body.classList.add('modal-open');el('confirmModal').querySelector('.modal-box').focus();
-        };
-        window.closeModal = () => {if(confirming)return;el('confirmModal').hidden=true;activeKey=null;document.body.classList.remove('modal-open');if(modalFocus?.isConnected)modalFocus.focus({preventScroll:true});};
-        el('cancelConfirmBtn').onclick=window.closeModal;
-        el('finalConfirmBtn').onclick=async()=>{
-            if(confirming||!activeKey||!messages[activeKey]||ui.isCelebration(messages[activeKey]))return;
-            confirming=true;const key=activeKey,button=el('finalConfirmBtn');button.disabled=true;el('cancelConfirmBtn').disabled=true;button.textContent='Onayınız kaydediliyor…';el('confirmError').hidden=true;
-            try {await update(ref(db,`user_messages/${userUID}/${key}`),{is_read:true,read_at:Date.now()});confirming=false;window.closeModal();showToast('Talimat onayınız kaydedildi.');}
-            catch(error){el('confirmError').textContent=`Onay kaydedilemedi. Bağlantınızı kontrol edip tekrar deneyin. (${error.code||error.message||'Bağlantı hatası'})`;el('confirmError').hidden=false;}
-            finally {confirming=false;button.disabled=false;el('cancelConfirmBtn').disabled=false;button.textContent='Okudum, anladım ve onaylıyorum';}
-        };
-        function showToast(text){if(toastTimer)clearTimeout(toastTimer);el('toast').textContent=text;el('toast').hidden=false;toastTimer=setTimeout(()=>el('toast').hidden=true,2500);}
-        window.openImageModal=url=>{const safe=ui.safeUrl(url,true);if(!safe)return;imageFocus=document.activeElement;el('lightboxExpandedImg').src=safe;el('imageLightboxModal').hidden=false;document.body.classList.add('modal-open');el('closeImageBtn').focus();};
-        window.closeImageModal=()=>{el('imageLightboxModal').hidden=true;el('lightboxExpandedImg').removeAttribute('src');document.body.classList.remove('modal-open');if(imageFocus?.isConnected)imageFocus.focus({preventScroll:true});};
-        el('closeImageBtn').onclick=window.closeImageModal;el('imageLightboxModal').onclick=event=>{if(event.target===el('imageLightboxModal'))window.closeImageModal();};
-        document.addEventListener('keydown',event=>{
-            const imageOpen=!el('imageLightboxModal').hidden,confirmOpen=!el('confirmModal').hidden;if(!imageOpen&&!confirmOpen)return;
-            if(event.key==='Escape'){event.preventDefault();imageOpen?window.closeImageModal():window.closeModal();}
-            if(event.key==='Tab'){const panel=imageOpen?el('imageLightboxModal'):el('confirmModal');const buttons=[...panel.querySelectorAll('button:not(:disabled)')];if(!buttons.length){event.preventDefault();return;}const first=buttons[0],last=buttons[buttons.length-1];if(event.shiftKey&&(document.activeElement===first||!buttons.includes(document.activeElement))){event.preventDefault();last.focus();}else if(!event.shiftKey&&(document.activeElement===last||!buttons.includes(document.activeElement))){event.preventDefault();first.focus();}}
-        });
-    </script>
-    <script src="nav.js"></script>
+<script src="nav.js"></script>
 </body>
 </html>
