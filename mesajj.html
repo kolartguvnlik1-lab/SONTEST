@@ -309,7 +309,7 @@
                 if (isBayram) {
                     const intro = document.createElement('div');
                     intro.className = 'bayram-intro';
-                    intro.innerHTML = `<span class="bayram-emblem" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M5 12h22v6H5zM8 18h16v11H8zM16 12v17M16 12h-6a4 4 0 1 1 4-5l2 5Zm0 0h6a4 4 0 1 0-4-5l-2 5Z"/></svg></span><div><h2>İyi bayramlar</h2><p>Birlikte nice güzel bayramlara.</p></div>`;
+                    intro.innerHTML = `<span class="bayram-emblem" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M5 12h22v6H5zM8 18h16v11H8zM16 12v17M16 12h-6a4 4 0 1 1 4-5l2 5Zm0 0h6a4 4 0 1 0-4-5l-2 5Z"/></svg></span><div><h2>KOD ONLİNE DENETİM</h2><p>Birlikte nice güzel bayramlara.</p></div>`;
                     div.querySelector('.bayram-badge').insertAdjacentElement('afterend', intro);
                     const content = div.querySelector('.content');
                     if (content) content.textContent = String(msg.content || '');
